@@ -1,0 +1,809 @@
+syntax = "proto3";
+
+package fitness_trainer.api.workout;
+
+option go_package = "fitness-trainer/internal/pb/fitness-trainer/api/workout;workout";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Fitness Trainer API"
+    version: "1.0.0"
+    description: "API for fitness Trainer service"
+  };
+  consumes: "application/json"
+  produces: "application/json"
+  schemes: HTTP
+  security_definitions: {
+    security: {
+      key: "Bearer"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "x-access-token"
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "Bearer"
+      value: {}
+    }
+  }
+};
+
+message User {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string email = 3;
+  string first_name = 5;
+  string last_name = 6;
+  google.protobuf.Timestamp date_of_birth = 7;
+  float height = 8;
+  float weight = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+message MuscleGroup {
+  string id = 1;
+  string name = 2;
+}
+
+message Exercise {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string name = 3;
+  string description = 4;
+  string video_url = 5;
+  repeated string target_muscle_groups = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Структура плана тренировки
+message Routine {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string user_id = 3;
+  string name = 4;
+  string description = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// Структура подхода
+message ExerciseInstance {
+  string id = 1;
+  string exercise_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+  string routine_id = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// Структура сета (подхода)
+message Set {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string exercise_instance_id = 3;
+  SetType set_type = 4;
+  int32 reps = 5 [
+    (validate.rules).int32.gt = 0
+  ];
+  float weight = 6 [
+    (validate.rules).float.gt = 0
+  ];
+  google.protobuf.Duration time = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// Структура тренировки
+message Workout {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string user_id = 3;
+  string routine_id = 4;
+  string notes = 5;
+  int32 rating = 6;
+  google.protobuf.Timestamp finished_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// Лог выполнения упражнения
+message ExerciseLog {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string workout_id = 3;
+  string exercise_id = 4;
+  string notes = 5;
+  int32 power_rating = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Лог выполнения подхода
+message SetLog {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string exercise_log_id = 3;
+  int32 reps = 4;
+  float weight = 5;
+  google.protobuf.Duration time = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Перечень типов подходов
+enum SetType {
+  SET_TYPE_UNSPECIFIED = 0;
+  SET_TYPE_REPS = 1;
+  SET_TYPE_WEIGHT = 2;
+  SET_TYPE_TIME = 3;
+}
+
+service ExerciseService {
+  // Метод для получения списка всех упражнений
+  rpc GetExercises(GetExercisesRequest) returns (GetExercisesResponse) {
+    option (google.api.http) = {
+      get: "/v1/exercises"
+    };
+  }
+
+  // Метод для создания нового упражнения
+  rpc CreateExercise(CreateExerciseRequest) returns (ExerciseResponse) {
+    option (google.api.http) = {
+      post: "/v1/exercises"
+      body: "*"
+    };
+  }
+
+  // Метод для получения деталей об упражнении
+  rpc GetExerciseDetail(GetExerciseDetailRequest) returns (ExerciseResponse) {
+    option (google.api.http) = {
+      get: "/v1/exercises/{exercise_id}"
+    };
+  }
+
+  // Метод для получения альтернативных упражнений по exercise_id
+  rpc GetExerciseAlternatives(GetExerciseAlternativesRequest) returns (GetExerciseAlternativesResponse) {
+    option (google.api.http) = {
+      get: "/v1/exercises/{exercise_id}/alternatives"
+    };
+  }
+
+  // Метод для получения истории выполнения упражнения
+  rpc GetExerciseHistory(GetExerciseHistoryRequest) returns (ExerciseHistoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/exercises/{exercise_id}/history"
+    };
+  }
+
+  // Метод для получения списка групп мышц
+  rpc GetMuscleGroups(google.protobuf.Empty) returns (GetMuscleGroupsResponse) {
+    option (google.api.http) = {
+      get: "/v1/muscle_groups"
+    };
+  }
+}
+
+message GetExercisesRequest {
+  repeated string muscle_group_ids = 1;
+  repeated string exclude_exercise_ids = 2;
+}
+
+message GetExercisesResponse {
+  repeated Exercise exercises = 1;
+}
+
+message GetExerciseAlternativesRequest {
+  string exercise_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetExerciseAlternativesResponse {
+  repeated Exercise alternatives = 1;
+}
+
+message GetExerciseDetailRequest {
+  string exercise_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ExerciseResponse {
+  Exercise exercise = 1;
+}
+
+message CreateExerciseRequest {
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string description = 2;
+  string video_url = 3;
+  repeated string target_muscle_group_ids = 4;
+}
+
+message GetMuscleGroupsResponse {
+  repeated MuscleGroup muscle_groups = 1;
+}
+
+message GetExerciseHistoryRequest {
+  string exercise_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ExerciseHistoryResponse {
+  repeated ExerciseLogDetails exercise_logs = 1;
+}
+
+service RoutineService {
+  // Метод для получения списка доступных пользователю рутин
+  rpc GetRoutines(google.protobuf.Empty) returns (RoutineListResponse) {
+    option (google.api.http) = {
+      get: "/v1/routines"
+    };
+  }
+
+  // Создание новой рутины
+  rpc CreateRoutine(CreateRoutineRequest) returns (RoutineResponse) {
+    option (google.api.http) = {
+      post: "/v1/routines"
+      body: "*"
+    };
+  }
+
+  // Получение информации о рутине по ID
+  rpc GetRoutineDetail(GetRoutineDetailRequest) returns (RoutineDetailResponse) {
+    option (google.api.http) = {
+      get: "/v1/routines/{routine_id}"
+    };
+  }
+
+  // Удаление рутины по ID
+  rpc DeleteRoutine(DeleteRoutineRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/routines/{routine_id}"
+    };
+  }
+
+  // Добавление упражнения в рутину
+  rpc AddExerciseToRoutine(AddExerciseToRoutineRequest) returns (RoutineInstanceResponse) {
+    option (google.api.http) = {
+      post: "/v1/routines/{routine_id}/exercises"
+      body: "*"
+    };
+  }
+
+  // Удаление упражнения из рутины
+  rpc RemoveExerciseInstanceFromRoutine(RemoveExerciseInstanceFromRoutineRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}"
+    };
+  }
+
+  // Метод для добавления сета в упражнение
+  rpc AddSetToExerciseInstance(AddSetToExerciseInstanceRequest) returns (SetResponse) {
+    option (google.api.http) = {
+      post: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}/sets"
+      body: "*"
+    };
+  }
+
+  // Метод для обновления сета в упражнении
+  rpc UpdateSetInExerciseInstance(UpdateSetInExerciseInstanceRequest) returns (SetResponse) {
+    option (google.api.http) = {
+      put: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}/sets/{set_id}"
+      body: "*"
+    };
+  }
+
+  // Метод для удаления сета из упражнения
+  rpc RemoveSetFromExerciseInstance(RemoveSetFromExerciseInstanceRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}/sets/{set_id}"
+    };
+  }
+}
+
+message RoutineListResponse {
+  repeated Routine routines = 1;
+}
+
+message CreateRoutineRequest {
+  optional string workout_id = 1;
+  string name = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string description = 3;
+}
+
+message RoutineResponse {
+  Routine routine = 1;
+}
+
+message GetRoutineDetailRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ExerciseInstanceDetailsResponse {
+  ExerciseInstance exercise_instance = 1;
+  Exercise exercise = 2;
+  repeated Set sets = 3;
+}
+
+message RoutineDetailResponse {
+  Routine routine = 1;
+  repeated ExerciseInstanceDetailsResponse exercise_instances = 2;
+}
+
+message ExerciseInstanceResponse {
+  ExerciseInstance exercise_instance = 1;
+}
+
+message RoutineInstanceResponse {
+  ExerciseInstance exercise_instance = 1;
+}
+
+message AddExerciseToRoutineRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteRoutineRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message RemoveExerciseInstanceFromRoutineRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message UpdateExerciseInstanceInRoutineRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  SetType set_type = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 reps = 4 [
+    (validate.rules).int32.gt = 0
+  ];
+  float weight = 5 [
+    (validate.rules).float.gt = 0
+  ];
+  google.protobuf.Duration time = 6;
+}
+
+message AddSetToExerciseInstanceRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  SetType set_type = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 reps = 4 [
+    (validate.rules).int32.gt = 0
+  ];
+  float weight = 5 [
+    (validate.rules).float.gt = 0
+  ];
+  google.protobuf.Duration time = 6;
+}
+
+message UpdateSetInExerciseInstanceRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string set_id = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  SetType set_type = 4 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 reps = 5 [
+    (validate.rules).int32.gt = 0
+  ];
+  float weight = 6 [
+    (validate.rules).float.gt = 0
+  ];
+  google.protobuf.Duration time = 7;
+}
+
+message RemoveSetFromExerciseInstanceRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string set_id = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message SetResponse {
+  Set set = 1;
+}
+
+
+service WorkoutService {  
+  // Метод для начала новой тренировки
+  rpc StartWorkout(StartWorkoutRequest) returns (WorkoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/workouts"
+      body: "*"
+    };
+  }
+
+  // Метод для получения состояния тренировки
+  rpc GetWorkout(GetWorkoutRequest) returns (GetWorkoutResponse) {
+    option (google.api.http) = {
+      get: "/v1/workouts/{workout_id}"
+    };
+  }
+
+  // Метод для получения списка активных тренировок
+  rpc GetActiveWorkouts(google.protobuf.Empty) returns (WorkoutsListResponse) {
+    option (google.api.http) = {
+      get: "/v1/workouts/active"
+    };
+  }
+
+  // Метод для получения списка всех тренировок
+  rpc GetWorkouts(google.protobuf.Empty) returns (WorkoutsListResponse) {
+    option (google.api.http) = {
+      get: "/v1/workouts"
+    };
+  }
+
+  // Метод для создания записи о выполнении упражнения
+  rpc LogExercise(LogExerciseRequest) returns (ExerciseLog) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/log/exercise"
+      body: "*"
+    };
+  }
+
+  // Метод для получения записи о выполнении упражнения
+  rpc GetExerciseLogDetails(GetExerciseLogDetailRequest) returns (ExerciseLogResponse) {
+    option (google.api.http) = {
+      get: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}"
+    };
+  }
+
+  // Удалить запись о выполнении упражнения
+  rpc DeleteExerciseLog(DeleteExerciseLogRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}"
+    };
+  }
+
+  // Метод для создания записи о выполнении подхода
+  rpc LogSet(LogSetRequest) returns (SetLogResponse) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set"
+      body: "*"
+    };
+  }
+
+  // Метод для завершения тренировки
+  rpc CompleteWorkout(CompleteWorkoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/complete"
+      body: "*"
+    };
+  }
+
+  // Метод для получения отчета о тренировке
+  rpc GetWorkoutReport(GetWorkoutReportRequest) returns (WorkoutReportResponse) {
+    option (google.api.http) = {
+      get: "/v1/workouts/{workout_id}/report"
+    };
+  }
+
+  // Метод для установки оценки тренировки
+  rpc RateWorkout(RateWorkoutRequest) returns (WorkoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/rate"
+      body: "*"
+    };
+  }
+
+  // Метод для добавления комментария к тренировке
+  rpc AddCommentToWorkout(AddCommentToWorkoutRequest) returns (WorkoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/comment"
+      body: "*"
+    };
+  }
+}
+
+message StartWorkoutRequest {
+  optional string routine_id = 2;
+}
+
+message GetWorkoutRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message WorkoutsListResponse {
+  repeated Workout workouts = 1;
+}
+
+message ExerciseLogDetails {
+  ExerciseLog exercise_log = 1;
+  Exercise exercise = 2;
+  repeated SetLog set_logs = 3;
+}
+
+message GetWorkoutResponse {
+  Workout workout = 1;
+  repeated ExerciseLogDetails exercise_logs = 2;
+}
+
+message LogExerciseRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetExerciseLogDetailRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteExerciseLogRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message LogSetRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 reps = 3 [
+    (validate.rules).int32.gt = 0
+  ];
+  float weight = 4 [
+    (validate.rules).float.gte = 0
+  ];
+  google.protobuf.Duration time = 5;
+}
+
+message CompleteWorkoutRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetWorkoutReportRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ExerciseLogResponse {
+  ExerciseLogDetails exercise_log_details = 1;
+}
+
+message SetLogResponse {
+  SetLog set_log = 1;
+}
+
+message WorkoutResponse {
+  Workout workout = 1;
+}
+
+message WorkoutReportResponse {
+  message AdditionalInfo {
+    int32 total_sets = 1;
+    int32 total_reps = 2;
+    float total_weight = 3;
+    google.protobuf.Duration total_time = 4;
+  }
+
+  Workout workout = 1;
+  repeated ExerciseLog exercise_logs = 2;
+  AdditionalInfo additional_info = 3;
+}
+
+message RateWorkoutRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 rating = 2 [
+    (validate.rules).int32.gte = 0,
+    (validate.rules).int32.lte = 5
+  ];
+}
+
+message AddCommentToWorkoutRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string comment = 2;
+}
+
+service UserService {
+  // Метод для создания пользователя
+  rpc CreateUser(CreateUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  }
+  
+  // Метод для получения пользователя по ID
+  rpc GetUser(GetUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}"
+    };
+  }
+  
+    // Метод для получения текущего пользователя
+    rpc GetMe(google.protobuf.Empty) returns (UserResponse) {
+      option (google.api.http) = {
+        get: "/v1/users/me"
+      };
+    }
+
+  // Метод для обновления данных пользователя
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      put: "/v1/users"
+      body: "*"
+    };
+  }
+}
+
+message CreateUserRequest {
+  string email = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string.email = true
+  ];
+  string password = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string.min_len = 8
+  ];
+  optional string first_name = 3;
+  optional string last_name = 4;
+  optional google.protobuf.Timestamp date_of_birth = 5;
+  optional float height = 6 [
+    (validate.rules).float.gt = 0
+  ];
+  optional float weight = 7 [
+    (validate.rules).float.gt = 0
+  ];
+}
+
+message GetUserRequest {
+  string user_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message UpdateUserRequest {
+  optional string first_name = 4 [
+    (validate.rules).string.min_len = 1
+  ];
+  optional string last_name = 5 [
+    (validate.rules).string.min_len = 1
+  ];
+  optional google.protobuf.Timestamp date_of_birth = 6;
+  optional float height = 7 [
+    (validate.rules).float.gt = 0
+  ];
+  optional float weight = 8 [
+    (validate.rules).float.gt = 0
+  ];
+}
+
+message DeleteUserRequest {
+  string user_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message UserResponse {
+  User user = 1;
+}
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  rpc Refresh(RefreshRequest) returns (RefreshResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/refresh"
+      body: "*"
+    };
+  }
+
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/auth/logout"
+      body: "*"
+    };
+  }
+}
+
+message TokensPair {
+  string access_token = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string refresh_token = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message LoginRequest {
+  string email = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string password = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message LoginResponse {
+  TokensPair tokens = 1;
+}
+
+message RefreshRequest {
+  TokensPair tokens = 1;
+}
+
+message RefreshResponse {
+  TokensPair tokens = 1;
+}
+
+message LogoutRequest {
+  string refresh_token = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}

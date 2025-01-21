@@ -1,0 +1,2008 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Fitness Trainer API",
+    "description": "API for fitness Trainer service",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "ExerciseService"
+    },
+    {
+      "name": "RoutineService"
+    },
+    {
+      "name": "WorkoutService"
+    },
+    {
+      "name": "UserService"
+    },
+    {
+      "name": "AuthService"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "AuthService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthService_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutLogoutRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthService_Refresh",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRefreshResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutRefreshRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/v1/exercises": {
+      "get": {
+        "summary": "Метод для получения списка всех упражнений",
+        "operationId": "ExerciseService_GetExercises",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutGetExercisesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "muscleGroupIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "excludeExerciseIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ExerciseService"
+        ]
+      },
+      "post": {
+        "summary": "Метод для создания нового упражнения",
+        "operationId": "ExerciseService_CreateExercise",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutExerciseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutCreateExerciseRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ExerciseService"
+        ]
+      }
+    },
+    "/v1/exercises/{exerciseId}": {
+      "get": {
+        "summary": "Метод для получения деталей об упражнении",
+        "operationId": "ExerciseService_GetExerciseDetail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutExerciseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "exerciseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExerciseService"
+        ]
+      }
+    },
+    "/v1/exercises/{exerciseId}/alternatives": {
+      "get": {
+        "summary": "Метод для получения альтернативных упражнений по exercise_id",
+        "operationId": "ExerciseService_GetExerciseAlternatives",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutGetExerciseAlternativesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "exerciseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExerciseService"
+        ]
+      }
+    },
+    "/v1/exercises/{exerciseId}/history": {
+      "get": {
+        "summary": "Метод для получения истории выполнения упражнения",
+        "operationId": "ExerciseService_GetExerciseHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutExerciseHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "exerciseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExerciseService"
+        ]
+      }
+    },
+    "/v1/muscle_groups": {
+      "get": {
+        "summary": "Метод для получения списка групп мышц",
+        "operationId": "ExerciseService_GetMuscleGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutGetMuscleGroupsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ExerciseService"
+        ]
+      }
+    },
+    "/v1/routines": {
+      "get": {
+        "summary": "Метод для получения списка доступных пользователю рутин",
+        "operationId": "RoutineService_GetRoutines",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRoutineListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "RoutineService"
+        ]
+      },
+      "post": {
+        "summary": "Создание новой рутины",
+        "operationId": "RoutineService_CreateRoutine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRoutineResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutCreateRoutineRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/routines/{routineId}": {
+      "get": {
+        "summary": "Получение информации о рутине по ID",
+        "operationId": "RoutineService_GetRoutineDetail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRoutineDetailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      },
+      "delete": {
+        "summary": "Удаление рутины по ID",
+        "operationId": "RoutineService_DeleteRoutine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}": {
+      "delete": {
+        "summary": "Удаление упражнения из рутины",
+        "operationId": "RoutineService_RemoveExerciseInstanceFromRoutine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseInstanceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}/sets": {
+      "post": {
+        "summary": "Метод для добавления сета в упражнение",
+        "operationId": "RoutineService_AddSetToExerciseInstance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutSetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseInstanceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoutineServiceAddSetToExerciseInstanceBody"
+            }
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}/sets/{setId}": {
+      "delete": {
+        "summary": "Метод для удаления сета из упражнения",
+        "operationId": "RoutineService_RemoveSetFromExerciseInstance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseInstanceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "setId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      },
+      "put": {
+        "summary": "Метод для обновления сета в упражнении",
+        "operationId": "RoutineService_UpdateSetInExerciseInstance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutSetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseInstanceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "setId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoutineServiceUpdateSetInExerciseInstanceBody"
+            }
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/routines/{routineId}/exercises": {
+      "post": {
+        "summary": "Добавление упражнения в рутину",
+        "operationId": "RoutineService_AddExerciseToRoutine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRoutineInstanceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoutineServiceAddExerciseToRoutineBody"
+            }
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      }
+    },
+    "/v1/users": {
+      "post": {
+        "summary": "Метод для создания пользователя",
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutCreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "put": {
+        "summary": "Метод для обновления данных пользователя",
+        "operationId": "UserService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutUpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users/me": {
+      "get": {
+        "summary": "Метод для получения текущего пользователя",
+        "operationId": "UserService_GetMe",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users/{userId}": {
+      "get": {
+        "summary": "Метод для получения пользователя по ID",
+        "operationId": "UserService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/workouts": {
+      "get": {
+        "summary": "Метод для получения списка всех тренировок",
+        "operationId": "WorkoutService_GetWorkouts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutsListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "WorkoutService"
+        ]
+      },
+      "post": {
+        "summary": "Метод для начала новой тренировки",
+        "operationId": "WorkoutService_StartWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutStartWorkoutRequest"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/active": {
+      "get": {
+        "summary": "Метод для получения списка активных тренировок",
+        "operationId": "WorkoutService_GetActiveWorkouts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutsListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}": {
+      "get": {
+        "summary": "Метод для получения состояния тренировки",
+        "operationId": "WorkoutService_GetWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutGetWorkoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/comment": {
+      "post": {
+        "summary": "Метод для добавления комментария к тренировке",
+        "operationId": "WorkoutService_AddCommentToWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceAddCommentToWorkoutBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/complete": {
+      "post": {
+        "summary": "Метод для завершения тренировки",
+        "operationId": "WorkoutService_CompleteWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceCompleteWorkoutBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/log/exercise": {
+      "post": {
+        "summary": "Метод для создания записи о выполнении упражнения",
+        "operationId": "WorkoutService_LogExercise",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutExerciseLog"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceLogExerciseBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}": {
+      "get": {
+        "summary": "Метод для получения записи о выполнении упражнения",
+        "operationId": "WorkoutService_GetExerciseLogDetails",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutExerciseLogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      },
+      "delete": {
+        "summary": "Удалить запись о выполнении упражнения",
+        "operationId": "WorkoutService_DeleteExerciseLog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/set": {
+      "post": {
+        "summary": "Метод для создания записи о выполнении подхода",
+        "operationId": "WorkoutService_LogSet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutSetLogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceLogSetBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/rate": {
+      "post": {
+        "summary": "Метод для установки оценки тренировки",
+        "operationId": "WorkoutService_RateWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceRateWorkoutBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
+    "/v1/workouts/{workoutId}/report": {
+      "get": {
+        "summary": "Метод для получения отчета о тренировке",
+        "operationId": "WorkoutService_GetWorkoutReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RoutineServiceAddExerciseToRoutineBody": {
+      "type": "object",
+      "properties": {
+        "exerciseId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "exerciseId"
+      ]
+    },
+    "RoutineServiceAddSetToExerciseInstanceBody": {
+      "type": "object",
+      "properties": {
+        "setType": {
+          "$ref": "#/definitions/workoutSetType"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "setType"
+      ]
+    },
+    "RoutineServiceUpdateSetInExerciseInstanceBody": {
+      "type": "object",
+      "properties": {
+        "setType": {
+          "$ref": "#/definitions/workoutSetType"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "setType"
+      ]
+    },
+    "WorkoutReportResponseAdditionalInfo": {
+      "type": "object",
+      "properties": {
+        "totalSets": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalReps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalWeight": {
+          "type": "number",
+          "format": "float"
+        },
+        "totalTime": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkoutServiceAddCommentToWorkoutBody": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkoutServiceCompleteWorkoutBody": {
+      "type": "object"
+    },
+    "WorkoutServiceLogExerciseBody": {
+      "type": "object",
+      "properties": {
+        "exerciseId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "exerciseId"
+      ]
+    },
+    "WorkoutServiceLogSetBody": {
+      "type": "object",
+      "properties": {
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        }
+      }
+    },
+    "WorkoutServiceRateWorkoutBody": {
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "workoutCreateExerciseRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "videoUrl": {
+          "type": "string"
+        },
+        "targetMuscleGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "workoutCreateRoutineRequest": {
+      "type": "object",
+      "properties": {
+        "workoutId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "workoutCreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "height": {
+          "type": "number",
+          "format": "float"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "workoutExercise": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "videoUrl": {
+          "type": "string"
+        },
+        "targetMuscleGroups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "workoutExerciseHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "exerciseLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExerciseLogDetails"
+          }
+        }
+      }
+    },
+    "workoutExerciseInstance": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "exerciseId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "routineId": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Структура подхода"
+    },
+    "workoutExerciseInstanceDetailsResponse": {
+      "type": "object",
+      "properties": {
+        "exerciseInstance": {
+          "$ref": "#/definitions/workoutExerciseInstance"
+        },
+        "exercise": {
+          "$ref": "#/definitions/workoutExercise"
+        },
+        "sets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutSet"
+          }
+        }
+      }
+    },
+    "workoutExerciseLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "workoutId": {
+          "type": "string"
+        },
+        "exerciseId": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "powerRating": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Лог выполнения упражнения"
+    },
+    "workoutExerciseLogDetails": {
+      "type": "object",
+      "properties": {
+        "exerciseLog": {
+          "$ref": "#/definitions/workoutExerciseLog"
+        },
+        "exercise": {
+          "$ref": "#/definitions/workoutExercise"
+        },
+        "setLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutSetLog"
+          }
+        }
+      }
+    },
+    "workoutExerciseLogResponse": {
+      "type": "object",
+      "properties": {
+        "exerciseLogDetails": {
+          "$ref": "#/definitions/workoutExerciseLogDetails"
+        }
+      }
+    },
+    "workoutExerciseResponse": {
+      "type": "object",
+      "properties": {
+        "exercise": {
+          "$ref": "#/definitions/workoutExercise"
+        }
+      }
+    },
+    "workoutGetExerciseAlternativesResponse": {
+      "type": "object",
+      "properties": {
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExercise"
+          }
+        }
+      }
+    },
+    "workoutGetExercisesResponse": {
+      "type": "object",
+      "properties": {
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExercise"
+          }
+        }
+      }
+    },
+    "workoutGetMuscleGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "muscleGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutMuscleGroup"
+          }
+        }
+      }
+    },
+    "workoutGetWorkoutResponse": {
+      "type": "object",
+      "properties": {
+        "workout": {
+          "$ref": "#/definitions/workoutWorkout"
+        },
+        "exerciseLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExerciseLogDetails"
+          }
+        }
+      }
+    },
+    "workoutLoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "workoutLoginResponse": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "$ref": "#/definitions/workoutTokensPair"
+        }
+      }
+    },
+    "workoutLogoutRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "refreshToken"
+      ]
+    },
+    "workoutMuscleGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "workoutRefreshRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "$ref": "#/definitions/workoutTokensPair"
+        }
+      }
+    },
+    "workoutRefreshResponse": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "$ref": "#/definitions/workoutTokensPair"
+        }
+      }
+    },
+    "workoutRoutine": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Структура плана тренировки"
+    },
+    "workoutRoutineDetailResponse": {
+      "type": "object",
+      "properties": {
+        "routine": {
+          "$ref": "#/definitions/workoutRoutine"
+        },
+        "exerciseInstances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExerciseInstanceDetailsResponse"
+          }
+        }
+      }
+    },
+    "workoutRoutineInstanceResponse": {
+      "type": "object",
+      "properties": {
+        "exerciseInstance": {
+          "$ref": "#/definitions/workoutExerciseInstance"
+        }
+      }
+    },
+    "workoutRoutineListResponse": {
+      "type": "object",
+      "properties": {
+        "routines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutRoutine"
+          }
+        }
+      }
+    },
+    "workoutRoutineResponse": {
+      "type": "object",
+      "properties": {
+        "routine": {
+          "$ref": "#/definitions/workoutRoutine"
+        }
+      }
+    },
+    "workoutSet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exerciseInstanceId": {
+          "type": "string"
+        },
+        "setType": {
+          "$ref": "#/definitions/workoutSetType"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Структура сета (подхода)"
+    },
+    "workoutSetLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exerciseLogId": {
+          "type": "string"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Лог выполнения подхода"
+    },
+    "workoutSetLogResponse": {
+      "type": "object",
+      "properties": {
+        "setLog": {
+          "$ref": "#/definitions/workoutSetLog"
+        }
+      }
+    },
+    "workoutSetResponse": {
+      "type": "object",
+      "properties": {
+        "set": {
+          "$ref": "#/definitions/workoutSet"
+        }
+      }
+    },
+    "workoutSetType": {
+      "type": "string",
+      "enum": [
+        "SET_TYPE_UNSPECIFIED",
+        "SET_TYPE_REPS",
+        "SET_TYPE_WEIGHT",
+        "SET_TYPE_TIME"
+      ],
+      "default": "SET_TYPE_UNSPECIFIED",
+      "title": "Перечень типов подходов"
+    },
+    "workoutStartWorkoutRequest": {
+      "type": "object",
+      "properties": {
+        "routineId": {
+          "type": "string"
+        }
+      }
+    },
+    "workoutTokensPair": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accessToken",
+        "refreshToken"
+      ]
+    },
+    "workoutUpdateUserRequest": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "height": {
+          "type": "number",
+          "format": "float"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "workoutUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "height": {
+          "type": "number",
+          "format": "float"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "workoutUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/workoutUser"
+        }
+      }
+    },
+    "workoutWorkout": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "routineId": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Структура тренировки"
+    },
+    "workoutWorkoutReportResponse": {
+      "type": "object",
+      "properties": {
+        "workout": {
+          "$ref": "#/definitions/workoutWorkout"
+        },
+        "exerciseLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExerciseLog"
+          }
+        },
+        "additionalInfo": {
+          "$ref": "#/definitions/WorkoutReportResponseAdditionalInfo"
+        }
+      }
+    },
+    "workoutWorkoutResponse": {
+      "type": "object",
+      "properties": {
+        "workout": {
+          "$ref": "#/definitions/workoutWorkout"
+        }
+      }
+    },
+    "workoutWorkoutsListResponse": {
+      "type": "object",
+      "properties": {
+        "workouts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutWorkout"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "x-access-token",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}
