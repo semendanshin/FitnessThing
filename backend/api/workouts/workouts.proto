@@ -106,7 +106,7 @@ message Workout {
   string id = 1;
   google.protobuf.Timestamp created_at = 2;
   string user_id = 3;
-  string routine_id = 4;
+  optional string routine_id = 4;
   string notes = 5;
   int32 rating = 6;
   google.protobuf.Timestamp finished_at = 7;
@@ -256,6 +256,14 @@ service RoutineService {
     };
   }
 
+  // Обновление рутины по ID
+  rpc UpdateRoutine(UpdateRoutineRequest) returns (RoutineResponse) {
+    option (google.api.http) = {
+      put: "/v1/routines/{routine_id}"
+      body: "*"
+    };
+  }
+
   // Получение информации о рутине по ID
   rpc GetRoutineDetail(GetRoutineDetailRequest) returns (RoutineDetailResponse) {
     option (google.api.http) = {
@@ -323,6 +331,14 @@ message CreateRoutineRequest {
 
 message RoutineResponse {
   Routine routine = 1;
+}
+
+message UpdateRoutineRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  optional string name = 2;
+  optional string description = 3;
 }
 
 message GetRoutineDetailRequest {
@@ -467,6 +483,13 @@ service WorkoutService {
     };
   }
 
+  // Удалить тренировку
+  rpc DeleteWorkout(DeleteWorkoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/workouts/{workout_id}"
+    };
+  }
+
   // Метод для получения списка активных тренировок
   rpc GetActiveWorkouts(google.protobuf.Empty) returns (WorkoutsListResponse) {
     option (google.api.http) = {
@@ -511,6 +534,21 @@ service WorkoutService {
     };
   }
 
+  // Метод для изменения записи о выполнении подхода
+  rpc UpdateSetLog(UpdateSetLogRequest) returns (SetLogResponse) {
+    option (google.api.http) = {
+      put: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"
+      body: "*"
+    };
+  }
+
+  // Удалить запись о выполнении подхода
+  rpc DeleteSetLog(DeleteSetLogRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"
+    };
+  }
+
   // Метод для завершения тренировки
   rpc CompleteWorkout(CompleteWorkoutRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -548,6 +586,12 @@ message StartWorkoutRequest {
 }
 
 message GetWorkoutRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteWorkoutRequest {
   string workout_id = 1 [
     (google.api.field_behavior) = REQUIRED
   ];
@@ -609,6 +653,40 @@ message LogSetRequest {
     (validate.rules).float.gte = 0
   ];
   google.protobuf.Duration time = 5;
+}
+
+message UpdateSetLogRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string set_id = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  optional SetType set_type = 4 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  optional int32 reps = 5 [
+    (validate.rules).int32.gt = 0
+  ];
+  optional float weight = 6 [
+    (validate.rules).float.gte = 0
+  ];
+  optional google.protobuf.Duration time = 7;
+}
+
+message DeleteSetLogRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string set_id = 3 [
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message CompleteWorkoutRequest {

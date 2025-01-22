@@ -11,7 +11,7 @@ import (
 func (s *Service) GetRoutines(ctx context.Context, userID domain.ID) ([]domain.Routine, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.GetRoutines")
 	defer span.Finish()
-	
+
 	return s.routineRepository.GetRoutines(ctx, userID)
 }
 
@@ -20,7 +20,42 @@ func (s *Service) CreateRoutine(ctx context.Context, dto dto.CreateRoutineDTO) (
 	defer span.Finish()
 
 	routine := domain.NewRoutine(dto.UserID, dto.Name, dto.Description)
-	return s.routineRepository.CreateRoutine(ctx, routine)
+
+	routine, err := s.routineRepository.CreateRoutine(ctx, routine)
+	if err != nil {
+		return domain.Routine{}, err
+	}
+
+	if dto.WorkoutID.IsValid {
+		s.fillRoutineWithWorkout(ctx, routine, dto.WorkoutID.V)
+	}
+
+	return routine, nil
+}
+
+func (s *Service) fillRoutineWithWorkout(ctx context.Context, routine domain.Routine, workoutID domain.ID) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.fillRoutineWithWorkout")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return
+	}
+
+	if routine.UserID != workout.UserID {
+		return
+	}
+
+	exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByWorkoutID(ctx, workoutID)
+	if err != nil {
+		return
+	}
+
+	for _, exerciseLog := range exerciseLogs {
+		s.AddExerciseToRoutine(ctx, routine.ID, exerciseLog.ExerciseID)
+
+		// TODO: add sets and reps
+	}
 }
 
 func (s *Service) GetRoutineByID(ctx context.Context, id domain.ID) (dto.RoutineDetailsDTO, error) {
@@ -53,10 +88,7 @@ func (s *Service) GetRoutineByID(ctx context.Context, id domain.ID) (dto.Routine
 			return dto.RoutineDetailsDTO{}, err
 		}
 
-		// sets, err := s.setRepository.GetSetsByExerciseInstanceID(ctx, instance.ID)
-		// if err != nil {
-		// 	return dto.RoutineDetailsDTO{}, err
-		// }
+		// TODO: add sets
 
 		result.ExerciseInstances[i] = dto.ExerciseInstanceDetailsDTO{
 			ID:         instance.ID,
@@ -99,6 +131,26 @@ func (s *Service) RemoveExerciseInstanceFromRoutine(ctx context.Context, userID 
 func (s *Service) DeleteRoutine(ctx context.Context, id domain.ID) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.DeleteRoutine")
 	defer span.Finish()
-	
+
 	return s.routineRepository.DeleteRoutine(ctx, id)
+}
+
+func (s *Service) UpdateRoutine(ctx context.Context, id domain.ID, dto dto.UpdateRoutineDTO) (domain.Routine, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.UpdateRoutine")
+	defer span.Finish()
+
+	routine, err := s.routineRepository.GetRoutineByID(ctx, id)
+	if err != nil {
+		return domain.Routine{}, err
+	}
+
+	if dto.Name.IsValid {
+		routine.Name = dto.Name.V
+	}
+
+	if dto.Description.IsValid {
+		routine.Description = dto.Description.V
+	}
+
+	return s.routineRepository.UpdateRoutine(ctx, id, routine)
 }

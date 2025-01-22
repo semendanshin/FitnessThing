@@ -326,6 +326,7 @@ var ExerciseService_ServiceDesc = grpc.ServiceDesc{
 const (
 	RoutineService_GetRoutines_FullMethodName                       = "/fitness_trainer.api.workout.RoutineService/GetRoutines"
 	RoutineService_CreateRoutine_FullMethodName                     = "/fitness_trainer.api.workout.RoutineService/CreateRoutine"
+	RoutineService_UpdateRoutine_FullMethodName                     = "/fitness_trainer.api.workout.RoutineService/UpdateRoutine"
 	RoutineService_GetRoutineDetail_FullMethodName                  = "/fitness_trainer.api.workout.RoutineService/GetRoutineDetail"
 	RoutineService_DeleteRoutine_FullMethodName                     = "/fitness_trainer.api.workout.RoutineService/DeleteRoutine"
 	RoutineService_AddExerciseToRoutine_FullMethodName              = "/fitness_trainer.api.workout.RoutineService/AddExerciseToRoutine"
@@ -343,6 +344,8 @@ type RoutineServiceClient interface {
 	GetRoutines(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RoutineListResponse, error)
 	// Создание новой рутины
 	CreateRoutine(ctx context.Context, in *CreateRoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error)
+	// Обновление рутины по ID
+	UpdateRoutine(ctx context.Context, in *UpdateRoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error)
 	// Получение информации о рутине по ID
 	GetRoutineDetail(ctx context.Context, in *GetRoutineDetailRequest, opts ...grpc.CallOption) (*RoutineDetailResponse, error)
 	// Удаление рутины по ID
@@ -381,6 +384,16 @@ func (c *routineServiceClient) CreateRoutine(ctx context.Context, in *CreateRout
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RoutineResponse)
 	err := c.cc.Invoke(ctx, RoutineService_CreateRoutine_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routineServiceClient) UpdateRoutine(ctx context.Context, in *UpdateRoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RoutineResponse)
+	err := c.cc.Invoke(ctx, RoutineService_UpdateRoutine_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -465,6 +478,8 @@ type RoutineServiceServer interface {
 	GetRoutines(context.Context, *emptypb.Empty) (*RoutineListResponse, error)
 	// Создание новой рутины
 	CreateRoutine(context.Context, *CreateRoutineRequest) (*RoutineResponse, error)
+	// Обновление рутины по ID
+	UpdateRoutine(context.Context, *UpdateRoutineRequest) (*RoutineResponse, error)
 	// Получение информации о рутине по ID
 	GetRoutineDetail(context.Context, *GetRoutineDetailRequest) (*RoutineDetailResponse, error)
 	// Удаление рутины по ID
@@ -494,6 +509,9 @@ func (UnimplementedRoutineServiceServer) GetRoutines(context.Context, *emptypb.E
 }
 func (UnimplementedRoutineServiceServer) CreateRoutine(context.Context, *CreateRoutineRequest) (*RoutineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRoutine not implemented")
+}
+func (UnimplementedRoutineServiceServer) UpdateRoutine(context.Context, *UpdateRoutineRequest) (*RoutineResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoutine not implemented")
 }
 func (UnimplementedRoutineServiceServer) GetRoutineDetail(context.Context, *GetRoutineDetailRequest) (*RoutineDetailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoutineDetail not implemented")
@@ -569,6 +587,24 @@ func _RoutineService_CreateRoutine_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RoutineServiceServer).CreateRoutine(ctx, req.(*CreateRoutineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoutineService_UpdateRoutine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRoutineRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutineServiceServer).UpdateRoutine(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutineService_UpdateRoutine_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutineServiceServer).UpdateRoutine(ctx, req.(*UpdateRoutineRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -715,6 +751,10 @@ var RoutineService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RoutineService_CreateRoutine_Handler,
 		},
 		{
+			MethodName: "UpdateRoutine",
+			Handler:    _RoutineService_UpdateRoutine_Handler,
+		},
+		{
 			MethodName: "GetRoutineDetail",
 			Handler:    _RoutineService_GetRoutineDetail_Handler,
 		},
@@ -750,12 +790,15 @@ var RoutineService_ServiceDesc = grpc.ServiceDesc{
 const (
 	WorkoutService_StartWorkout_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/StartWorkout"
 	WorkoutService_GetWorkout_FullMethodName            = "/fitness_trainer.api.workout.WorkoutService/GetWorkout"
+	WorkoutService_DeleteWorkout_FullMethodName         = "/fitness_trainer.api.workout.WorkoutService/DeleteWorkout"
 	WorkoutService_GetActiveWorkouts_FullMethodName     = "/fitness_trainer.api.workout.WorkoutService/GetActiveWorkouts"
 	WorkoutService_GetWorkouts_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/GetWorkouts"
 	WorkoutService_LogExercise_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/LogExercise"
 	WorkoutService_GetExerciseLogDetails_FullMethodName = "/fitness_trainer.api.workout.WorkoutService/GetExerciseLogDetails"
 	WorkoutService_DeleteExerciseLog_FullMethodName     = "/fitness_trainer.api.workout.WorkoutService/DeleteExerciseLog"
 	WorkoutService_LogSet_FullMethodName                = "/fitness_trainer.api.workout.WorkoutService/LogSet"
+	WorkoutService_UpdateSetLog_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/UpdateSetLog"
+	WorkoutService_DeleteSetLog_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/DeleteSetLog"
 	WorkoutService_CompleteWorkout_FullMethodName       = "/fitness_trainer.api.workout.WorkoutService/CompleteWorkout"
 	WorkoutService_GetWorkoutReport_FullMethodName      = "/fitness_trainer.api.workout.WorkoutService/GetWorkoutReport"
 	WorkoutService_RateWorkout_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/RateWorkout"
@@ -770,6 +813,8 @@ type WorkoutServiceClient interface {
 	StartWorkout(ctx context.Context, in *StartWorkoutRequest, opts ...grpc.CallOption) (*WorkoutResponse, error)
 	// Метод для получения состояния тренировки
 	GetWorkout(ctx context.Context, in *GetWorkoutRequest, opts ...grpc.CallOption) (*GetWorkoutResponse, error)
+	// Удалить тренировку
+	DeleteWorkout(ctx context.Context, in *DeleteWorkoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для получения списка активных тренировок
 	GetActiveWorkouts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutsListResponse, error)
 	// Метод для получения списка всех тренировок
@@ -782,6 +827,10 @@ type WorkoutServiceClient interface {
 	DeleteExerciseLog(ctx context.Context, in *DeleteExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для создания записи о выполнении подхода
 	LogSet(ctx context.Context, in *LogSetRequest, opts ...grpc.CallOption) (*SetLogResponse, error)
+	// Метод для изменения записи о выполнении подхода
+	UpdateSetLog(ctx context.Context, in *UpdateSetLogRequest, opts ...grpc.CallOption) (*SetLogResponse, error)
+	// Удалить запись о выполнении подхода
+	DeleteSetLog(ctx context.Context, in *DeleteSetLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для завершения тренировки
 	CompleteWorkout(ctx context.Context, in *CompleteWorkoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для получения отчета о тренировке
@@ -814,6 +863,16 @@ func (c *workoutServiceClient) GetWorkout(ctx context.Context, in *GetWorkoutReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetWorkoutResponse)
 	err := c.cc.Invoke(ctx, WorkoutService_GetWorkout_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workoutServiceClient) DeleteWorkout(ctx context.Context, in *DeleteWorkoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkoutService_DeleteWorkout_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -880,6 +939,26 @@ func (c *workoutServiceClient) LogSet(ctx context.Context, in *LogSetRequest, op
 	return out, nil
 }
 
+func (c *workoutServiceClient) UpdateSetLog(ctx context.Context, in *UpdateSetLogRequest, opts ...grpc.CallOption) (*SetLogResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetLogResponse)
+	err := c.cc.Invoke(ctx, WorkoutService_UpdateSetLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workoutServiceClient) DeleteSetLog(ctx context.Context, in *DeleteSetLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkoutService_DeleteSetLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workoutServiceClient) CompleteWorkout(ctx context.Context, in *CompleteWorkoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -928,6 +1007,8 @@ type WorkoutServiceServer interface {
 	StartWorkout(context.Context, *StartWorkoutRequest) (*WorkoutResponse, error)
 	// Метод для получения состояния тренировки
 	GetWorkout(context.Context, *GetWorkoutRequest) (*GetWorkoutResponse, error)
+	// Удалить тренировку
+	DeleteWorkout(context.Context, *DeleteWorkoutRequest) (*emptypb.Empty, error)
 	// Метод для получения списка активных тренировок
 	GetActiveWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error)
 	// Метод для получения списка всех тренировок
@@ -940,6 +1021,10 @@ type WorkoutServiceServer interface {
 	DeleteExerciseLog(context.Context, *DeleteExerciseLogRequest) (*emptypb.Empty, error)
 	// Метод для создания записи о выполнении подхода
 	LogSet(context.Context, *LogSetRequest) (*SetLogResponse, error)
+	// Метод для изменения записи о выполнении подхода
+	UpdateSetLog(context.Context, *UpdateSetLogRequest) (*SetLogResponse, error)
+	// Удалить запись о выполнении подхода
+	DeleteSetLog(context.Context, *DeleteSetLogRequest) (*emptypb.Empty, error)
 	// Метод для завершения тренировки
 	CompleteWorkout(context.Context, *CompleteWorkoutRequest) (*emptypb.Empty, error)
 	// Метод для получения отчета о тренировке
@@ -964,6 +1049,9 @@ func (UnimplementedWorkoutServiceServer) StartWorkout(context.Context, *StartWor
 func (UnimplementedWorkoutServiceServer) GetWorkout(context.Context, *GetWorkoutRequest) (*GetWorkoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkout not implemented")
 }
+func (UnimplementedWorkoutServiceServer) DeleteWorkout(context.Context, *DeleteWorkoutRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorkout not implemented")
+}
 func (UnimplementedWorkoutServiceServer) GetActiveWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActiveWorkouts not implemented")
 }
@@ -981,6 +1069,12 @@ func (UnimplementedWorkoutServiceServer) DeleteExerciseLog(context.Context, *Del
 }
 func (UnimplementedWorkoutServiceServer) LogSet(context.Context, *LogSetRequest) (*SetLogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogSet not implemented")
+}
+func (UnimplementedWorkoutServiceServer) UpdateSetLog(context.Context, *UpdateSetLogRequest) (*SetLogResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSetLog not implemented")
+}
+func (UnimplementedWorkoutServiceServer) DeleteSetLog(context.Context, *DeleteSetLogRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSetLog not implemented")
 }
 func (UnimplementedWorkoutServiceServer) CompleteWorkout(context.Context, *CompleteWorkoutRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteWorkout not implemented")
@@ -1047,6 +1141,24 @@ func _WorkoutService_GetWorkout_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkoutServiceServer).GetWorkout(ctx, req.(*GetWorkoutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkoutService_DeleteWorkout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteWorkoutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkoutServiceServer).DeleteWorkout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkoutService_DeleteWorkout_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkoutServiceServer).DeleteWorkout(ctx, req.(*DeleteWorkoutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1159,6 +1271,42 @@ func _WorkoutService_LogSet_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkoutService_UpdateSetLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSetLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkoutServiceServer).UpdateSetLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkoutService_UpdateSetLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkoutServiceServer).UpdateSetLog(ctx, req.(*UpdateSetLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkoutService_DeleteSetLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSetLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkoutServiceServer).DeleteSetLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkoutService_DeleteSetLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkoutServiceServer).DeleteSetLog(ctx, req.(*DeleteSetLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkoutService_CompleteWorkout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CompleteWorkoutRequest)
 	if err := dec(in); err != nil {
@@ -1247,6 +1395,10 @@ var WorkoutService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _WorkoutService_GetWorkout_Handler,
 		},
 		{
+			MethodName: "DeleteWorkout",
+			Handler:    _WorkoutService_DeleteWorkout_Handler,
+		},
+		{
 			MethodName: "GetActiveWorkouts",
 			Handler:    _WorkoutService_GetActiveWorkouts_Handler,
 		},
@@ -1269,6 +1421,14 @@ var WorkoutService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LogSet",
 			Handler:    _WorkoutService_LogSet_Handler,
+		},
+		{
+			MethodName: "UpdateSetLog",
+			Handler:    _WorkoutService_UpdateSetLog_Handler,
+		},
+		{
+			MethodName: "DeleteSetLog",
+			Handler:    _WorkoutService_DeleteSetLog_Handler,
 		},
 		{
 			MethodName: "CompleteWorkout",

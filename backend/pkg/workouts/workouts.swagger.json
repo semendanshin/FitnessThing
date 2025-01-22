@@ -434,6 +434,43 @@
         "tags": [
           "RoutineService"
         ]
+      },
+      "put": {
+        "summary": "Обновление рутины по ID",
+        "operationId": "RoutineService_UpdateRoutine",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutRoutineResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RoutineServiceUpdateRoutineBody"
+            }
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
       }
     },
     "/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}": {
@@ -875,6 +912,36 @@
         "tags": [
           "WorkoutService"
         ]
+      },
+      "delete": {
+        "summary": "Удалить тренировку",
+        "operationId": "WorkoutService_DeleteWorkout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
       }
     },
     "/v1/workouts/{workoutId}/comment": {
@@ -1113,6 +1180,99 @@
         ]
       }
     },
+    "/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/set/{setId}": {
+      "delete": {
+        "summary": "Удалить запись о выполнении подхода",
+        "operationId": "WorkoutService_DeleteSetLog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "setId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      },
+      "put": {
+        "summary": "Метод для изменения записи о выполнении подхода",
+        "operationId": "WorkoutService_UpdateSetLog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutSetLogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseLogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "setId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WorkoutServiceUpdateSetLogBody"
+            }
+          }
+        ],
+        "tags": [
+          "WorkoutService"
+        ]
+      }
+    },
     "/v1/workouts/{workoutId}/rate": {
       "post": {
         "summary": "Метод для установки оценки тренировки",
@@ -1218,6 +1378,17 @@
         "setType"
       ]
     },
+    "RoutineServiceUpdateRoutineBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
     "RoutineServiceUpdateSetInExerciseInstanceBody": {
       "type": "object",
       "properties": {
@@ -1306,6 +1477,28 @@
           "format": "int32"
         }
       }
+    },
+    "WorkoutServiceUpdateSetLogBody": {
+      "type": "object",
+      "properties": {
+        "setType": {
+          "$ref": "#/definitions/workoutSetType"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "setType"
+      ]
     },
     "protobufAny": {
       "type": "object",

@@ -13,9 +13,62 @@ import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import { useDisclosure } from "@nextui-org/modal";
+import { DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
+function ExerciseLogCard({
+    exerciseLogDetails,
+    workoutId,
+}: {
+    exerciseLogDetails: WorkoutExerciseLogDetails;
+    workoutId: string;
+}) {
+    return (
+        <Card
+            className="flex flex-row items-center justify-between p-4 cursor-pointer"
+            shadow="sm"
+            fullWidth
+            as={Link}
+            href={`/workouts/${workoutId}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
+        >
+            <div className="flex flex-col items-start justify-between w-full gap-2">
+                <label className="text-lg font-bold">
+                    {exerciseLogDetails.exercise?.name}
+                </label>
+                {exerciseLogDetails.setLogs!.length > 0 && (
+                    <CardBody className="flex flex-col w-full gap-1 p-0">
+                        {exerciseLogDetails.setLogs?.map(
+                            (setLog, setNum) => (
+                                <div
+                                    key={setLog.id}
+                                    className="flex flex-row w-full gap-2"
+                                >
+                                    <div className="text-sm font-semibold w-4">
+                                        {setNum + 1}
+                                    </div>
+                                    <div className="text-sm font-semibold w-fit">
+                                        {setLog?.weight} кг
+                                    </div>
+                                    <div className="text-sm font-semibold w-fit">
+                                        x
+                                    </div>
+                                    <div className="text-sm font-semibold w-fit">
+                                        {setLog?.reps}
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </CardBody>
+                )}
+            </div>
+            <div className="flex flex-col items-center justify-between">
+                <RightArrowIcon className="w-4 h-4" fill="currentColor" />
+            </div>
+        </Card>
+    );
+}
 
 export default function RoutineDetailsPage({
     params,
@@ -127,6 +180,33 @@ export default function RoutineDetailsPage({
         }
     }
 
+    async function onDelete() {
+        setIsLoading(true);
+        try {
+            await authApi.v1
+                .workoutServiceDeleteWorkout(id)
+                .then((response) => {
+                    console.log(response.data);
+                    router.push("/");
+                })
+                .catch((error) => {
+                    console.log(error);
+                    if (
+                        error === errUnauthorized ||
+                        error.response?.status === 401
+                    ) {
+                        router.push("/auth/login");
+                        return;
+                    }
+                    throw error;
+                });
+        } catch (error) {
+            toast.error("Не удалось удалить тренировку");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -146,93 +226,57 @@ export default function RoutineDetailsPage({
         );
     }
 
-    function ExerciseLogCard({
-        exerciseLogDetails,
-    }: {
-        exerciseLogDetails: WorkoutExerciseLogDetails;
-    }) {
-        return (
-            <Card
-                className="flex flex-row items-center justify-between p-2 cursor-pointer"
-                shadow="sm"
-                fullWidth
-                as={Link}
-                href={`/workouts/${id}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
-            >
-                <div className="flex flex-col items-start justify-between p-2 w-full">
-                    <CardHeader className="p-0">
-                        <label className="text-m font-bold">
-                            {exerciseLogDetails.exercise?.name}
-                        </label>
-                    </CardHeader>
-                    {exerciseLogDetails.setLogs!.length > 0 && (
-                        <CardBody className="w-full p-0 py-2">
-                            <div className="grid grid-cols-3 gap-2 w-fit">
-                                {exerciseLogDetails.setLogs?.map(
-                                    (setLog, index) => (
-                                        <div key={index} className="contents">
-                                            <div className="text-sm font-semibold">
-                                                {index + 1}
-                                            </div>
-                                            <div className="text-sm font-semibold">
-                                                {setLog?.weight} кг
-                                            </div>
-                                            <div className="text-sm font-semibold">
-                                                {setLog?.reps} раз
-                                            </div>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        </CardBody>
-                    )}
-                </div>
-                <div className="flex flex-col items-center justify-between p-2">
-                    <RightArrowIcon className="w-4 h-4" fill="currentColor" />
-                </div>
-            </Card>
-        );
-    }
-
     return (
         <>
             <div className="py-4 flex-grow max-w-full">
                 <div className="h-full max-h-full overflow-y-auto gap-4 flex flex-col">
-                    <PageHeader title={"Тренировка"} enableBackButton={true} />
-                    <section className="flex flex-col gap-4 px-4">
-                        <div className="flex flex-col gap-2">
-                            {workoutDetails.exerciseLogs?.map(
-                                (exerciseLogDetails, index) => (
-                                    <ExerciseLogCard
-                                        key={index}
-                                        exerciseLogDetails={exerciseLogDetails}
-                                    />
-                                )
-                            )}
-                            <Card className="p-2">
-                                <Button
-                                    className="w-full"
-                                    onPress={() => {
-                                        onOpen();
-                                    }}
-                                >
-                                    <PlusIcon className="w-5 h-5" />
-                                    <span>Добавить упражнение</span>
-                                </Button>
-                            </Card>
-                        </div>
-                    </section>
-                    <section className="w-full bottom-0 px-4">
-                        <Button
-                            color="secondary"
-                            className="w-full"
-                            onPress={async () => {
-                                await finishWorkout();
-                            }}
+                    <PageHeader title={"Тренировка"} enableBackButton={true}>
+                        <DropdownItem
+                            key="delete"
+                            className="text-danger"
+                            color="danger"
+                            onPress={onDelete}
                         >
-                            Завершить тренировку
-                        </Button>
-                    </section>
+                            Удалить
+                        </DropdownItem>
+                    </PageHeader>
+                    <div className="flex flex-col justify-between h-full">
+                        <section className="flex flex-col gap-4 px-4">
+                            <div className="flex flex-col gap-2">
+                                {workoutDetails.exerciseLogs?.map(
+                                    (exerciseLogDetails, index) => (
+                                        <ExerciseLogCard
+                                            key={index}
+                                            exerciseLogDetails={exerciseLogDetails}
+                                            workoutId={id}
+                                        />
+                                    )
+                                )}
+                                <Card className="p-2">
+                                    <Button
+                                        className="w-full"
+                                        onPress={() => {
+                                            onOpen();
+                                        }}
+                                    >
+                                        <PlusIcon className="w-4 h-4" />
+                                        <span>Добавить упражнение</span>
+                                    </Button>
+                                </Card>
+                            </div>
+                        </section>
+                        <section className="w-full bottom-0 px-4">
+                            <Button
+                                color="primary"
+                                className="w-full"
+                                onPress={async () => {
+                                    await finishWorkout();
+                                }}
+                            >
+                                Завершить тренировку
+                            </Button>
+                        </section>
+                    </div>
                 </div>
             </div>
             <ModalSelectExercise

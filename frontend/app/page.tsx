@@ -131,12 +131,8 @@ export default function Home() {
     useEffect(() => {
         const canvas = document.getElementById("home-bg") as HTMLCanvasElement;
         if (!canvas) return;
-        
-        const animationProcessor = new AnimationProcessor(
-            canvas,
-            400,
-            1
-        );
+
+        const animationProcessor = new AnimationProcessor(canvas, 400, 1);
 
         const updateAnimationDimensions = () => {
             const container = canvas.parentElement?.parentElement;
@@ -144,10 +140,10 @@ export default function Home() {
 
             const width = container.clientWidth;
             const height = container.clientHeight;
-            
+
             // Update center to be in the middle of the container
             animationProcessor.updateCenter(width / 2, height / 2);
-            
+
             // Update radius to be 60% of the smallest dimension
             const radius = Math.min(width, height) * 0.6;
             animationProcessor.updateRadius(radius);
@@ -158,11 +154,11 @@ export default function Home() {
         animationProcessor.start();
 
         // Add resize listener
-        window.addEventListener('resize', updateAnimationDimensions);
+        window.addEventListener("resize", updateAnimationDimensions);
 
         return () => {
             animationProcessor.stop();
-            window.removeEventListener('resize', updateAnimationDimensions);
+            window.removeEventListener("resize", updateAnimationDimensions);
         };
     }, [isLoading]);
 
@@ -269,7 +265,12 @@ export default function Home() {
                 <div className="flex flex-col p-4 max-w-full overflow-x-auto">
                     <div className="flex flex-row gap-4 justify-start w-fit">
                         {routines.map((routine) => (
-                            <Card key={routine.id} className="w-52 h-52">
+                            <Card
+                                key={routine.id}
+                                className="w-52 h-52"
+                                as={Link}
+                                href={`/routines/${routine.id}`}
+                            >
                                 <CardHeader>
                                     <h3 className="text-lg font-bold">
                                         {routine.name}

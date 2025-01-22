@@ -7,7 +7,7 @@ import { PlusIcon, TrashCanIcon } from "@/config/icons";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Form } from "@nextui-org/form";
-import { Input } from "@nextui-org/input";
+import { Input } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { DropdownItem } from "@nextui-org/dropdown";
 import {
@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { PageHeader } from "@/components/page-header";
+import { Divider } from "@nextui-org/divider";
 
 export default function RoutineDetailsPage({
     params,
@@ -132,34 +133,32 @@ export default function RoutineDetailsPage({
         onDelete?: () => void;
     }) {
         return (
-            <Card className="flex flex-row items-center justify-between p-2 h-12">
-                <div className="flex flex-row justify-between w-full items-center gap-2">
-                    <div className="grid grid-cols-3 w-fit gap-4">
-                        <div className="contents">
-                            <div className="text-sm font-semibold w-fit px-2">
-                                {setNum + 1}
-                            </div>
-                            <div className="text-sm font-semibold w-fit">
-                                {setLog?.weight} кг
-                            </div>
-                            <div className="text-sm font-semibold w-fit">
-                                {setLog?.reps} раз
-                            </div>
-                        </div>
+            <Card className="flex flex-row items-center justify-between p-2 w-full">
+                <div className="flex flex-row w-full gap-2 px-2">
+                    <div className="text-sm font-semibold w-4">
+                        {setNum + 1}
                     </div>
-                    {enableDelete && (
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                color="danger"
-                                size="sm"
-                                onPress={onDelete}
-                                isIconOnly
-                            >
-                                <TrashCanIcon className="w-3 h-3" />
-                            </Button>
-                        </div>
-                    )}
+                    <div className="text-sm font-semibold w-fit">
+                        {setLog?.weight} кг
+                    </div>
+                    <div className="text-sm font-semibold w-fit">x</div>
+                    <div className="text-sm font-semibold w-fit">
+                        {setLog?.reps} раз
+                    </div>
                 </div>
+                {enableDelete && (
+                    <div className="flex flex-col">
+                        <Button
+                            color="danger"
+                            size="sm"
+                            onPress={onDelete}
+                            isIconOnly
+                            className="h-fit w-fit min-w-fit p-2"
+                        >
+                            <TrashCanIcon className="w-3 h-3" />
+                        </Button>
+                    </div>
+                )}
             </Card>
         );
     }
@@ -267,9 +266,134 @@ export default function RoutineDetailsPage({
     }
 
     function TodayContent() {
+        const [weight, setWeight] = useState<number>(
+            exerciseLogHistory[0]?.setLogs![0]?.weight!
+        );
+        const [reps, setReps] = useState<number>(
+            exerciseLogHistory[0]?.setLogs![0]?.reps!
+        );
+
+        function IncrementButtons({
+            value,
+            setValue,
+            isSubtract,
+        }: {
+            value: number;
+            setValue: (value: number) => void;
+            isSubtract?: boolean;
+        }) {
+            return (
+                <div className="flex flex-col justify-around p-0">
+                    <Button
+                        onPress={() => {
+                            if (value > 0 && isSubtract) {
+                                setValue(value - 1);
+                                return;
+                            }
+                            if (!isSubtract) {
+                                setValue(value + 1);
+                            }
+                        }}
+                        className="min-w-fit w-fit p-3"
+                        isIconOnly
+                    >
+                        {isSubtract ? "-" : "+"}
+                    </Button>
+                </div>
+            );
+        }
+
+        async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+            event.preventDefault();
+            try {
+                await authApi.v1.workoutServiceLogSet(id, exerciseLogId, {
+                    weight: weight!,
+                    reps: reps!,
+                });
+                await fetchData();
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to add exercises to workout");
+            }
+        }
+
+        async function onDeleteSet(setId: string) {
+            try {
+                await authApi.v1.workoutServiceDeleteSetLog(
+                    id,
+                    exerciseLogId,
+                    setId
+                );
+                await fetchData();
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to delete set");
+            }
+        }
+
         return (
-            <div className="flex flex-col gap-2">
-                <label className="text-xl font-bold">Сеты</label>
+            <div className="flex flex-col gap-4">
+                <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+                    <div className="flex flex-row justify-around gap-4">
+                        <div className="flex flex-col gap-1 w-1/2">
+                            <label>Вес</label>
+                            <div className="flex flex-row gap-2 items-center">
+                                <IncrementButtons
+                                    value={weight}
+                                    setValue={setWeight}
+                                    isSubtract
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="10"
+                                    className="p-0 w-full h-full"
+                                    isRequired
+                                    value={String(weight)}
+                                    onValueChange={(value) =>
+                                        setWeight(Number(value))
+                                    }
+                                />
+                                <IncrementButtons
+                                    value={weight}
+                                    setValue={setWeight}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1 w-1/2">
+                            <label>Повторы</label>
+                            <div className="flex flex-row gap-2 items-center">
+                                <IncrementButtons
+                                    value={reps}
+                                    setValue={setReps}
+                                    isSubtract
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="10"
+                                    className="p-0 w-full h-full"
+                                    isRequired
+                                    value={String(reps)}
+                                    onValueChange={(value) =>
+                                        setReps(Number(value))
+                                    }
+                                />
+                                <IncrementButtons
+                                    value={reps}
+                                    setValue={setReps}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <Button
+                        color="primary"
+                        className="w-full"
+                        type="submit"
+                        size="sm"
+                    >
+                        Добавить
+                    </Button>
+                </Form>
+                <Divider />
                 <div className="flex flex-col gap-2">
                     {exerciseLogDetails.setLogs?.map((setLog, index) => (
                         <SetLogCard
@@ -277,16 +401,10 @@ export default function RoutineDetailsPage({
                             setLog={setLog}
                             setNum={index}
                             enableDelete
-                            onDelete={() => {
-                                console.log("delete set");
-                            }}
+                            onDelete={() => onDeleteSet(setLog.id!)}
                         />
                     ))}
                 </div>
-                <Button className="w-full" color="success" onPress={onOpen}>
-                    <PlusIcon className="w-5 h-5" />
-                    Добавить сет
-                </Button>
             </div>
         );
     }
@@ -294,7 +412,6 @@ export default function RoutineDetailsPage({
     function HistoryContent() {
         return (
             <div className="flex flex-col gap-4">
-                <label className="text-xl font-bold">История</label>
                 <div className="flex flex-col gap-2">
                     {exerciseLogHistory.map(
                         (exerciseLog, index) =>

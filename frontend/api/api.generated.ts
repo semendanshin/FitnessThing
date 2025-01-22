@@ -22,6 +22,11 @@ export interface RoutineServiceAddSetToExerciseInstanceBody {
   time?: string;
 }
 
+export interface RoutineServiceUpdateRoutineBody {
+  name?: string;
+  description?: string;
+}
+
 export interface RoutineServiceUpdateSetInExerciseInstanceBody {
   setType: WorkoutSetType;
   /** @format int32 */
@@ -62,6 +67,15 @@ export interface WorkoutServiceLogSetBody {
 export interface WorkoutServiceRateWorkoutBody {
   /** @format int32 */
   rating?: number;
+}
+
+export interface WorkoutServiceUpdateSetLogBody {
+  setType: WorkoutSetType;
+  /** @format int32 */
+  reps?: number;
+  /** @format float */
+  weight?: number;
+  time?: string;
 }
 
 export interface ProtobufAny {
@@ -750,6 +764,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags RoutineService
+     * @name RoutineServiceUpdateRoutine
+     * @summary Обновление рутины по ID
+     * @request PUT:/v1/routines/{routineId}
+     * @secure
+     */
+    routineServiceUpdateRoutine: (
+      routineId: string,
+      body: RoutineServiceUpdateRoutineBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutRoutineResponse, RpcStatus>({
+        path: `/v1/routines/${routineId}`,
+        method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags RoutineService
      * @name RoutineServiceRemoveExerciseInstanceFromRoutine
      * @summary Удаление упражнения из рутины
      * @request DELETE:/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}
@@ -1020,6 +1058,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags WorkoutService
+     * @name WorkoutServiceDeleteWorkout
+     * @summary Удалить тренировку
+     * @request DELETE:/v1/workouts/{workoutId}
+     * @secure
+     */
+    workoutServiceDeleteWorkout: (workoutId: string, params: RequestParams = {}) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/workouts/${workoutId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags WorkoutService
      * @name WorkoutServiceAddCommentToWorkout
      * @summary Метод для добавления комментария к тренировке
      * @request POST:/v1/workouts/{workoutId}/comment
@@ -1138,6 +1194,50 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<WorkoutSetLogResponse, RpcStatus>({
         path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}/set`,
         method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags WorkoutService
+     * @name WorkoutServiceDeleteSetLog
+     * @summary Удалить запись о выполнении подхода
+     * @request DELETE:/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/set/{setId}
+     * @secure
+     */
+    workoutServiceDeleteSetLog: (workoutId: string, exerciseLogId: string, setId: string, params: RequestParams = {}) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}/set/${setId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags WorkoutService
+     * @name WorkoutServiceUpdateSetLog
+     * @summary Метод для изменения записи о выполнении подхода
+     * @request PUT:/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/set/{setId}
+     * @secure
+     */
+    workoutServiceUpdateSetLog: (
+      workoutId: string,
+      exerciseLogId: string,
+      setId: string,
+      body: WorkoutServiceUpdateSetLogBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutSetLogResponse, RpcStatus>({
+        path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}/set/${setId}`,
+        method: "PUT",
         body: body,
         secure: true,
         type: ContentType.Json,

@@ -260,6 +260,48 @@ func local_request_RoutineService_CreateRoutine_0(ctx context.Context, marshaler
 	return msg, metadata, err
 }
 
+func request_RoutineService_UpdateRoutine_0(ctx context.Context, marshaler runtime.Marshaler, client RoutineServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateRoutineRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["routine_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "routine_id")
+	}
+	protoReq.RoutineId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "routine_id", err)
+	}
+	msg, err := client.UpdateRoutine(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_RoutineService_UpdateRoutine_0(ctx context.Context, marshaler runtime.Marshaler, server RoutineServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateRoutineRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["routine_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "routine_id")
+	}
+	protoReq.RoutineId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "routine_id", err)
+	}
+	msg, err := server.UpdateRoutine(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_RoutineService_GetRoutineDetail_0(ctx context.Context, marshaler runtime.Marshaler, client RoutineServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetRoutineDetailRequest
@@ -686,6 +728,42 @@ func local_request_WorkoutService_GetWorkout_0(ctx context.Context, marshaler ru
 	return msg, metadata, err
 }
 
+func request_WorkoutService_DeleteWorkout_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteWorkoutRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	msg, err := client.DeleteWorkout(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_WorkoutService_DeleteWorkout_0(ctx context.Context, marshaler runtime.Marshaler, server WorkoutServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteWorkoutRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	msg, err := server.DeleteWorkout(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_WorkoutService_GetActiveWorkouts_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq emptypb.Empty
@@ -923,6 +1001,148 @@ func local_request_WorkoutService_LogSet_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
 	}
 	msg, err := server.LogSet(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_WorkoutService_UpdateSetLog_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateSetLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	val, ok = pathParams["set_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "set_id")
+	}
+	protoReq.SetId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "set_id", err)
+	}
+	msg, err := client.UpdateSetLog(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_WorkoutService_UpdateSetLog_0(ctx context.Context, marshaler runtime.Marshaler, server WorkoutServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateSetLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	val, ok = pathParams["set_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "set_id")
+	}
+	protoReq.SetId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "set_id", err)
+	}
+	msg, err := server.UpdateSetLog(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_WorkoutService_DeleteSetLog_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteSetLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	val, ok = pathParams["set_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "set_id")
+	}
+	protoReq.SetId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "set_id", err)
+	}
+	msg, err := client.DeleteSetLog(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_WorkoutService_DeleteSetLog_0(ctx context.Context, marshaler runtime.Marshaler, server WorkoutServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteSetLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	val, ok = pathParams["set_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "set_id")
+	}
+	protoReq.SetId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "set_id", err)
+	}
+	msg, err := server.DeleteSetLog(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -1438,6 +1658,26 @@ func RegisterRoutineServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 		forward_RoutineService_CreateRoutine_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPut, pattern_RoutineService_UpdateRoutine_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.RoutineService/UpdateRoutine", runtime.WithHTTPPathPattern("/v1/routines/{routine_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_RoutineService_UpdateRoutine_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_RoutineService_UpdateRoutine_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodGet, pattern_RoutineService_GetRoutineDetail_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1628,6 +1868,26 @@ func RegisterWorkoutServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 		forward_WorkoutService_GetWorkout_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodDelete, pattern_WorkoutService_DeleteWorkout_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/DeleteWorkout", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_WorkoutService_DeleteWorkout_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_DeleteWorkout_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodGet, pattern_WorkoutService_GetActiveWorkouts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1747,6 +2007,46 @@ func RegisterWorkoutServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 			return
 		}
 		forward_WorkoutService_LogSet_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPut, pattern_WorkoutService_UpdateSetLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/UpdateSetLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_WorkoutService_UpdateSetLog_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_UpdateSetLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_WorkoutService_DeleteSetLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/DeleteSetLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_WorkoutService_DeleteSetLog_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_DeleteSetLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPost, pattern_WorkoutService_CompleteWorkout_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -2221,6 +2521,23 @@ func RegisterRoutineServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 		forward_RoutineService_CreateRoutine_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPut, pattern_RoutineService_UpdateRoutine_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.RoutineService/UpdateRoutine", runtime.WithHTTPPathPattern("/v1/routines/{routine_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RoutineService_UpdateRoutine_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_RoutineService_UpdateRoutine_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodGet, pattern_RoutineService_GetRoutineDetail_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2346,6 +2663,7 @@ func RegisterRoutineServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 var (
 	pattern_RoutineService_GetRoutines_0                       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "routines"}, ""))
 	pattern_RoutineService_CreateRoutine_0                     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "routines"}, ""))
+	pattern_RoutineService_UpdateRoutine_0                     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "routines", "routine_id"}, ""))
 	pattern_RoutineService_GetRoutineDetail_0                  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "routines", "routine_id"}, ""))
 	pattern_RoutineService_DeleteRoutine_0                     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "routines", "routine_id"}, ""))
 	pattern_RoutineService_AddExerciseToRoutine_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "routines", "routine_id", "exercises"}, ""))
@@ -2358,6 +2676,7 @@ var (
 var (
 	forward_RoutineService_GetRoutines_0                       = runtime.ForwardResponseMessage
 	forward_RoutineService_CreateRoutine_0                     = runtime.ForwardResponseMessage
+	forward_RoutineService_UpdateRoutine_0                     = runtime.ForwardResponseMessage
 	forward_RoutineService_GetRoutineDetail_0                  = runtime.ForwardResponseMessage
 	forward_RoutineService_DeleteRoutine_0                     = runtime.ForwardResponseMessage
 	forward_RoutineService_AddExerciseToRoutine_0              = runtime.ForwardResponseMessage
@@ -2436,6 +2755,23 @@ func RegisterWorkoutServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 			return
 		}
 		forward_WorkoutService_GetWorkout_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_WorkoutService_DeleteWorkout_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/DeleteWorkout", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_WorkoutService_DeleteWorkout_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_DeleteWorkout_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodGet, pattern_WorkoutService_GetActiveWorkouts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -2539,6 +2875,40 @@ func RegisterWorkoutServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 		forward_WorkoutService_LogSet_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPut, pattern_WorkoutService_UpdateSetLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/UpdateSetLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_WorkoutService_UpdateSetLog_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_UpdateSetLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_WorkoutService_DeleteSetLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/DeleteSetLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/set/{set_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_WorkoutService_DeleteSetLog_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_DeleteSetLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_WorkoutService_CompleteWorkout_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2613,12 +2983,15 @@ func RegisterWorkoutServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 var (
 	pattern_WorkoutService_StartWorkout_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
 	pattern_WorkoutService_GetWorkout_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
+	pattern_WorkoutService_DeleteWorkout_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
 	pattern_WorkoutService_GetActiveWorkouts_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "workouts", "active"}, ""))
 	pattern_WorkoutService_GetWorkouts_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
 	pattern_WorkoutService_LogExercise_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"v1", "workouts", "workout_id", "log", "exercise"}, ""))
 	pattern_WorkoutService_GetExerciseLogDetails_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
 	pattern_WorkoutService_DeleteExerciseLog_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
 	pattern_WorkoutService_LogSet_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set"}, ""))
+	pattern_WorkoutService_UpdateSetLog_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
+	pattern_WorkoutService_DeleteSetLog_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
 	pattern_WorkoutService_CompleteWorkout_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "complete"}, ""))
 	pattern_WorkoutService_GetWorkoutReport_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "report"}, ""))
 	pattern_WorkoutService_RateWorkout_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "rate"}, ""))
@@ -2628,12 +3001,15 @@ var (
 var (
 	forward_WorkoutService_StartWorkout_0          = runtime.ForwardResponseMessage
 	forward_WorkoutService_GetWorkout_0            = runtime.ForwardResponseMessage
+	forward_WorkoutService_DeleteWorkout_0         = runtime.ForwardResponseMessage
 	forward_WorkoutService_GetActiveWorkouts_0     = runtime.ForwardResponseMessage
 	forward_WorkoutService_GetWorkouts_0           = runtime.ForwardResponseMessage
 	forward_WorkoutService_LogExercise_0           = runtime.ForwardResponseMessage
 	forward_WorkoutService_GetExerciseLogDetails_0 = runtime.ForwardResponseMessage
 	forward_WorkoutService_DeleteExerciseLog_0     = runtime.ForwardResponseMessage
 	forward_WorkoutService_LogSet_0                = runtime.ForwardResponseMessage
+	forward_WorkoutService_UpdateSetLog_0          = runtime.ForwardResponseMessage
+	forward_WorkoutService_DeleteSetLog_0          = runtime.ForwardResponseMessage
 	forward_WorkoutService_CompleteWorkout_0       = runtime.ForwardResponseMessage
 	forward_WorkoutService_GetWorkoutReport_0      = runtime.ForwardResponseMessage
 	forward_WorkoutService_RateWorkout_0           = runtime.ForwardResponseMessage

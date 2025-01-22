@@ -227,29 +227,29 @@ export default function RoutineDetailsPage({
         const [routineDescription, setRoutineDescription] = useState(
             routineDetails.routine?.description
         );
+        const [isButtonLoading, setIsButtonLoading] = useState(false);
 
         async function updateRoutine() {
-            // await authApi.v1
-            //     .fitnessServiceUpdateRoutine(id, {
-            //         name: routineName,
-            //         description: routineDescription,
-            //     })
-            //     .then((response) => {
-            //         console.log(response.data);
-            //         setIsError(false);
-            //         setRoutineDetails(response.data);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //         if (
-            //             error === errUnauthorized ||
-            //             error.response?.status === 401
-            //         ) {
-            //             router.push("/auth/login");
-            //             return;
-            //         }
-            //         setIsError(true);
-            //     });
+            setIsButtonLoading(true);
+            try {
+                await authApi.v1.routineServiceUpdateRoutine(id, {
+                    name: routineName,
+                    description: routineDescription,
+                });
+                await fetchRoutineDetails();
+            } catch (error) {
+                console.log(error);
+                toast.error("Ошибка при обновлении рутины");
+                if (
+                    error === errUnauthorized ||
+                    (error as any).response?.status === 401
+                ) {
+                    router.push("/auth/login");
+                    return;
+                }
+            } finally {
+                setIsButtonLoading(false);
+            }
         }
 
         return (
@@ -270,26 +270,10 @@ export default function RoutineDetailsPage({
 
                             <Form
                                 className="inline-block text-center justify-center w-full max-w-lg p-0"
-                                onSubmit={(e) => {
+                                onSubmit={async (e) => {
                                     e.preventDefault();
-                                    try {
-                                        updateRoutine();
-                                        fetchRoutineDetails();
-                                        onClose();
-                                    } catch (error) {
-                                        console.log(error);
-                                        if (
-                                            error === errUnauthorized ||
-                                            (error as any).response?.status ===
-                                                401
-                                        ) {
-                                            router.push("/auth/login");
-                                            return;
-                                        }
-                                        toast.error(
-                                            "Ошибка при обновлении рутины"
-                                        );
-                                    }
+                                    await updateRoutine();
+                                    onClose();
                                 }}
                             >
                                 <div className="grid grid-cols-1 gap-4 p-2">
@@ -314,7 +298,11 @@ export default function RoutineDetailsPage({
                                             )
                                         }
                                     />
-                                    <Button color="primary" type="submit">
+                                    <Button
+                                        color="primary"
+                                        type="submit"
+                                        isLoading={isButtonLoading}
+                                    >
                                         Сохранить
                                     </Button>
                                 </div>

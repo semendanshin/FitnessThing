@@ -38,6 +38,7 @@ type routineRepository interface {
 	CreateRoutine(ctx context.Context, routine domain.Routine) (domain.Routine, error)
 	GetRoutineByID(ctx context.Context, id domain.ID) (domain.Routine, error)
 	DeleteRoutine(ctx context.Context, id domain.ID) error
+	UpdateRoutine(ctx context.Context, id domain.ID, routine domain.Routine) (domain.Routine, error)
 }
 
 type exerciseInstanceRepository interface {
@@ -56,6 +57,7 @@ type workoutRepository interface {
 	GetWorkoutByID(ctx context.Context, id domain.ID) (domain.Workout, error)
 	GetActiveWorkouts(ctx context.Context, userID domain.ID) ([]domain.Workout, error)
 	UpdateWorkout(ctx context.Context, id domain.ID, workout domain.Workout) (domain.Workout, error)
+	DeleteWorkout(ctx context.Context, id domain.ID) error
 }
 
 type exerciseLogRepository interface {
@@ -63,11 +65,15 @@ type exerciseLogRepository interface {
 	GetExerciseLogByID(ctx context.Context, id domain.ID) (domain.ExerciseLog, error)
 	CreateExerciseLog(ctx context.Context, exerciseLog domain.ExerciseLog) (domain.ExerciseLog, error)
 	GetExerciseLogsByExerciseIDAndUserID(ctx context.Context, exerciseID, userID domain.ID) ([]domain.ExerciseLog, error)
+	DeleteExerciseLog(ctx context.Context, id domain.ID) error
 }
 
 type setLogRepository interface {
 	GetSetLogsByExerciseLogID(ctx context.Context, exerciseLogID domain.ID) ([]domain.ExerciseSetLog, error)
 	CreateSetLog(ctx context.Context, setLog domain.ExerciseSetLog) (domain.ExerciseSetLog, error)
+	GetSetLogByID(ctx context.Context, id domain.ID) (domain.ExerciseSetLog, error)
+	DeleteSetLog(ctx context.Context, id domain.ID) error
+	UpdateSetLog(ctx context.Context, id domain.ID, setLog domain.ExerciseSetLog) (domain.ExerciseSetLog, error)
 }
 
 type Service struct {

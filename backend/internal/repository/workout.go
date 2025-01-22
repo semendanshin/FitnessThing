@@ -141,3 +141,25 @@ func (r *PGXRepository) UpdateWorkout(ctx context.Context, id domain.ID, workout
 
 	return workoutEntity.toDomain(), nil
 }
+
+func (r *PGXRepository) DeleteWorkout(ctx context.Context, id domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.DeleteWorkout")
+	defer span.Finish()
+
+	query := `
+		DELETE FROM workouts
+		WHERE id = $1
+		RETURNING id
+	`
+
+	var workout workoutEntity
+	if err := pgxscan.Get(ctx, r.pool, &workout, query, uuidToPgtype(id)); err != nil {
+		if err == pgx.ErrNoRows {
+			return domain.ErrNotFound
+		}
+		logger.Errorf("failed to delete workout: %v", err)
+		return domain.ErrInternal
+	}
+
+	return nil
+}

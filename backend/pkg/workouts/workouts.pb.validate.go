@@ -1095,8 +1095,6 @@ func (m *Workout) validate(all bool) error {
 
 	// no validation rules for UserId
 
-	// no validation rules for RoutineId
-
 	// no validation rules for Notes
 
 	// no validation rules for Rating
@@ -1157,6 +1155,10 @@ func (m *Workout) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	if m.RoutineId != nil {
+		// no validation rules for RoutineId
 	}
 
 	if len(errors) > 0 {
@@ -3168,6 +3170,118 @@ var _ interface {
 	ErrorName() string
 } = RoutineResponseValidationError{}
 
+// Validate checks the field values on UpdateRoutineRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateRoutineRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateRoutineRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateRoutineRequestMultiError, or nil if none found.
+func (m *UpdateRoutineRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateRoutineRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoutineId
+
+	if m.Name != nil {
+		// no validation rules for Name
+	}
+
+	if m.Description != nil {
+		// no validation rules for Description
+	}
+
+	if len(errors) > 0 {
+		return UpdateRoutineRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateRoutineRequestMultiError is an error wrapping multiple validation
+// errors returned by UpdateRoutineRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateRoutineRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateRoutineRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateRoutineRequestMultiError) AllErrors() []error { return m }
+
+// UpdateRoutineRequestValidationError is the validation error returned by
+// UpdateRoutineRequest.Validate if the designated constraints aren't met.
+type UpdateRoutineRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateRoutineRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateRoutineRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateRoutineRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateRoutineRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateRoutineRequestValidationError) ErrorName() string {
+	return "UpdateRoutineRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateRoutineRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateRoutineRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateRoutineRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateRoutineRequestValidationError{}
+
 // Validate checks the field values on GetRoutineDetailRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -5151,6 +5265,110 @@ var _ interface {
 	ErrorName() string
 } = GetWorkoutRequestValidationError{}
 
+// Validate checks the field values on DeleteWorkoutRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteWorkoutRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteWorkoutRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteWorkoutRequestMultiError, or nil if none found.
+func (m *DeleteWorkoutRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteWorkoutRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WorkoutId
+
+	if len(errors) > 0 {
+		return DeleteWorkoutRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteWorkoutRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteWorkoutRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteWorkoutRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteWorkoutRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteWorkoutRequestMultiError) AllErrors() []error { return m }
+
+// DeleteWorkoutRequestValidationError is the validation error returned by
+// DeleteWorkoutRequest.Validate if the designated constraints aren't met.
+type DeleteWorkoutRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteWorkoutRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteWorkoutRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteWorkoutRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteWorkoutRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteWorkoutRequestValidationError) ErrorName() string {
+	return "DeleteWorkoutRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteWorkoutRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteWorkoutRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteWorkoutRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteWorkoutRequestValidationError{}
+
 // Validate checks the field values on WorkoutsListResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -6119,6 +6337,289 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LogSetRequestValidationError{}
+
+// Validate checks the field values on UpdateSetLogRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateSetLogRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateSetLogRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateSetLogRequestMultiError, or nil if none found.
+func (m *UpdateSetLogRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateSetLogRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WorkoutId
+
+	// no validation rules for ExerciseLogId
+
+	// no validation rules for SetId
+
+	if m.SetType != nil {
+		// no validation rules for SetType
+	}
+
+	if m.Reps != nil {
+
+		if m.GetReps() <= 0 {
+			err := UpdateSetLogRequestValidationError{
+				field:  "Reps",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.Weight != nil {
+
+		if m.GetWeight() < 0 {
+			err := UpdateSetLogRequestValidationError{
+				field:  "Weight",
+				reason: "value must be greater than or equal to 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.Time != nil {
+
+		if all {
+			switch v := interface{}(m.GetTime()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateSetLogRequestValidationError{
+						field:  "Time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateSetLogRequestValidationError{
+						field:  "Time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateSetLogRequestValidationError{
+					field:  "Time",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return UpdateSetLogRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateSetLogRequestMultiError is an error wrapping multiple validation
+// errors returned by UpdateSetLogRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateSetLogRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateSetLogRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateSetLogRequestMultiError) AllErrors() []error { return m }
+
+// UpdateSetLogRequestValidationError is the validation error returned by
+// UpdateSetLogRequest.Validate if the designated constraints aren't met.
+type UpdateSetLogRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateSetLogRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateSetLogRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateSetLogRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateSetLogRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateSetLogRequestValidationError) ErrorName() string {
+	return "UpdateSetLogRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateSetLogRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateSetLogRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateSetLogRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateSetLogRequestValidationError{}
+
+// Validate checks the field values on DeleteSetLogRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteSetLogRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteSetLogRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteSetLogRequestMultiError, or nil if none found.
+func (m *DeleteSetLogRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteSetLogRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WorkoutId
+
+	// no validation rules for ExerciseLogId
+
+	// no validation rules for SetId
+
+	if len(errors) > 0 {
+		return DeleteSetLogRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteSetLogRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteSetLogRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteSetLogRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteSetLogRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteSetLogRequestMultiError) AllErrors() []error { return m }
+
+// DeleteSetLogRequestValidationError is the validation error returned by
+// DeleteSetLogRequest.Validate if the designated constraints aren't met.
+type DeleteSetLogRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteSetLogRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteSetLogRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteSetLogRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteSetLogRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteSetLogRequestValidationError) ErrorName() string {
+	return "DeleteSetLogRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteSetLogRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteSetLogRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteSetLogRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteSetLogRequestValidationError{}
 
 // Validate checks the field values on CompleteWorkoutRequest with the rules
 // defined in the proto definition for this message. If any rules are

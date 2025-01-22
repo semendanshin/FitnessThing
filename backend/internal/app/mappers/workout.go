@@ -20,9 +20,14 @@ func WorkoutsToProto(workouts []domain.Workout) *desc.WorkoutsListResponse {
 }
 
 func WorkoutToProto(workout domain.Workout) *desc.Workout {
+	var routineID *string
+	if workout.RoutineID.IsValid {
+		routineIDValue := workout.RoutineID.V.String()
+		routineID = &routineIDValue
+	}
 	return &desc.Workout{
 		Id:         workout.ID.String(),
-		RoutineId:  workout.RoutineID.V.String(),
+		RoutineId:  routineID,
 		UserId:     workout.UserID.String(),
 		CreatedAt:  timestamppb.New(workout.CreatedAt),
 		Notes:      workout.Notes,

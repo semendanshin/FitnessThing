@@ -136,12 +136,16 @@ export default function RoutineDetailsPage({
     }
 
     function WorkoutResultsDate() {
+        const startDate = new Date(workoutDetails?.workout?.createdAt!);
+        const workoutDuration = new Date(
+            new Date(workoutDetails?.workout?.finishedAt!).getTime() -
+                startDate.getTime()
+        );
+
         return (
             <section className="flex flex-row justify-between items-center">
                 <label className="text-md font-semibold">
-                    {new Date(
-                        workoutDetails?.workout?.createdAt!
-                    ).toLocaleDateString("ru-RU", {
+                    {startDate.toLocaleDateString("ru-RU", {
                         day: "numeric",
                         month: "long",
                         hour: "numeric",
@@ -150,17 +154,10 @@ export default function RoutineDetailsPage({
                 </label>
                 <label className="text-sm">
                     {(() => {
-                        const duration = new Date(
-                            new Date(
-                                workoutDetails?.workout?.finishedAt!
-                            ).getTime() -
-                                new Date(
-                                    workoutDetails?.workout?.createdAt!
-                                ).getTime()
-                        );
-                        const hours = duration.getHours();
-                        const minutes = duration.getMinutes();
-                        return `${hours} часа ${minutes} минут`;
+                        if (workoutDuration.getHours() === 0) {
+                            return `${workoutDuration.getMinutes()} минут`;
+                        }
+                        return `${workoutDuration.getUTCHours()} часа ${workoutDuration.getUTCMinutes()} минут`;
                     })()}
                 </label>
             </section>
@@ -203,6 +200,34 @@ export default function RoutineDetailsPage({
     }
 
     function WorkoutResultsAdditionalInfo() {
+        const totalWeight = workoutDetails?.exerciseLogs?.reduce(
+            (total, exerciseLog) => {
+                return (
+                    total +
+                        exerciseLog.setLogs!.reduce(
+                            (total, setLog) =>
+                                total + setLog.weight! * setLog.reps!,
+                            0
+                        ) || 0
+                );
+            },
+            0
+        );
+
+        const distinctMuscleGroups = [
+            ...new Set(
+                workoutDetails?.exerciseLogs?.reduce(
+                    (muscleGroups, exerciseLog) => {
+                        return [
+                            ...muscleGroups,
+                            ...exerciseLog.exercise?.targetMuscleGroups!,
+                        ];
+                    },
+                    [] as string[]
+                )
+            ),
+        ];
+
         return (
             <section className="flex flex-col gap-2">
                 {/*  список групп мышц */}
@@ -211,19 +236,7 @@ export default function RoutineDetailsPage({
                         <PersonIcon className="w-4 h-4" />
                     </div>
                     <label className="text-sm">
-                        {workoutDetails?.exerciseLogs
-                            ?.reduce((muscleGroups, exerciseLog) => {
-                                return [
-                                    ...muscleGroups,
-                                    ...exerciseLog.exercise
-                                        ?.targetMuscleGroups!,
-                                ];
-                            }, [] as string[])
-                            .filter(
-                                (muscleGroup, index, self) =>
-                                    self.indexOf(muscleGroup) === index
-                            )
-                            .join(", ")}
+                        {distinctMuscleGroups.join(", ")}
                     </label>
                 </div>
                 {/* общий вес упражнений */}
@@ -232,20 +245,7 @@ export default function RoutineDetailsPage({
                         <WeightIcon className="w-3 h-3" />
                     </div>
                     <label className="text-sm">
-                        {workoutDetails?.exerciseLogs?.reduce(
-                            (total, exerciseLog) => {
-                                return (
-                                    total +
-                                        exerciseLog.setLogs!.reduce(
-                                            (total, setLog) =>
-                                                total +
-                                                setLog.weight! * setLog.reps!,
-                                            0
-                                        ) || 0
-                                );
-                            },
-                            0
-                        )}
+                        {totalWeight}
                         {" кг"}
                     </label>
                 </div>
@@ -403,8 +403,11 @@ export default function RoutineDetailsPage({
                 <PageHeader title="Так держать!" />
                 <div className="flex flex-col gap-4 px-4">
                     <WorkoutResultsCard />
+                    {(workoutDetails?.workout?.routineId === undefined ||
+                        workoutDetails?.workout?.routineId === "") && (
+                        <SaveWorkoutAsRoutineCard />
+                    )}
                     <RateWorkoutCard />
-                    <SaveWorkoutAsRoutineCard />
                 </div>
             </div>
             <SaveWorkoutAsRoutineModal />

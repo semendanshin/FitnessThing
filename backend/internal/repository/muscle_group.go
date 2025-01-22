@@ -27,7 +27,7 @@ func (m muscleGroupEntity) toDTO() dto.MuscleGroupDTO {
 func (r *PGXRepository) GetMuscleGroups(ctx context.Context) ([]dto.MuscleGroupDTO, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetMuscleGroups")
 	defer span.Finish()
-	
+
 	query := `
 		SELECT * FROM muscle_groups
 	`
@@ -49,7 +49,7 @@ func (r *PGXRepository) GetMuscleGroups(ctx context.Context) ([]dto.MuscleGroupD
 func (r *PGXRepository) GetMuscleGroupByName(ctx context.Context, name string) (dto.MuscleGroupDTO, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetMuscleGroupByName")
 	defer span.Finish()
-	
+
 	query := `
 		SELECT * FROM muscle_groups
 		WHERE name = $1

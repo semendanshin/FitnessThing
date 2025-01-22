@@ -133,3 +133,20 @@ func (r *PGXRepository) GetExerciseLogsByExerciseIDAndUserID(ctx context.Context
 
 	return exerciseLogs, nil
 }
+
+func (r *PGXRepository) DeleteExerciseLog(ctx context.Context, id domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.DeleteExerciseLog")
+	defer span.Finish()
+
+	query := `
+		DELETE FROM exercise_logs
+		WHERE id = $1
+	`
+
+	_, err := r.pool.Exec(ctx, query, uuidToPgtype(id))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

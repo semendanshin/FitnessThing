@@ -90,3 +90,57 @@ func (r *PGXRepository) CreateSetLog(ctx context.Context, setLog domain.Exercise
 
 	return setLogEntity.toDomain(), nil
 }
+
+func (r *PGXRepository) GetSetLogByID(ctx context.Context, id domain.ID) (domain.ExerciseSetLog, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetSetLogByID")
+	defer span.Finish()
+
+	query := `
+		SELECT id, created_at, exercise_log_id, reps, weight, time, updated_at
+		FROM set_logs
+		WHERE id = $1
+	`
+
+	var setLog setLogEntity
+	if err := pgxscan.Get(ctx, r.pool, &setLog, query, id); err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	return setLog.toDomain(), nil
+}
+
+func (r *PGXRepository) DeleteSetLog(ctx context.Context, id domain.ID) error {	
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.DeleteSetLog")
+	defer span.Finish()
+
+	query := `
+		DELETE FROM set_logs
+		WHERE id = $1
+	`
+
+	_, err := r.pool.Exec(ctx, query, uuidToPgtype(id))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *PGXRepository) UpdateSetLog(ctx context.Context, id domain.ID, setLog domain.ExerciseSetLog) (domain.ExerciseSetLog, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.UpdateSetLog")
+	defer span.Finish()
+
+	query := `
+		UPDATE set_logs
+		SET reps = $2, weight = $3, time = $4, updated_at = $5
+		WHERE id = $1
+		RETURNING *
+	`
+
+	setLogEntity := setLogFromDomain(setLog)
+	if err := pgxscan.Get(ctx, r.pool, &setLogEntity, query, setLogEntity.ID, setLogEntity.Reps, setLogEntity.Weight, setLogEntity.Time, timeToPgtype(setLog.UpdatedAt)); err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	return setLogEntity.toDomain(), nil
+}

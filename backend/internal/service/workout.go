@@ -249,3 +249,171 @@ func (s *Service) CompleteWorkout(ctx context.Context, userID, workoutID domain.
 
 	return nil
 }
+
+func (s *Service) DeleteWorkout(ctx context.Context, userID, workoutID domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.DeleteWorkout")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to delete workout %s", userID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to delete finished workout %s", userID, workoutID)
+		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	err = s.workoutRepository.DeleteWorkout(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.DeleteExerciseLog")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to delete exercise log %s for workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to delete exercise log %s for finished workout %s", userID, exerciseLogID, workoutID)
+		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	exerciseLog, err := s.exerciseLogRepository.GetExerciseLogByID(ctx, exerciseLogID)
+	if err != nil {
+		return err
+	}
+
+	if exerciseLog.WorkoutID != workoutID {
+		logger.Errorf("user %s tried to delete exercise log %s for workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	err = s.exerciseLogRepository.DeleteExerciseLog(ctx, exerciseLogID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteSetLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, setLogID domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.DeleteSetLog")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to delete set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to delete set log %s for exercise log %s in finished workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	exerciseLog, err := s.exerciseLogRepository.GetExerciseLogByID(ctx, exerciseLogID)
+	if err != nil {
+		return err
+	}
+
+	if exerciseLog.WorkoutID != workoutID {
+		logger.Errorf("user %s tried to delete set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	setLog, err := s.setLogRepository.GetSetLogByID(ctx, setLogID)
+	if err != nil {
+		return err
+	}
+
+	if setLog.ExerciseLogID != exerciseLogID {
+		logger.Errorf("user %s tried to delete set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	err = s.setLogRepository.DeleteSetLog(ctx, setLogID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateSetLog(ctx context.Context, userID, workoutID, exerciseLogID, setLogID domain.ID, setlogDTO dto.UpdateSetLogDTO) (domain.ExerciseSetLog, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.UpdateSetLog")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to update set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ExerciseSetLog{}, domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to update set log %s for exercise log %s in finished workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ExerciseSetLog{}, fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	exerciseLog, err := s.exerciseLogRepository.GetExerciseLogByID(ctx, exerciseLogID)
+	if err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	if exerciseLog.WorkoutID != workoutID {
+		logger.Errorf("user %s tried to update set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ExerciseSetLog{}, domain.ErrNotFound
+	}
+
+	setLog, err := s.setLogRepository.GetSetLogByID(ctx, setLogID)
+	if err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	if setLog.ExerciseLogID != exerciseLogID {
+		logger.Errorf("user %s tried to update set log %s for exercise log %s in workout %s", userID, setLogID, exerciseLogID, workoutID)
+		return domain.ExerciseSetLog{}, domain.ErrNotFound
+	}
+
+	if setlogDTO.Reps.IsValid {
+		setLog.Reps = setlogDTO.Reps.V
+	}
+
+	if setlogDTO.Weight.IsValid {
+		setLog.Weight = setlogDTO.Weight.V
+	}
+
+	setLog.UpdatedAt = time.Now()
+
+	setLog, err = s.setLogRepository.UpdateSetLog(ctx, setLogID, setLog)
+	if err != nil {
+		return domain.ExerciseSetLog{}, err
+	}
+
+	return setLog, nil
+}

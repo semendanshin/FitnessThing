@@ -134,3 +134,27 @@ func (r *PGXRepository) DeleteRoutine(ctx context.Context, id domain.ID) error {
 
 	return nil
 }
+
+func (r *PGXRepository) UpdateRoutine(ctx context.Context, id domain.ID, routine domain.Routine) (domain.Routine, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.UpdateRoutine")
+	defer span.Finish()
+
+	query := `
+		UPDATE routines
+		SET name = $2, description = $3
+		WHERE id = $1
+		RETURNING *
+	`
+
+	entity := routineFromDomain(routine)
+	err := pgxscan.Get(ctx, r.pool, &entity, query, entity.ID, entity.Name, entity.Description)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Routine{}, domain.ErrNotFound
+		}
+		logger.Errorf("failed to update routine: %v", err)
+		return domain.Routine{}, err
+	}
+
+	return entity.toDomain(), nil
+}

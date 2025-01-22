@@ -9,6 +9,7 @@ import (
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/domain/dto"
 	"fitness-trainer/internal/logger"
+	"fitness-trainer/internal/utils"
 	desc "fitness-trainer/pkg/workouts"
 
 	"github.com/opentracing/opentracing-go"
@@ -33,6 +34,14 @@ func (i *Implementation) CreateRoutine(ctx context.Context, in *desc.CreateRouti
 
 		dto.Name = in.GetName()
 		dto.Description = in.GetDescription()
+
+		if in.WorkoutId != nil {
+			parsedID, err := domain.ParseID(*in.WorkoutId)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
+			}
+			dto.WorkoutID = utils.NewNullable(parsedID, parsedID != domain.ID{})
+		}
 	}
 
 	routine, err := i.service.CreateRoutine(ctx, dto)
