@@ -11,17 +11,46 @@ import (
 	"github.com/uber/jaeger-lib/metrics/prometheus"
 )
 
-func MustSetup(ctx context.Context, serviceName string) {
-	log.Printf("Initializing tracer for service: %s", serviceName)
+type options struct {
+	ServiceName       string
+	CollectorEndpoint string
+}
+
+type OptFunc func(*options)
+
+func WithServiceName(serviceName string) OptFunc {
+	return func(o *options) {
+		o.ServiceName = serviceName
+	}
+}
+
+func WithCollectorEndpoint(collectorEndpoint string) OptFunc {
+	return func(o *options) {
+		o.CollectorEndpoint = collectorEndpoint
+	}
+}
+
+var defaultOptions = &options{
+	ServiceName:       "service",
+	CollectorEndpoint: "http://localhost:14268/api/traces",
+}
+
+func MustSetup(ctx context.Context, opts ...OptFunc) {
+	o := defaultOptions
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	log.Printf("Initializing tracer for service: %s", o.ServiceName)
 	cfg := traceconfig.Configuration{
-		ServiceName: serviceName,
+		ServiceName: o.ServiceName,
 		Sampler: &traceconfig.SamplerConfig{
 			Type:  "const",
 			Param: 1,
 		},
 		Reporter: &traceconfig.ReporterConfig{
 			// LogSpans: true,
-			CollectorEndpoint: "http://localhost:14268/api/traces",
+			CollectorEndpoint: o.CollectorEndpoint,
 		},
 	}
 

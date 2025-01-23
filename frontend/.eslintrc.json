@@ -27,7 +27,8 @@
     }
   },
   "rules": {
-    "no-console": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "no-console": "off",
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",

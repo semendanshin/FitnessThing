@@ -1,4 +1,4 @@
-import { HomeIcon, ProfileIcon, RoutinesIcon } from "./icons";
+import { HomeIcon, ProfileIcon } from "./icons";
 
 export type SiteConfig = typeof siteConfig;
 

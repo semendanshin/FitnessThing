@@ -1,3 +1,54 @@
 include:
-  - database/db-compose.yaml
-  - jaeger/jaeger-compose.yaml
+    - database/db-compose.yaml
+    - jaeger/jaeger-compose.yaml
+    - nginx/nginx-compose.yaml
+
+services:
+    app:
+        container_name: app
+        build:
+            context: backend
+            dockerfile: Dockerfile
+            target: final
+        env_file:
+            - ./backend/.env.docker
+        expose:
+            - "8080"
+        depends_on:
+            db:
+                condition: service_healthy
+            jaeger:
+                condition: service_started
+            app_init:
+                condition: service_completed_successfully
+
+    app_init:
+        container_name: app_init
+        build:
+            context: backend
+            dockerfile: Dockerfile
+            target: migrate
+        volumes:
+            - ./backend/migrations:/migrations
+        env_file:
+            - ./backend/.env.docker
+        depends_on:
+            - db
+
+    frontend:
+        build:
+            context: frontend
+            dockerfile: Dockerfile
+        expose:
+            - "3000"
+        env_file:
+            - ./frontend/.env.docker
+        depends_on:
+            - app
+    dozzle:
+        container_name: dozzle
+        image: amir20/dozzle:latest
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - "8081:8080"

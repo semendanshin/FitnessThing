@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"os"
 	"time"
@@ -38,20 +39,24 @@ func Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	tracer.MustSetup(ctx, "fitness-trainer")
+	tracer.MustSetup(
+		ctx, 
+		tracer.WithServiceName("fitness-trainer"),
+		tracer.WithCollectorEndpoint(os.Getenv("JAEGER_COLLECTOR_ENDPOINT")),
+	)
 
 	postgresURL := loadPostgresURL()
-	
+
 	pool, err := pgxpool.New(ctx, postgresURL)
 	if err != nil {
 		logger.Fatal(err.Error())
-	}	
+	}
 	defer pool.Close()
-	
+
 	if err := pool.Ping(ctx); err != nil {
 		logger.Fatal(err.Error())
-	}	
-	
+	}
+
 	Repo := repository.NewPGXRepository(pool)
 
 	JWTProvider := jwt.NewProvider(
@@ -82,6 +87,7 @@ func Run() error {
 		Service,
 		Service,
 		Service,
+		app.WithHTTPPathPrefix("/api"),
 	)
 
 	if err := App.Run(ctx); err != nil {

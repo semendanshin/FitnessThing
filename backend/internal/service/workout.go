@@ -417,3 +417,61 @@ func (s *Service) UpdateSetLog(ctx context.Context, userID, workoutID, exerciseL
 
 	return setLog, nil
 }
+
+func (s *Service) RateWorkout(ctx context.Context, userID, workoutID domain.ID, rating int) (domain.Workout, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.RateWorkout")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return domain.Workout{}, err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to rate workout %s", userID, workoutID)
+		return domain.Workout{}, domain.ErrNotFound
+	}
+
+	if workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to rate unfinished workout %s", userID, workoutID)
+		return domain.Workout{}, fmt.Errorf("%w: workout %s is not finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	workout.Rating = rating
+
+	workout, err = s.workoutRepository.UpdateWorkout(ctx, workoutID, workout)
+	if err != nil {
+		return domain.Workout{}, err
+	}
+
+	return workout, nil
+}
+
+func (s *Service) AddCommentToWorkout(ctx context.Context, userID, workoutID domain.ID, comment string) (domain.Workout, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.AddCommentToWorkout")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return domain.Workout{}, err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to add comment to workout %s", userID, workoutID)
+		return domain.Workout{}, domain.ErrNotFound
+	}
+
+	if workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to add comment to unfinished workout %s", userID, workoutID)
+		return domain.Workout{}, fmt.Errorf("%w: workout %s is not finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	workout.Notes = comment
+
+	workout, err = s.workoutRepository.UpdateWorkout(ctx, workoutID, workout)
+	if err != nil {
+		return domain.Workout{}, err
+	}
+
+	return workout, nil
+}

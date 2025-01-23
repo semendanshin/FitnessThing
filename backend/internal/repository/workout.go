@@ -129,12 +129,12 @@ func (r *PGXRepository) UpdateWorkout(ctx context.Context, id domain.ID, workout
 	workoutEntity := workoutFromDomain(workout)
 	query := `
 		UPDATE workouts
-		SET notes = $1, rating = $2, finished_at = $3
+		SET notes = $1, rating = $2, finished_at = $3, updated_at = now()
 		WHERE id = $4
-		RETURNING created_at
+		RETURNING updated_at
 	`
 
-	if err := pgxscan.Get(ctx, r.pool, &workoutEntity.CreatedAt, query, workoutEntity.Notes, workoutEntity.Rating, workoutEntity.FinishedAt, uuidToPgtype(id)); err != nil {
+	if err := pgxscan.Get(ctx, r.pool, &workoutEntity.UpdatedAt, query, workoutEntity.Notes, workoutEntity.Rating, workoutEntity.FinishedAt, uuidToPgtype(id)); err != nil {
 		logger.Errorf("failed to update workout: %v", err)
 		return domain.Workout{}, err
 	}

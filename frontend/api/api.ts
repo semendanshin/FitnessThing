@@ -1,4 +1,4 @@
-import { Api, ApiConfig, RequestParams, WorkoutTokensPair } from "./api.generated";
+import { Api, ApiConfig, WorkoutTokensPair } from "./api.generated";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
@@ -17,12 +17,13 @@ class AuthApi<T = any> extends Api<T> {
         this.config = config;
         // Добавляем interceptor для запросов
         this.instance.interceptors.request.use(
-            
             (config) => {
                 const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
                 if (token) {
                     config.headers[HEADER_AUTHORIZATION] = token;
                 }
+
                 return config;
             },
             (error) => Promise.reject(error)
@@ -44,29 +45,33 @@ class AuthApi<T = any> extends Api<T> {
                         try {
                             const refreshToken =
                                 localStorage.getItem(REFRESH_TOKEN_KEY);
+
                             if (!refreshToken) {
                                 throw new Error("No refresh token");
                             }
 
                             const accessToken =
                                 localStorage.getItem(ACCESS_TOKEN_KEY);
+
                             if (!accessToken) {
                                 throw new Error("No access token");
                             }
 
                             // Создаем временный клиент для обновления токена
                             const tempApi = new Api(config);
-                            const response = await tempApi.v1.authServiceRefresh({
-                                tokens: {
-                                    accessToken,
-                                    refreshToken,
-                                },
-                            });
+                            const response =
+                                await tempApi.v1.authServiceRefresh({
+                                    tokens: {
+                                        accessToken,
+                                        refreshToken,
+                                    },
+                                });
 
                             const tokens = response.data
                                 .tokens as WorkoutTokensPair;
+
                             this.updateTokens(tokens);
-                            
+
                             console.log("Token refreshed, retrying request");
                             originalRequest.headers[HEADER_AUTHORIZATION] =
                                 tokens.accessToken;
@@ -75,11 +80,16 @@ class AuthApi<T = any> extends Api<T> {
                                 cb(tokens.accessToken)
                             );
                             AuthApi.refreshSubscribers = [];
+
                             return this.instance(originalRequest);
                         } catch (refreshError) {
-                            console.log("Failed to refresh token", refreshError);
+                            console.log(
+                                "Failed to refresh token",
+                                refreshError
+                            );
                             localStorage.removeItem(ACCESS_TOKEN_KEY);
                             localStorage.removeItem(REFRESH_TOKEN_KEY);
+
                             return Promise.reject(errUnauthorized);
                         } finally {
                             AuthApi.isRefreshing = false;
@@ -87,12 +97,14 @@ class AuthApi<T = any> extends Api<T> {
                     } else {
                         return new Promise((resolve) => {
                             AuthApi.refreshSubscribers.push((token: string) => {
-                                originalRequest.headers[HEADER_AUTHORIZATION] = token;
+                                originalRequest.headers[HEADER_AUTHORIZATION] =
+                                    token;
                                 resolve(this.instance(originalRequest));
                             });
                         });
                     }
                 }
+
                 return Promise.reject(error);
             }
         );
@@ -105,5 +117,5 @@ class AuthApi<T = any> extends Api<T> {
 }
 
 export const authApi = new AuthApi({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
 });

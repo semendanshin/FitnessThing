@@ -1,16 +1,7 @@
 "use client";
 
-import { authApi, errUnauthorized } from "@/api/api";
-import {
-    WorkoutExerciseLogDetails,
-    WorkoutGetWorkoutResponse,
-} from "@/api/api.generated";
-import { Loading } from "@/components/loading";
-import { PageHeader } from "@/components/page-header";
-import { ModalSelectExercise } from "@/components/pick-exercises-modal";
-import { LeftArrowIcon, PlusIcon, RightArrowIcon } from "@/config/icons";
 import { Button } from "@nextui-org/button";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Card, CardBody } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import { useDisclosure } from "@nextui-org/modal";
 import { DropdownItem } from "@nextui-org/react";
@@ -18,275 +9,268 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+import { ChevronRightIcon, PlusIcon } from "@/config/icons";
+import { ModalSelectExercise } from "@/components/pick-exercises-modal";
+import { PageHeader } from "@/components/page-header";
+import { Loading } from "@/components/loading";
+import {
+  WorkoutExerciseLogDetails,
+  WorkoutGetWorkoutResponse,
+} from "@/api/api.generated";
+import { authApi, errUnauthorized } from "@/api/api";
+
 function ExerciseLogCard({
-    exerciseLogDetails,
-    workoutId,
+  exerciseLogDetails,
+  workoutId,
 }: {
-    exerciseLogDetails: WorkoutExerciseLogDetails;
-    workoutId: string;
+  exerciseLogDetails: WorkoutExerciseLogDetails;
+  workoutId: string;
 }) {
-    return (
-        <Card
-            className="flex flex-row items-center justify-between p-4 cursor-pointer"
-            shadow="sm"
-            fullWidth
-            as={Link}
-            href={`/workouts/${workoutId}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
-        >
-            <div className="flex flex-col items-start justify-between w-full gap-2">
-                <label className="text-lg font-bold">
-                    {exerciseLogDetails.exercise?.name}
-                </label>
-                {exerciseLogDetails.setLogs!.length > 0 && (
-                    <CardBody className="flex flex-col w-full gap-1 p-0">
-                        {exerciseLogDetails.setLogs?.map(
-                            (setLog, setNum) => (
-                                <div
-                                    key={setLog.id}
-                                    className="flex flex-row w-full gap-2"
-                                >
-                                    <div className="text-sm font-semibold w-4">
-                                        {setNum + 1}
-                                    </div>
-                                    <div className="text-sm font-semibold w-fit">
-                                        {setLog?.weight} кг
-                                    </div>
-                                    <div className="text-sm font-semibold w-fit">
-                                        x
-                                    </div>
-                                    <div className="text-sm font-semibold w-fit">
-                                        {setLog?.reps}
-                                    </div>
-                                </div>
-                            )
-                        )}
-                    </CardBody>
-                )}
-            </div>
-            <div className="flex flex-col items-center justify-between">
-                <RightArrowIcon className="w-4 h-4" fill="currentColor" />
-            </div>
-        </Card>
-    );
+  return (
+    <Card
+      fullWidth
+      as={Link}
+      className="flex flex-row items-center justify-between p-4 cursor-pointer"
+      href={`/workouts/${workoutId}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
+      shadow="sm"
+    >
+      <div className="flex flex-col items-start justify-between w-full gap-2">
+        <p className="text-lg font-bold">{exerciseLogDetails.exercise?.name}</p>
+        {exerciseLogDetails.setLogs!.length > 0 && (
+          <CardBody className="flex flex-col w-full gap-1 p-0">
+            {exerciseLogDetails.setLogs?.map((setLog, setNum) => (
+              <div key={setLog.id} className="flex flex-row w-full gap-2">
+                <div className="text-sm font-semibold min-w-fit w-3">
+                  {setNum + 1}.
+                </div>
+                <div className="text-sm font-semibold w-fit">
+                  {setLog?.weight} кг
+                </div>
+                <div className="text-sm font-semibold w-fit">x</div>
+                <div className="text-sm font-semibold w-fit">
+                  {setLog?.reps}
+                </div>
+              </div>
+            ))}
+          </CardBody>
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-between">
+        <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+      </div>
+    </Card>
+  );
 }
 
 export default function RoutineDetailsPage({
-    params,
+  params,
 }: {
-    params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
-    const [workoutDetails, setWorkoutDetails] =
-        useState<WorkoutGetWorkoutResponse>({});
+  const [workoutDetails, setWorkoutDetails] =
+    useState<WorkoutGetWorkoutResponse>({});
 
-    const { id } = use(params);
+  const { id } = use(params);
 
-    const router = useRouter();
+  const router = useRouter();
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-    async function fetchWorkoutDetails() {
-        await authApi.v1
-            .workoutServiceGetWorkout(id)
+  async function fetchWorkoutDetails() {
+    await authApi.v1
+      .workoutServiceGetWorkout(id)
+      .then((response) => {
+        console.log(response.data);
+        setWorkoutDetails(response.data!);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error === errUnauthorized || error.response?.status === 401) {
+          router.push("/auth/login");
+
+          return;
+        }
+        throw error;
+      });
+  }
+
+  async function fetchData() {
+    setIsLoading(true);
+    try {
+      await fetchWorkoutDetails();
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to fetch workout details");
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function finishWorkout() {
+    try {
+      await authApi.v1
+        .workoutServiceCompleteWorkout(id, {})
+        .then((response) => {
+          console.log(response.data);
+          router.push(`/workouts/${id}/results`);
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error === errUnauthorized || error.response?.status === 401) {
+            router.push("/auth/login");
+
+            return;
+          }
+          throw error;
+        });
+    } catch (error) {
+      console.log(error);
+      toast.error("Не удалось завершить тренировку");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function addExercisesToWorkout(exerciseIds: string[]) {
+    try {
+      await Promise.all(
+        exerciseIds.map((exerciseId) =>
+          authApi.v1
+            .workoutServiceLogExercise(id, {
+              exerciseId,
+            })
             .then((response) => {
-                console.log(response.data);
-                setWorkoutDetails(response.data!);
+              console.log(response.data);
             })
             .catch((error) => {
-                console.log(error);
-                if (
-                    error === errUnauthorized ||
-                    error.response?.status === 401
-                ) {
-                    router.push("/auth/login");
-                    return;
-                }
-                throw error;
-            });
+              console.log(error);
+              if (error === errUnauthorized || error.response?.status === 401) {
+                router.push("/auth/login");
+
+                return;
+              }
+              throw error;
+            }),
+        ),
+      );
+      onClose();
+      await fetchData();
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to add exercises to workout");
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    async function fetchData() {
-        setIsLoading(true);
-        try {
-            await fetchWorkoutDetails();
-        } catch (error) {
-            toast.error("Failed to fetch workout details");
-            setIsError(true);
-        } finally {
-            setIsLoading(false);
-        }
+  async function onDelete() {
+    setIsLoading(true);
+    try {
+      await authApi.v1
+        .workoutServiceDeleteWorkout(id)
+        .then((response) => {
+          console.log(response.data);
+          router.push("/");
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error === errUnauthorized || error.response?.status === 401) {
+            router.push("/auth/login");
+
+            return;
+          }
+          throw error;
+        });
+    } catch (error) {
+      console.log(error);
+      toast.error("Не удалось удалить тренировку");
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    async function finishWorkout() {
-        setIsLoading(true);
-        try {
-            await authApi.v1
-                .workoutServiceCompleteWorkout(id, {})
-                .then((response) => {
-                    console.log(response.data);
-                    router.push(`/workouts/${id}/results`);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (
-                        error === errUnauthorized ||
-                        error.response?.status === 401
-                    ) {
-                        router.push("/auth/login");
-                        return;
-                    }
-                    throw error;
-                });
-        } catch (error) {
-            toast.error("Не удалось завершить тренировку");
-        } finally {
-            setIsLoading(false);
-        }
-    }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    async function addExercisesToWorkout(exerciseIds: string[]) {
-        try {
-            await Promise.all(
-                exerciseIds.map((exerciseId) =>
-                    authApi.v1
-                        .workoutServiceLogExercise(id, {
-                            exerciseId,
-                        })
-                        .then((response) => {
-                            console.log(response.data);
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            if (
-                                error === errUnauthorized ||
-                                error.response?.status === 401
-                            ) {
-                                router.push("/auth/login");
-                                return;
-                            }
-                            throw error;
-                        })
-                )
-            );
-            onClose();
-            await fetchData();
-        } catch (error) {
-            console.log(error);
-            toast.error("Failed to add exercises to workout");
-        } finally {
-            setIsLoading(false);
-        }
-    }
+  if (isLoading) {
+    return <Loading />;
+  }
 
-    async function onDelete() {
-        setIsLoading(true);
-        try {
-            await authApi.v1
-                .workoutServiceDeleteWorkout(id)
-                .then((response) => {
-                    console.log(response.data);
-                    router.push("/");
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (
-                        error === errUnauthorized ||
-                        error.response?.status === 401
-                    ) {
-                        router.push("/auth/login");
-                        return;
-                    }
-                    throw error;
-                });
-        } catch (error) {
-            toast.error("Не удалось удалить тренировку");
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    if (isLoading) {
-        return <Loading />;
-    }
-
-    if (isError) {
-        return (
-            <div className="p-4">
-                <h2 className="text-lg text-red-500">
-                    Ошибка при загрузке данных
-                </h2>
-                <p>Проверьте соединение с сервером или обновите страницу.</p>
-            </div>
-        );
-    }
-
+  if (isError) {
     return (
-        <>
-            <div className="py-4 flex-grow max-w-full">
-                <div className="h-full max-h-full overflow-y-auto gap-4 flex flex-col">
-                    <PageHeader title={"Тренировка"} enableBackButton={true}>
-                        <DropdownItem
-                            key="delete"
-                            className="text-danger"
-                            color="danger"
-                            onPress={onDelete}
-                        >
-                            Удалить
-                        </DropdownItem>
-                    </PageHeader>
-                    <div className="flex flex-col justify-between h-full">
-                        <section className="flex flex-col gap-4 px-4">
-                            <div className="flex flex-col gap-2">
-                                {workoutDetails.exerciseLogs?.map(
-                                    (exerciseLogDetails, index) => (
-                                        <ExerciseLogCard
-                                            key={index}
-                                            exerciseLogDetails={exerciseLogDetails}
-                                            workoutId={id}
-                                        />
-                                    )
-                                )}
-                                <Card className="p-2">
-                                    <Button
-                                        className="w-full"
-                                        onPress={() => {
-                                            onOpen();
-                                        }}
-                                    >
-                                        <PlusIcon className="w-4 h-4" />
-                                        <span>Добавить упражнение</span>
-                                    </Button>
-                                </Card>
-                            </div>
-                        </section>
-                        <section className="w-full bottom-0 px-4">
-                            <Button
-                                color="primary"
-                                className="w-full"
-                                onPress={async () => {
-                                    await finishWorkout();
-                                }}
-                            >
-                                Завершить тренировку
-                            </Button>
-                        </section>
-                    </div>
-                </div>
-            </div>
-            <ModalSelectExercise
-                isOpen={isOpen}
-                onClose={onClose}
-                excludeExerciseIds={workoutDetails.exerciseLogs!.map(
-                    (exerciseLog) => exerciseLog.exerciseLog!.exerciseId!
-                )}
-                onSubmit={addExercisesToWorkout}
-            />
-        </>
+      <div className="p-4">
+        <h2 className="text-lg text-red-500">Ошибка при загрузке данных</h2>
+        <p>Проверьте соединение с сервером или обновите страницу.</p>
+      </div>
     );
+  }
+
+  return (
+    <>
+      <div className="py-4 flex-grow max-w-full">
+        <div className="h-full max-h-full overflow-y-auto gap-4 flex flex-col">
+          <PageHeader enableBackButton={true} title={"Тренировка"}>
+            <DropdownItem
+              key="delete"
+              className="text-danger"
+              color="danger"
+              onPress={onDelete}
+            >
+              Удалить
+            </DropdownItem>
+          </PageHeader>
+          <div className="flex flex-col justify-between h-full">
+            <section className="flex flex-col gap-4 px-4">
+              <div className="flex flex-col gap-2">
+                {workoutDetails.exerciseLogs?.map(
+                  (exerciseLogDetails, index) => (
+                    <ExerciseLogCard
+                      key={index}
+                      exerciseLogDetails={exerciseLogDetails}
+                      workoutId={id}
+                    />
+                  ),
+                )}
+                <Card className="p-2">
+                  <Button
+                    className="w-full"
+                    onPress={() => {
+                      onOpen();
+                    }}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                    <span>Добавить упражнение</span>
+                  </Button>
+                </Card>
+              </div>
+            </section>
+            <section className="w-full bottom-0 px-4">
+              <Button
+                className="w-full"
+                color="primary"
+                onPress={async () => {
+                  await finishWorkout();
+                }}
+              >
+                Завершить тренировку
+              </Button>
+            </section>
+          </div>
+        </div>
+      </div>
+      <ModalSelectExercise
+        excludeExerciseIds={workoutDetails.exerciseLogs!.map(
+          (exerciseLog) => exerciseLog.exerciseLog!.exerciseId!,
+        )}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={addExercisesToWorkout}
+      />
+    </>
+  );
 }

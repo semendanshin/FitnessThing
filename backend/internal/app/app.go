@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
 	"net"
@@ -19,6 +20,7 @@ import (
 	"fitness-trainer/internal/logger"
 	desc "fitness-trainer/pkg/workouts"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rs/cors"
@@ -45,8 +47,10 @@ func CustomMatcher(key string) (string, bool) {
 type Options struct {
 	grpcPort         int
 	gatewayPort      int
+	httpPathPrefix   string
 	enableGateway    bool
 	enableReflection bool
+	swaggerFile      []byte
 }
 
 var defaultOptions = &Options{
@@ -54,6 +58,7 @@ var defaultOptions = &Options{
 	gatewayPort:      8080,
 	enableGateway:    true,
 	enableReflection: true,
+	httpPathPrefix:   "/",
 }
 
 type OptionsFunc func(*Options)
@@ -79,6 +84,18 @@ func WithEnableReflection(enableReflection bool) OptionsFunc {
 func WithEnableGateway(enableGateway bool) OptionsFunc {
 	return func(o *Options) {
 		o.enableGateway = enableGateway
+	}
+}
+
+func WithSwaggerFile(swaggerFile []byte) OptionsFunc {
+	return func(o *Options) {
+		o.swaggerFile = swaggerFile
+	}
+}
+
+func WithHTTPPathPrefix(httpPathPrefix string) OptionsFunc {
+	return func(o *Options) {
+		o.httpPathPrefix = httpPathPrefix
 	}
 }
 
@@ -180,23 +197,28 @@ func (a *App) Run(ctx context.Context) error {
 	).Handler(gatewayMux)
 
 	// Create swagger ui
-	httpMux := http.NewServeMux()
+	httpMux := chi.NewRouter()
 	httpMux.HandleFunc("/swagger", func(w http.ResponseWriter, request *http.Request) {
-		http.ServeFile(w, request, "pkg/workouts/workouts.swagger.json")
+		logger.Info("serving swagger file")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(a.options.swaggerFile)
 	})
-	httpMux.Handle("/docs/", v5emb.NewHandler(
-		"PVZ Service",
-		"/swagger",
-		"/docs/",
+	httpMux.Mount("/docs/", v5emb.NewHandler(
+		"Fitness Trainer Service",
+		fmt.Sprintf("%s/swagger", a.options.httpPathPrefix),
+		fmt.Sprintf("%s/docs/", a.options.httpPathPrefix),
 	))
 
 	//httpMux.Handle("/metrics", promhttp.Handler())
 
-	httpMux.Handle("/", gatewayMuxWithCORS)
+	httpMux.Mount("/", http.StripPrefix(a.options.httpPathPrefix, gatewayMuxWithCORS))
+
+	baseMux := chi.NewRouter()
+	baseMux.Mount(a.options.httpPathPrefix, httpMux)
 
 	httpSrv := &http.Server{
 		Addr:    httpEndpoint,
-		Handler: httpMux,
+		Handler: baseMux,
 	}
 
 	// Start the gateway and swagger ui

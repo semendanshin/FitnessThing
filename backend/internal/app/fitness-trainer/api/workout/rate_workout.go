@@ -5,16 +5,16 @@ import (
 	"fmt"
 
 	"fitness-trainer/internal/app/interceptors"
+	"fitness-trainer/internal/app/mappers"
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/logger"
 	desc "fitness-trainer/pkg/workouts"
 
 	"github.com/opentracing/opentracing-go"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (i *Implementation) DeleteWorkout(ctx context.Context, in *desc.DeleteWorkoutRequest) (*emptypb.Empty, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.DeleteWorkout")
+func (i *Implementation) RateWorkout(ctx context.Context, in *desc.RateWorkoutRequest) (*desc.WorkoutResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.RateWorkout")
 	defer span.Finish()
 
 	if err := in.ValidateAll(); err != nil {
@@ -32,9 +32,14 @@ func (i *Implementation) DeleteWorkout(ctx context.Context, in *desc.DeleteWorko
 		return nil, fmt.Errorf("%w: %v", domain.ErrInvalidArgument, err)
 	}
 
-	if err := i.service.DeleteWorkout(ctx, userID, workoutID); err != nil {
+	rating := int(in.GetRating())
+
+	workout, err := i.service.RateWorkout(ctx, userID, workoutID, rating)
+	if err != nil {
 		return nil, err
 	}
 
-	return &emptypb.Empty{}, nil
+	return &desc.WorkoutResponse{
+		Workout: mappers.WorkoutToProto(workout),
+	}, nil
 }
