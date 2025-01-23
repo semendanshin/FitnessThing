@@ -22,6 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/json"
   base_path: "/api"
   schemes: HTTP
+  schemes: HTTPS
   security_definitions: {
     security: {
       key: "Bearer"

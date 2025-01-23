@@ -24,7 +24,8 @@
   ],
   "basePath": "/api",
   "schemes": [
-    "http"
+    "http",
+    "https"
   ],
   "consumes": [
     "application/json"
