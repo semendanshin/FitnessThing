@@ -45,8 +45,10 @@ services:
             - app
     dozzle:
         container_name: dozzle
+        environment:
+            - DOZZLE_BASE=/logs
         image: amir20/dozzle:latest
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-        ports:
-            - "8081:8080"
+        expose:
+            - "8080"
