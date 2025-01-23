@@ -7,8 +7,8 @@ import { siteConfig } from "@/config/site";
 
 export const Navbar = () => {
   return (
-    <div className="h-16 flex items-center justify-between sticky bottom-0 left-0 w-full z-50 shadow-inner bg-background">
-      <div className="mx-auto max-w-7xl px-2 flex items-center justify-around w-full z-49">
+    <div className="h-fit flex items-center justify-between sticky bottom-0 left-0 w-full shadow-inner bg-background pb-4 z-50">
+      <div className="mx-auto max-w-7xl px-2 flex items-center justify-around w-full z-49 py-2">
         {siteConfig.navItems.map((item, id) => (
           <NextLink
             key={id}

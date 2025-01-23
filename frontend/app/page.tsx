@@ -238,47 +238,45 @@ export default function Home() {
           </div>
         </section>
       )}
-      {routines.length > 0 && (
-        <section className="flex flex-col flex-grow max-w-full h-fit relative max-w-full">
-          {/* Список шаблонов. Горизонтальный скролл с квадратными карточками */}
-          <Link className="flex items-center px-4 gap-1" href="/routines">
-            <h4 className="text-xl font-bold">Шаблоны</h4>
-            <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
-          </Link>
-          <div className="flex flex-col p-4 max-w-full overflow-x-auto">
-            <div className="flex flex-row gap-4 justify-start w-fit">
-              {routines.map((routine) => (
-                <Card
-                  key={routine.id}
-                  as={Link}
-                  className="w-52 h-52"
-                  href={`/routines/${routine.id}`}
-                >
-                  <CardHeader>
-                    <h3 className="text-lg font-bold">{routine.name}</h3>
-                  </CardHeader>
-                  <CardBody>
-                    <p>{routine.description}</p>
-                  </CardBody>
-                  <CardFooter>
-                    <Button
-                      className="flex items-center px-2 w-full"
-                      color="primary"
-                      size="sm"
-                      onPress={async () => {
-                        await startWorkout(routine.id);
-                      }}
-                    >
-                      <PlayIcon className="w-3 h-3" fill="currentColor" />
-                      <span className="text-sm font-bold">Начать</span>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+      <section className="flex flex-col flex-grow max-w-full h-fit relative max-w-full">
+        {/* Список шаблонов. Горизонтальный скролл с квадратными карточками */}
+        <Link className="flex items-center px-4 gap-1" href="/routines">
+          <h4 className="text-xl font-bold">Шаблоны</h4>
+          <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+        </Link>
+        <div className="flex flex-col p-4 max-w-full overflow-x-auto">
+          <div className="flex flex-row gap-4 justify-start w-fit">
+            {routines.map((routine) => (
+              <Card
+                key={routine.id}
+                as={Link}
+                className="w-52 h-52"
+                href={`/routines/${routine.id}`}
+              >
+                <CardHeader>
+                  <h3 className="text-lg font-bold">{routine.name}</h3>
+                </CardHeader>
+                <CardBody>
+                  <p>{routine.description}</p>
+                </CardBody>
+                <CardFooter>
+                  <Button
+                    className="flex items-center px-2 w-full"
+                    color="primary"
+                    size="sm"
+                    onPress={async () => {
+                      await startWorkout(routine.id);
+                    }}
+                  >
+                    <PlayIcon className="w-3 h-3" fill="currentColor" />
+                    <span className="text-sm font-bold">Начать</span>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
       <style jsx>{`
         .fade-bottom::after {
           content: "";
@@ -286,7 +284,7 @@ export default function Home() {
           bottom: 0;
           left: 0;
           width: 100%;
-          height: 100px;
+          height: 50px;
           background: linear-gradient(
             to top,
             hsl(var(--nextui-background)),
