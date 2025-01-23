@@ -10,11 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// type JWTProvider interface {
-// 	GeneratePair(ctx context.Context, userID domain.ID, atTime time.Time) (domain.Tokens, error)
-// 	VerifyPair(ctx context.Context, userID domain.ID, tokens domain.Tokens, atTime time.Time) error
-// }
-
 type Credentials interface {
 	NewWithClaims(claims jwt.Claims) (string, error)
 	GetKey(*jwt.Token) (interface{}, error)

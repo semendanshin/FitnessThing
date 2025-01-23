@@ -30,7 +30,7 @@ type userRepository interface {
 type exerciseRepository interface {
 	GetExercises(ctx context.Context, muscleGroups, excludedExercises []domain.ID) ([]domain.Exercise, error)
 	GetExerciseByID(ctx context.Context, id domain.ID) (domain.Exercise, error)
-	CreateExercise(ctx context.Context, exercise domain.Exercise) (domain.Exercise, error)
+	CreateExercise(ctx context.Context, exercise domain.Exercise, miscleGroupsIDs []domain.ID) (domain.Exercise, error)
 }
 
 type routineRepository interface {

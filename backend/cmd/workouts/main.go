@@ -4,6 +4,8 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"time"
 
@@ -21,6 +23,7 @@ import (
 func init() {
 	logger.Init()
 	godotenv.Load()
+	log.SetOutput(io.Discard)
 }
 
 func loadPostgresURL() string {
@@ -40,7 +43,7 @@ func Run() error {
 	defer cancel()
 
 	tracer.MustSetup(
-		ctx, 
+		ctx,
 		tracer.WithServiceName("fitness-trainer"),
 		tracer.WithCollectorEndpoint(os.Getenv("JAEGER_COLLECTOR_ENDPOINT")),
 	)

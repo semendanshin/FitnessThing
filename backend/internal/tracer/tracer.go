@@ -2,7 +2,7 @@ package tracer
 
 import (
 	"context"
-	"log"
+	"fitness-trainer/internal/logger"
 	"sync"
 
 	"github.com/opentracing/opentracing-go"
@@ -41,7 +41,7 @@ func MustSetup(ctx context.Context, opts ...OptFunc) {
 		opt(o)
 	}
 
-	log.Printf("Initializing tracer for service: %s", o.ServiceName)
+	logger.Infof("Initializing tracer for service: %s", o.ServiceName)
 	cfg := traceconfig.Configuration{
 		ServiceName: o.ServiceName,
 		Sampler: &traceconfig.SamplerConfig{
@@ -56,15 +56,15 @@ func MustSetup(ctx context.Context, opts ...OptFunc) {
 
 	tracer, closer, err := cfg.NewTracer(traceconfig.Logger(jaeger.StdLogger), traceconfig.Metrics(prometheus.New()))
 	if err != nil {
-		log.Fatalf("ERROR: cannot init Jaeger %s", err)
+		logger.Fatalf("ERROR: cannot init Jaeger %s", err)
 	}
-	log.Printf("Successfully initialized Jaeger tracer")
+	logger.Infof("Successfully initialized Jaeger tracer")
 
 	go func() {
 		onceCloser := sync.OnceFunc(func() {
-			log.Println("closing tracer")
+			logger.Infof("closing tracer")
 			if err = closer.Close(); err != nil {
-				log.Fatalf("ERROR: cannot close Jaeger %s", err)
+				logger.Fatalf("ERROR: cannot close Jaeger %s", err)
 			}
 		})
 
@@ -75,5 +75,5 @@ func MustSetup(ctx context.Context, opts ...OptFunc) {
 	}()
 
 	opentracing.SetGlobalTracer(tracer)
-	log.Printf("Set global tracer successfully")
+	logger.Infof("Set global tracer successfully")
 }

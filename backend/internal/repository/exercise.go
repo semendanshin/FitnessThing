@@ -15,6 +15,7 @@ type exerciseEntity struct {
 	ID                 pgtype.UUID
 	Name               string
 	Description        pgtype.Text
+	VideoURL           pgtype.Text
 	TargetMuscleGroups pgtype.Array[string]
 	CreatedAt          pgtype.Timestamptz
 	UpdatedAt          pgtype.Timestamptz
@@ -33,6 +34,7 @@ func (e exerciseEntity) toDomain() domain.Exercise {
 		},
 		Name:               e.Name,
 		Description:        e.Description.String,
+		VideoURL:           e.VideoURL.String,
 		TargetMuscleGroups: musclegroups,
 	}
 }
@@ -46,6 +48,7 @@ func exerciseFromDomain(exercise domain.Exercise) exerciseEntity {
 		ID:                 uuidToPgtype(exercise.ID),
 		Name:               exercise.Name,
 		Description:        pgtype.Text{String: exercise.Description, Valid: exercise.Description != ""},
+		VideoURL:           pgtype.Text{String: exercise.VideoURL, Valid: exercise.VideoURL != ""},
 		TargetMuscleGroups: pgtype.Array[string]{Elements: musclegroups, Valid: true},
 		CreatedAt:          timeToPgtype(exercise.CreatedAt),
 		UpdatedAt:          timeToPgtype(exercise.UpdatedAt),
@@ -55,7 +58,7 @@ func exerciseFromDomain(exercise domain.Exercise) exerciseEntity {
 func (r *PGXRepository) GetExercises(ctx context.Context, muscleGroups, excludedExercises []domain.ID) ([]domain.Exercise, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetExercises")
 	defer span.Finish()
-	
+
 	query := `
 		SELECT e.id, e.name, e.description, e.created_at, ARRAY_AGG(mg.name) AS target_muscle_groups, e.updated_at
 		FROM exercise_muscle_groups emg
@@ -105,34 +108,34 @@ func (r *PGXRepository) GetExerciseByID(ctx context.Context, id domain.ID) (doma
 	return exercise.toDomain(), nil
 }
 
-func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exercise) (domain.Exercise, error) {
+func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exercise, muscleGroupIDs []domain.ID) (domain.Exercise, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.CreateExercise")
 	defer span.Finish()
-	
+
 	exerciseQuery := `
 		INSERT INTO exercises (id, name, description, created_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING *
 	`
 
-	exercieMuscleGroupQuery := `
-		INSERT INTO exercise_muscle_groups (exercise_id, muscle_group_id)
-		WITH muscle_groups AS (
-			SELECT id
-			FROM muscle_groups
-			WHERE name = ANY($1)
-		)
-		SELECT $2, id
-		FROM muscle_groups
-		RETURNING exercise_id, muscle_group_id
+	// insert multiple records
+	exercieMuscleGroupsQuery := `
+		INSERT INTO exercise_muscle_groups (muscle_group_id, exercise_id)
+		SELECT UNNEST($1::UUID[]), $2
+		RETURNING *
 	`
 
-	err := r.runInTransaction(ctx, func(tx pgx.Tx) error {
-		exerciseEntity := exerciseFromDomain(exercise)
+	convertedMuscleGroupIDs := make([]pgtype.UUID, len(muscleGroupIDs))
+	for i, id := range muscleGroupIDs {
+		convertedMuscleGroupIDs[i] = uuidToPgtype(id)
+	}
 
-		err := pgxscan.Get(
+	exerciseEntity := exerciseFromDomain(exercise)
+
+	err := r.runInTransaction(ctx, func(tx pgx.Tx) error {
+		innerErr := pgxscan.Get(
 			ctx,
-			r.pool,
+			tx,
 			&exerciseEntity,
 			exerciseQuery,
 			exerciseEntity.ID,
@@ -140,23 +143,18 @@ func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exer
 			exerciseEntity.Description,
 			exerciseEntity.CreatedAt,
 		)
-		if err != nil {
-			logger.Errorf("failed to create exercise: %v", err)
-			return err
+		if innerErr != nil {
+			return innerErr
 		}
 
-		type exerciseMuscleGroup struct {
-			ExerciseID   pgtype.UUID
-			MuscleGroupID pgtype.UUID
-		}
-
-		for _, mg := range exercise.TargetMuscleGroups {
-			var emg exerciseMuscleGroup
-			err := pgxscan.Get(ctx, tx, &emg, exercieMuscleGroupQuery, mg, exerciseEntity.ID)
-			if err != nil {
-				logger.Errorf("failed to create exercise muscle group: %v", err)
-				return err
-			}
+		_, innerErr = tx.Exec(
+			ctx,
+			exercieMuscleGroupsQuery,
+			convertedMuscleGroupIDs,
+			exerciseEntity.ID,
+		)
+		if innerErr != nil {
+			return innerErr
 		}
 
 		return nil
@@ -166,5 +164,5 @@ func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exer
 		return domain.Exercise{}, err
 	}
 
-	return exercise, nil
+	return r.GetExerciseByID(ctx, exercise.ID)
 }

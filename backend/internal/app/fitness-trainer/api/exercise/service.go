@@ -9,6 +9,7 @@ import (
 )
 
 type Service interface {
+	CreateExercise(ctx context.Context, exercise dto.CreateExerciseDTO) (domain.Exercise, error)
 	GetExercises(ctx context.Context, muscleGroups, excludedExercises []domain.ID) ([]domain.Exercise, error)
 	GetExerciseByID(ctx context.Context, id domain.ID) (domain.Exercise, error)
 	GetExerciseAlternatives(ctx context.Context, id domain.ID) ([]domain.Exercise, error)

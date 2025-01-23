@@ -2335,9 +2335,13 @@ func (m *CreateExerciseRequest) validate(all bool) error {
 
 	// no validation rules for Name
 
-	// no validation rules for Description
+	if m.Description != nil {
+		// no validation rules for Description
+	}
 
-	// no validation rules for VideoUrl
+	if m.VideoUrl != nil {
+		// no validation rules for VideoUrl
+	}
 
 	if len(errors) > 0 {
 		return CreateExerciseRequestMultiError(errors)

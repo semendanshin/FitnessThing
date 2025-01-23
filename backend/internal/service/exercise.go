@@ -69,3 +69,17 @@ func (s *Service) GetExerciseHistory(ctx context.Context, userID, exerciseID dom
 
 	return exerciseLogDTOs, nil
 }
+
+func (s *Service) CreateExercise(ctx context.Context, exerciseDTO dto.CreateExerciseDTO) (domain.Exercise, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.CreateExercise")
+	defer span.Finish()
+
+	exercise := domain.NewExercise(
+		exerciseDTO.Name,
+		exerciseDTO.Description.V,
+		exerciseDTO.VideoURL.V,
+		[]domain.MuscleGroup{},
+	)
+
+	return s.exerciseRepository.CreateExercise(ctx, exercise, exerciseDTO.TargetMuscleGroups)
+}

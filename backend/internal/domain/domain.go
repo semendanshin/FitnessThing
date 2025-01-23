@@ -137,6 +137,16 @@ type Exercise struct {
 	TargetMuscleGroups []MuscleGroup
 }
 
+func NewExercise(name, description, videoURL string, targetMuscleGroups []MuscleGroup) Exercise {
+	return Exercise{
+		Model:              NewModel(),
+		Name:               name,
+		Description:        description,
+		VideoURL:           videoURL,
+		TargetMuscleGroups: targetMuscleGroups,
+	}
+}
+
 type Routine struct {
 	Model
 

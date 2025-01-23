@@ -23,6 +23,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	"github.com/swaggest/swgui/v5emb"
 	"google.golang.org/grpc"
@@ -58,7 +59,7 @@ var defaultOptions = &Options{
 	gatewayPort:      8080,
 	enableGateway:    true,
 	enableReflection: true,
-	httpPathPrefix:   "/",
+	httpPathPrefix:   "",
 }
 
 type OptionsFunc func(*Options)
@@ -201,7 +202,7 @@ func (a *App) Run(ctx context.Context) error {
 	httpMux.HandleFunc("/swagger", func(w http.ResponseWriter, request *http.Request) {
 		logger.Info("serving swagger file")
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(a.options.swaggerFile)
+		w.Write(desc.GetSwaggerDescription())
 	})
 	httpMux.Mount("/docs/", v5emb.NewHandler(
 		"Fitness Trainer Service",
@@ -209,12 +210,16 @@ func (a *App) Run(ctx context.Context) error {
 		fmt.Sprintf("%s/docs/", a.options.httpPathPrefix),
 	))
 
-	//httpMux.Handle("/metrics", promhttp.Handler())
+	httpMux.Handle("/metrics", promhttp.Handler())
 
 	httpMux.Mount("/", http.StripPrefix(a.options.httpPathPrefix, gatewayMuxWithCORS))
 
 	baseMux := chi.NewRouter()
-	baseMux.Mount(a.options.httpPathPrefix, httpMux)
+	prefix := a.options.httpPathPrefix
+	if prefix == "" {
+		prefix = "/"
+	}
+	baseMux.Mount(prefix, httpMux)
 
 	httpSrv := &http.Server{
 		Addr:    httpEndpoint,
@@ -223,6 +228,7 @@ func (a *App) Run(ctx context.Context) error {
 
 	// Start the gateway and swagger ui
 	go func() {
+		logger.Infof("http server listening on port %d", a.options.gatewayPort)
 		if err := httpSrv.ListenAndServe(); err != nil {
 			if !errors.Is(err, http.ErrServerClosed) {
 				logger.Errorf("error starting http server: %v", err)

@@ -1,31 +1,58 @@
 package exercise
 
-// import (
-// 	"context"
-// 	"fitness-trainer/internal/app/mappers"
-// 	"fitness-trainer/internal/domain"
-// 	"fitness-trainer/internal/logger"
-// 	desc "fitness-trainer/pkg/workouts"
+import (
+	"context"
+	"fitness-trainer/internal/app/mappers"
+	"fitness-trainer/internal/domain"
+	"fitness-trainer/internal/domain/dto"
+	"fitness-trainer/internal/logger"
+	"fitness-trainer/internal/utils"
+	desc "fitness-trainer/pkg/workouts"
+	"fmt"
 
-// 	"github.com/opentracing/opentracing-go"
-// )
+	"github.com/opentracing/opentracing-go"
+)
 
-// func (i *Implementation) CreateExercise(ctx context.Context, in *desc.CreateExerciseRequest) (*desc.ExerciseResponse, error) {
-// 	span, ctx := opentracing.StartSpanFromContext(ctx, "api.CreateExercise")
-// 	defer span.Finish()
+func (i *Implementation) CreateExercise(ctx context.Context, in *desc.CreateExerciseRequest) (*desc.ExerciseResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.CreateExercise")
+	defer span.Finish()
 
-// 	var exerciseDTO dto.Exe
+	if err := in.Validate(); err != nil {
+		return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
+	}
 
-// 	exercise, err := i.service.CreateExercise(
-// 		ctx,
+	var exerciseDTO dto.CreateExerciseDTO
+	{
+		exerciseDTO.Name = in.Name
 		
-// 	)
-// 	if err != nil {
-// 		logger.Errorf("error creating exercise: %v", err)
-// 		return nil, err
-// 	}
+		if in.Description != nil {
+			exerciseDTO.Description = utils.NewNullable(in.GetDescription(), true)
+		}
 
-// 	return &desc.CreateExerciseResponse{
-// 		Exercise: mappers.ExerciseToProto(exercise),
-// 	}, nil
-// }
+		if in.VideoUrl != nil {
+			exerciseDTO.VideoURL = utils.NewNullable(in.GetVideoUrl(), true)
+		}
+
+		for _, muscleGroupID := range in.TargetMuscleGroupIds {
+			id, err := domain.ParseID(muscleGroupID)
+			if err != nil {
+				return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
+			}
+
+			exerciseDTO.TargetMuscleGroups = append(exerciseDTO.TargetMuscleGroups, id)
+		}
+	}
+
+	exercise, err := i.service.CreateExercise(
+		ctx,
+		exerciseDTO,
+	)
+	if err != nil {
+		logger.Errorf("error creating exercise: %v", err)
+		return nil, err
+	}
+
+	return &desc.ExerciseResponse{
+		Exercise: mappers.ExerciseToProto(exercise),
+	}, nil
+}

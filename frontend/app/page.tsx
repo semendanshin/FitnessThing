@@ -179,7 +179,7 @@ export default function Home() {
           <canvas id="home-bg" />
         </div>
         <h1 className="text-2xl font-bold p-4 absolute">
-          Привет{user.firstName && `, ${user.firstName}`}!
+          Привет{user.firstName ? `, ${user.firstName}` : ""}!
         </h1>
         <div className="flex-grow flex flex-col justify-center items-center relative z-10 drop-shadow-lg">
           <Button

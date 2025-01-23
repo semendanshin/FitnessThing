@@ -20,6 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   };
   consumes: "application/json"
   produces: "application/json"
+  base_path: "/api"
   schemes: HTTP
   security_definitions: {
     security: {
@@ -221,8 +222,8 @@ message CreateExerciseRequest {
   string name = 1 [
     (google.api.field_behavior) = REQUIRED
   ];
-  string description = 2;
-  string video_url = 3;
+  optional string description = 2;
+  optional string video_url = 3;
   repeated string target_muscle_group_ids = 4;
 }
 

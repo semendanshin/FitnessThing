@@ -1,9 +1,14 @@
 package logger
 
 import (
+	"context"
 	"os"
+	"time"
 
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 //const (
@@ -16,12 +21,50 @@ var logger *zap.Logger
 var sugar *zap.SugaredLogger
 
 func Init() {
-	logger, _ = zap.NewDevelopment()
-	sugar = logger.Sugar()
+	config := zap.Config{
+        Encoding: "json",
+        Level: zap.NewAtomicLevelAt(zap.InfoLevel),
+        OutputPaths: []string{"stdout"},
+        EncoderConfig: zapcore.EncoderConfig{
+            TimeKey:        "timestamp",
+            LevelKey:      "level",
+            MessageKey:    "message",
+            EncodeLevel:   zapcore.LowercaseLevelEncoder,
+            EncodeTime:    zapcore.TimeEncoderOfLayout(time.RFC3339),
+            EncodeCaller:  zapcore.ShortCallerEncoder,
+        },
+    }
+    
+    // Добавляем базовые поля, которые будут в каждом логе
+    defaultFields := []zap.Field{
+		zap.String("service", "fitness-trainer"),
+		zap.String("env", os.Getenv("ENV")),
+	}
+    
+    var err error
+    logger, err = config.Build(zap.Fields(
+        defaultFields...,
+    ))
+    if err != nil {
+        panic(err)
+    }
+    sugar = logger.Sugar()
 }
 
 func Logger() *zap.Logger {
 	return logger
+}
+
+func formatFields(ctx context.Context) map[string]interface{} {
+	fields := make(map[string]interface{})
+
+	span := opentracing.SpanFromContext(ctx)
+
+	if spanCtx, ok := span.Context().(jaeger.SpanContext); ok {
+		fields["trace_id"] = spanCtx.TraceID().String()
+	}
+
+	return fields
 }
 
 func Debug(msg string, args ...interface{}) {
