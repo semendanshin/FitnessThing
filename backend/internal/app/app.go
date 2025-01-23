@@ -184,7 +184,6 @@ func (a *App) Run(ctx context.Context) error {
 
 	gatewayMuxWithCORS := cors.New(
 		cors.Options{
-			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{
 				http.MethodHead,
 				http.MethodGet,
@@ -193,7 +192,10 @@ func (a *App) Run(ctx context.Context) error {
 				http.MethodPatch,
 				http.MethodDelete,
 			},
-			AllowedHeaders: []string{"x-access-token"},
+			AllowedHeaders: []string{
+				accessTokenHeader,
+			},
+			AllowedOrigins: []string{"*"},
 		},
 	).Handler(gatewayMux)
 
