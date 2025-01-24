@@ -2,6 +2,7 @@ services:
   nginx:
     container_name: nginx
     image: nginx:alpine
+    profiles: [frontend, backend, full]
     ports:
       - "8080:80"
     depends_on:

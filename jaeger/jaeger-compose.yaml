@@ -1,5 +1,7 @@
 services:
   jaeger:
+    container_name: jaeger
+    profiles: [tracing, full, dev]
     image: jaegertracing/all-in-one
     environment:
         - QUERY_BASE_PATH=/tracing

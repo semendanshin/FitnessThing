@@ -6,6 +6,7 @@ include:
 services:
     app:
         container_name: app
+        profiles: [backend, full]
         build:
             context: backend
             dockerfile: Dockerfile
@@ -24,6 +25,7 @@ services:
 
     app_init:
         container_name: app_init
+        profiles: [backend, full]
         build:
             context: backend
             dockerfile: Dockerfile
@@ -36,6 +38,8 @@ services:
             - db
 
     frontend:
+        container_name: frontend
+        profiles: [frontend, full]
         build:
             context: frontend
             dockerfile: Dockerfile
@@ -45,6 +49,7 @@ services:
             - app
     dozzle:
         container_name: dozzle
+        profiles: [logging, full]
         environment:
             - DOZZLE_BASE=/logs
         image: amir20/dozzle:latest

@@ -51,7 +51,9 @@ export default function RootLayout({
             }}
           >
             <main className="flex mx-auto flex-grow overflow-y-auto mb-20 w-full h-full">
-              <div className="flex flex-grow h-fit flex-col w-full">{children}</div>
+              <div className="flex flex-grow h-fit flex-col w-full">
+                {children}
+              </div>
               <ToastContainer />
               <Navbar />
             </main>

@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:15
     container_name: fitness-db
+    profiles: [database, full, dev]
     restart: unless-stopped
     volumes:
       - fitness_app_postgres_data:/var/lib/postgresql/data/
