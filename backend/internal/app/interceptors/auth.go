@@ -55,6 +55,7 @@ func NewAuth(
 		}
 
 		ctx = context.WithValue(ctx, userIDKey, id)
+		span.SetTag("user_id", id.String())
 
 		return handler(ctx, req)
 	}
