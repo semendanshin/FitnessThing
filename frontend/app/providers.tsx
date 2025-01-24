@@ -25,6 +25,7 @@ function TelegramMiniAppProvider({ children }: ProvidersProps) {
   function inner() {
     try {
       init();
+      swipeBehavior.mount();
       swipeBehavior.disableVertical();
     } catch (e) {
       console.log("Error while initializing Telegram Mini App SDK");
