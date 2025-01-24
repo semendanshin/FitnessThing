@@ -38,23 +38,23 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "h-full max-w-full bg-background font-sans antialiased flex flex-row flex-grow",
+          "h-full w-full overflow-hidden font-sans antialiased ",
           fontSans.variable,
         )}
       >
-        <div className="relative flex flex-col h-full w-full justify-between">
+        <div className="flex flex-col justify-between h-dvh overflow-y-scroll max-w-full">
           <Providers
             themeProps={{
               attribute: "class",
               defaultTheme: "dark",
             }}
           >
-            <main className="flex p-0 w-full min-h-full mx-auto flex-grow">
-              {children}
+            <main className="flex mx-auto flex-grow overflow-y-auto mb-20 w-full h-full">
+              <div className="flex flex-1 flex-col w-full">{children}</div>
               <ToastContainer />
+              <Navbar />
             </main>
           </Providers>
-          <Navbar />
         </div>
       </body>
     </html>
