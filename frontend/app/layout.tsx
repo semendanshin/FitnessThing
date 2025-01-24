@@ -38,11 +38,11 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "h-full bg-background font-sans antialiased flex flex-col flex-grow",
+          "h-full max-w-full bg-background font-sans antialiased flex flex-row flex-grow",
           fontSans.variable,
         )}
       >
-        <div className="relative flex flex-col min-h-dvh justify-between">
+        <div className="relative flex flex-col h-full w-full justify-between">
           <Providers
             themeProps={{
               attribute: "class",
