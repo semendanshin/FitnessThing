@@ -22,13 +22,17 @@ declare module "@react-types/shared" {
 }
 
 function TelegramMiniAppProvider({ children }: ProvidersProps) {
-  init();
-
-  if (swipeBehavior.disableVertical.isAvailable()) {
-    swipeBehavior.disableVertical();
-  } else {
-    console.warn("Swipe behavior is not available");
+  function inner() {
+    try {
+      init();
+      swipeBehavior.disableVertical();
+    } catch (e) {
+      console.log("Error while initializing Telegram Mini App SDK");
+      console.log(e);
+    }
   }
+
+  React.useEffect(inner, []);
 
   return <>{children}</>;
 }
