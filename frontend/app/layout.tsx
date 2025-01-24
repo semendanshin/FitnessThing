@@ -47,6 +47,7 @@ export default function RootLayout({
             themeProps={{
               attribute: "class",
               defaultTheme: "dark",
+              enableSystem: true,
             }}
           >
             <main className="flex mx-auto flex-grow overflow-y-auto mb-20 w-full h-full">
