@@ -6,7 +6,7 @@ import * as React from "react";
 import { NextUIProvider } from "@nextui-org/system";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { swipeBehavior } from "@telegram-apps/sdk-react";
+import { init, swipeBehavior } from "@telegram-apps/sdk-react";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -22,6 +22,8 @@ declare module "@react-types/shared" {
 }
 
 function TelegramMiniAppProvider({ children }: ProvidersProps) {
+  init();
+
   if (swipeBehavior.disableVertical.isAvailable()) {
     swipeBehavior.disableVertical();
   } else {
