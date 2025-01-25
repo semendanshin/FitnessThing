@@ -152,8 +152,8 @@ export default function RoutineDetailsPage({
         </p>
         <p className="text-sm">
           {(() => {
-            if (workoutDuration.getHours() === 0) {
-              return `${workoutDuration.getMinutes()} минут`;
+            if (workoutDuration.getUTCHours() === 0) {
+              return `${workoutDuration.getUTCMinutes()} минут`;
             }
 
             return `${workoutDuration.getUTCHours()} часа ${workoutDuration.getUTCMinutes()} минут`;
