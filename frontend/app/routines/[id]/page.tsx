@@ -86,12 +86,10 @@ export default function RoutineDetailsPage({
   async function submitPickExercise(exerciseIds: string[]) {
     console.log(exerciseIds);
     try {
-      setIsLoading(true);
       await Promise.all(exerciseIds.map((eId) => addExerciseToRoutine(eId)));
       await fetchRoutineDetails();
     } catch (error) {
       console.log(error);
-      toast.error("Ошибка при добавлении упражнения");
       if (
         error === errUnauthorized ||
         (error as any).response?.status === 401
@@ -100,8 +98,7 @@ export default function RoutineDetailsPage({
 
         return;
       }
-    } finally {
-      setIsLoading(false);
+      toast.error("Ошибка при добавлении упражнения");
     }
   }
 

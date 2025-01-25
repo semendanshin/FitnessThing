@@ -51,7 +51,7 @@ export default function RootLayout({
             }}
           >
             <main className="flex mx-auto flex-grow overflow-y-auto mb-[4rem] w-full h-full">
-              <div className="flex flex-grow h-fit flex-col w-full">
+              <div className="flex flex-grow max-h-full flex-col w-full">
                 {children}
               </div>
               <ToastContainer />

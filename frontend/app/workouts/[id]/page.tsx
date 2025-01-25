@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import { useDisclosure } from "@nextui-org/modal";
-import { DropdownItem } from "@nextui-org/react";
+import { DropdownItem, ScrollShadow } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -168,7 +168,6 @@ export default function RoutineDetailsPage({
   }
 
   async function onDelete() {
-    setIsLoading(true);
     try {
       await authApi.v1
         .workoutServiceDeleteWorkout(id)
@@ -188,8 +187,6 @@ export default function RoutineDetailsPage({
     } catch (error) {
       console.log(error);
       toast.error("Не удалось удалить тренировку");
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -212,56 +209,52 @@ export default function RoutineDetailsPage({
 
   return (
     <>
-      <div className="py-4 flex-grow max-w-full">
-        <div className="h-full max-h-full overflow-y-auto gap-4 flex flex-col">
-          <PageHeader enableBackButton={true} title={"Тренировка"}>
-            <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-              onPress={onDelete}
-            >
-              Удалить
-            </DropdownItem>
-          </PageHeader>
-          <div className="flex flex-col justify-between h-full">
-            <section className="flex flex-col gap-4 px-4">
-              <div className="flex flex-col gap-2">
-                {workoutDetails.exerciseLogs?.map(
-                  (exerciseLogDetails, index) => (
-                    <ExerciseLogCard
-                      key={index}
-                      exerciseLogDetails={exerciseLogDetails}
-                      workoutId={id}
-                    />
-                  ),
-                )}
-                <Card className="p-2">
-                  <Button
-                    className="w-full"
-                    onPress={() => {
-                      onOpen();
-                    }}
-                  >
-                    <PlusIcon className="w-4 h-4" />
-                    <span>Добавить упражнение</span>
-                  </Button>
-                </Card>
-              </div>
-            </section>
-            <section className="w-full bottom-0 px-4">
-              <Button
-                className="w-full"
-                color="primary"
-                onPress={async () => {
-                  await finishWorkout();
-                }}
-              >
-                Завершить тренировку
-              </Button>
-            </section>
-          </div>
-        </div>
+      <div className="py-4 flex flex-col h-full flex-grow max-w-full basis-full">
+        <PageHeader enableBackButton={true} title={"Тренировка"}>
+          <DropdownItem
+            key="delete"
+            className="text-danger"
+            color="danger"
+            onPress={onDelete}
+          >
+            Удалить
+          </DropdownItem>
+        </PageHeader>
+        <section className="flex flex-col gap-4 h-full overflow-y-scroll px-4 pt-4">
+          <ScrollShadow size={50}>
+            <div className="flex flex-col gap-2 ">
+              {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
+                <ExerciseLogCard
+                  key={index}
+                  exerciseLogDetails={exerciseLogDetails}
+                  workoutId={id}
+                />
+              ))}
+              <Card className="p-2">
+                <Button
+                  className="w-full"
+                  onPress={() => {
+                    onOpen();
+                  }}
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  <span>Добавить упражнение</span>
+                </Button>
+              </Card>
+            </div>
+          </ScrollShadow>
+        </section>
+        <section className="w-full px-4 py-2 ">
+          <Button
+            className="w-full"
+            color="primary"
+            onPress={async () => {
+              await finishWorkout();
+            }}
+          >
+            Завершить тренировку
+          </Button>
+        </section>
       </div>
       <ModalSelectExercise
         excludeExerciseIds={workoutDetails.exerciseLogs!.map(

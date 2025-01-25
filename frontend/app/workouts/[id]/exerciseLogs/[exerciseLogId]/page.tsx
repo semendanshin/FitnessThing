@@ -130,8 +130,10 @@ export default function RoutineDetailsPage({
     setLog: WorkoutSetLog;
     setNum: number;
     enableDelete?: boolean;
-    onDelete?: () => void;
+    onDelete?: () => Promise<void>;
   }) {
+    const [isLoading, setIsLoading] = useState(false);
+
     return (
       <Card className="flex flex-row items-center justify-between p-2 w-full">
         <div className="flex flex-row w-full gap-2 px-2">
@@ -144,10 +146,15 @@ export default function RoutineDetailsPage({
           <div className="flex flex-col">
             <Button
               isIconOnly
-              className="h-fit w-fit min-w-fit p-2"
+              className="h-fit w-fit min-w-fit p-2 w-9 h-6"
               color="danger"
+              isLoading={isLoading}
               size="sm"
-              onPress={onDelete}
+              onPress={async () => {
+                setIsLoading(true);
+                await onDelete!();
+                setIsLoading(false);
+              }}
             >
               <TrashCanIcon className="w-3 h-3" />
             </Button>
@@ -303,7 +310,7 @@ export default function RoutineDetailsPage({
           weight: weight!,
           reps: reps!,
         });
-        await fetchData();
+        await fetchExerciseLogDetails();
       } catch (error) {
         console.log(error);
         toast.error("Failed to add exercises to workout");
@@ -313,7 +320,7 @@ export default function RoutineDetailsPage({
     async function onDeleteSet(setId: string) {
       try {
         await authApi.v1.workoutServiceDeleteSetLog(id, exerciseLogId, setId);
-        await fetchData();
+        await fetchExerciseLogDetails();
       } catch (error) {
         console.log(error);
         toast.error("Failed to delete set");

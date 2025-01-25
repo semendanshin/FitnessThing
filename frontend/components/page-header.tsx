@@ -1,7 +1,14 @@
-import { Dropdown, DropdownTrigger, DropdownMenu } from "@nextui-org/react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 
 import { LeftArrowIcon, ElipsisIcon } from "@/config/icons";
+
+export { DropdownItem as PageHeaderItem };
 
 export function PageHeader({
   children,

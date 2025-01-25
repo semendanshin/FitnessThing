@@ -52,6 +52,7 @@ type Options struct {
 	enableGateway    bool
 	enableReflection bool
 	swaggerFile      []byte
+	bypassCors       bool
 }
 
 var defaultOptions = &Options{
@@ -97,6 +98,12 @@ func WithSwaggerFile(swaggerFile []byte) OptionsFunc {
 func WithHTTPPathPrefix(httpPathPrefix string) OptionsFunc {
 	return func(o *Options) {
 		o.httpPathPrefix = httpPathPrefix
+	}
+}
+
+func WithBypassCors(bypassCors bool) OptionsFunc {
+	return func(o *Options) {
+		o.bypassCors = bypassCors
 	}
 }
 
@@ -182,22 +189,14 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	gatewayMuxWithCORS := cors.New(
-		cors.Options{
-			AllowedMethods: []string{
-				http.MethodHead,
-				http.MethodGet,
-				http.MethodPost,
-				http.MethodPut,
-				http.MethodPatch,
-				http.MethodDelete,
-			},
-			AllowedHeaders: []string{
-				accessTokenHeader,
-			},
-			AllowedOrigins: []string{"*"},
-		},
-	).Handler(gatewayMux)
+	var corsHandler *cors.Cors
+	if a.options.bypassCors {
+		corsHandler = cors.AllowAll()
+	} else {
+		// TODO: Add allowed origins
+		corsHandler = cors.AllowAll()
+	}
+	gatewayMuxWithCORS := corsHandler.Handler(gatewayMux)
 
 	// Create swagger ui
 	httpMux := chi.NewRouter()
