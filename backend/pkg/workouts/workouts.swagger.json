@@ -1497,10 +1497,7 @@
         "time": {
           "type": "string"
         }
-      },
-      "required": [
-        "setType"
-      ]
+      }
     },
     "protobufAny": {
       "type": "object",

@@ -70,7 +70,7 @@ export interface WorkoutServiceRateWorkoutBody {
 }
 
 export interface WorkoutServiceUpdateSetLogBody {
-  setType: WorkoutSetType;
+  setType?: WorkoutSetType;
   /** @format int32 */
   reps?: number;
   /** @format float */

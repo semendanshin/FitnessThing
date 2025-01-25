@@ -40,6 +40,8 @@ export default function RoutineDetailsPage({
   const [exerciseLogHistory, setExerciseLogHistory] = useState<
     WorkoutExerciseLogDetails[]
   >([]);
+  const [exerciseLogForUpdate, setExerciseLogForUpdate] =
+    useState<WorkoutSetLog>({});
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -126,16 +128,22 @@ export default function RoutineDetailsPage({
     setNum,
     enableDelete,
     onDelete,
+    onPress,
   }: {
     setLog: WorkoutSetLog;
     setNum: number;
     enableDelete?: boolean;
     onDelete?: () => Promise<void>;
+    onPress?: () => void;
   }) {
     const [isLoading, setIsLoading] = useState(false);
 
     return (
-      <Card className="flex flex-row items-center justify-between p-2 w-full">
+      <Card
+        className="flex flex-row items-center justify-between p-2 w-full"
+        isPressable={!!onPress}
+        onPress={onPress}
+      >
         <div className="flex flex-row w-full gap-2 px-2">
           <div className="text-sm font-semibold w-4">{setNum + 1}</div>
           <div className="text-sm font-semibold w-fit">{setLog?.weight} кг</div>
@@ -174,15 +182,80 @@ export default function RoutineDetailsPage({
     }
   }
 
-  function AddSetLogModal({
+  function IncrementButtons({
+    value,
+    setValue,
+    isSubtract,
+  }: {
+    value: number;
+    setValue: (value: number) => void;
+    isSubtract?: boolean;
+  }) {
+    return (
+      <div className="flex flex-col justify-around p-0">
+        <Button
+          isIconOnly
+          className="min-w-fit w-fit p-3"
+          onPress={() => {
+            if (value > 0 && isSubtract) {
+              setValue(value - 1);
+
+              return;
+            }
+            if (!isSubtract) {
+              setValue(value + 1);
+            }
+          }}
+        >
+          {isSubtract ? "-" : "+"}
+        </Button>
+      </div>
+    );
+  }
+
+  function InputWithIncrement({
+    value,
+    setValue,
+    label,
+    placeholder,
+    type,
+  }: {
+    value: number;
+    setValue: (value: number) => void;
+    label: string;
+    placeholder: string;
+    type: string;
+  }) {
+    return (
+      <>
+        <p>{label}</p>
+        <div className="flex flex-row gap-2 items-center">
+          <IncrementButtons isSubtract setValue={setValue} value={value} />
+          <Input
+            isRequired
+            className="p-0 w-full h-full"
+            placeholder={placeholder}
+            type={type}
+            value={String(value)}
+            onValueChange={(value) => setValue(Number(value))}
+          />
+          <IncrementButtons setValue={setValue} value={value} />
+        </div>
+      </>
+    );
+  }
+
+  function UpdateSetLogModal({
     isOpen,
     onClose,
+    setLog,
   }: {
     isOpen: boolean;
     onClose: () => void;
+    setLog: WorkoutSetLog;
   }) {
-    const [weight, setWeight] = useState<number>(0);
-    const [reps, setReps] = useState<number>(0);
+    const [weight, setWeight] = useState<number>(setLog.weight!);
+    const [reps, setReps] = useState<number>(setLog.reps!);
 
     const [errors, setErrors] = useState<{
       weight?: string;
@@ -191,17 +264,21 @@ export default function RoutineDetailsPage({
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
-      setIsLoading(true);
       try {
-        await authApi.v1.workoutServiceLogSet(id, exerciseLogId, {
-          weight: weight!,
-          reps: reps!,
-        });
+        await authApi.v1.workoutServiceUpdateSetLog(
+          id,
+          exerciseLogId,
+          setLog.id!,
+          {
+            weight: weight!,
+            reps: reps!,
+          },
+        );
+        fetchExerciseLogDetails();
         onClose();
-        await fetchData();
       } catch (error) {
         console.log(error);
-        toast.error("Failed to add exercises to workout");
+        toast.error("Failed to update set log");
       } finally {
         setIsLoading(false);
       }
@@ -212,7 +289,7 @@ export default function RoutineDetailsPage({
         <ModalContent>
           {(onClose) => (
             <div className="flex flex-col py-4 mb-4">
-              <ModalHeader className="p-0 px-4">Добавить сет</ModalHeader>
+              <ModalHeader className="p-0 px-4">Изменить сет</ModalHeader>
               <Form
                 className="flex flex-col p-0 px-2"
                 validationBehavior="native"
@@ -220,25 +297,28 @@ export default function RoutineDetailsPage({
                 onSubmit={handleSubmit}
               >
                 <ModalBody className="flex flex-row gap-2 px-2 w-full">
-                  <Input
-                    autoFocus
-                    isRequired
-                    label="Вес"
-                    placeholder="Вес"
-                    type="number"
-                    onValueChange={(value) => setWeight(Number(value))}
-                  />
-                  <Input
-                    isRequired
-                    label="Повторы"
-                    placeholder="Повторы"
-                    type="number"
-                    onValueChange={(value) => setReps(Number(value))}
-                  />
+                  <div className="flex flex-col gap-1 w-1/2">
+                    <InputWithIncrement
+                      label="Вес"
+                      placeholder="10"
+                      setValue={setWeight}
+                      type="number"
+                      value={weight}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 w-1/2">
+                    <InputWithIncrement
+                      label="Повторы"
+                      placeholder="10"
+                      setValue={setReps}
+                      type="number"
+                      value={reps}
+                    />
+                  </div>
                 </ModalBody>
                 <ModalFooter className="flex flex-col gap-2 w-full justify-around px-2 py-0">
                   <Button className="w-full" color="success" type="submit">
-                    Добавить
+                    Изменить
                   </Button>
                   <Button className="w-full" color="danger" onPress={onClose}>
                     Отмена
@@ -272,37 +352,6 @@ export default function RoutineDetailsPage({
       }
     }, [exerciseLogDetails, exerciseLogHistory]);
 
-    function IncrementButtons({
-      value,
-      setValue,
-      isSubtract,
-    }: {
-      value: number;
-      setValue: (value: number) => void;
-      isSubtract?: boolean;
-    }) {
-      return (
-        <div className="flex flex-col justify-around p-0">
-          <Button
-            isIconOnly
-            className="min-w-fit w-fit p-3"
-            onPress={() => {
-              if (value > 0 && isSubtract) {
-                setValue(value - 1);
-
-                return;
-              }
-              if (!isSubtract) {
-                setValue(value + 1);
-              }
-            }}
-          >
-            {isSubtract ? "-" : "+"}
-          </Button>
-        </div>
-      );
-    }
-
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       try {
@@ -332,38 +381,22 @@ export default function RoutineDetailsPage({
         <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
           <div className="flex flex-row justify-around gap-4">
             <div className="flex flex-col gap-1 w-1/2">
-              <p>Вес</p>
-              <div className="flex flex-row gap-2 items-center">
-                <IncrementButtons
-                  isSubtract
-                  setValue={setWeight}
-                  value={weight}
-                />
-                <Input
-                  isRequired
-                  className="p-0 w-full h-full"
-                  placeholder="10"
-                  type="number"
-                  value={String(weight)}
-                  onValueChange={(value) => setWeight(Number(value))}
-                />
-                <IncrementButtons setValue={setWeight} value={weight} />
-              </div>
+              <InputWithIncrement
+                label="Вес"
+                placeholder="10"
+                setValue={setWeight}
+                type="number"
+                value={weight}
+              />
             </div>
             <div className="flex flex-col gap-1 w-1/2">
-              <p>Повторы</p>
-              <div className="flex flex-row gap-2 items-center">
-                <IncrementButtons isSubtract setValue={setReps} value={reps} />
-                <Input
-                  isRequired
-                  className="p-0 w-full h-full"
-                  placeholder="10"
-                  type="number"
-                  value={String(reps)}
-                  onValueChange={(value) => setReps(Number(value))}
-                />
-                <IncrementButtons setValue={setReps} value={reps} />
-              </div>
+              <InputWithIncrement
+                label="Повторы"
+                placeholder="10"
+                setValue={setReps}
+                type="number"
+                value={reps}
+              />
             </div>
           </div>
           <Button className="w-full" color="primary" size="sm" type="submit">
@@ -379,6 +412,10 @@ export default function RoutineDetailsPage({
               setLog={setLog}
               setNum={index}
               onDelete={() => onDeleteSet(setLog.id!)}
+              onPress={() => {
+                setExerciseLogForUpdate(setLog);
+                onOpen();
+              }}
             />
           ))}
         </div>
@@ -458,7 +495,12 @@ export default function RoutineDetailsPage({
           </section>
         </div>
       </div>
-      <AddSetLogModal isOpen={isOpen} onClose={onClose} />
+      {/* <AddSetLogModal isOpen={isOpen} onClose={onClose} /> */}
+      <UpdateSetLogModal
+        isOpen={isOpen}
+        setLog={exerciseLogForUpdate}
+        onClose={onClose}
+      />
     </>
   );
 }
