@@ -231,10 +231,10 @@ export default function Home() {
         <div className="flex flex-col flex-grow absolute w-full h-[75vh] z-0 fade-bottom opacity-80">
           <canvas id="home-bg" />
         </div>
-        <h1 className="text-2xl font-bold p-4">
-          Привет{user.firstName ? `, ${user.firstName}` : ""}!
-        </h1>
         <div className="flex-grow flex flex-col justify-center items-center relative z-10 drop-shadow-lg">
+          <h1 className="text-2xl font-bold p-4 absolute top-0 left-0">
+            Привет{user.firstName ? `, ${user.firstName}` : ""}!
+          </h1>
           <Button
             disableRipple
             className="flex items-center bg-transparent h-fit"

@@ -131,7 +131,7 @@ export class AnimationProcessor {
       this.ctx,
       this.center.x,
       this.center.y,
-      this.radius * 0.1,
+      0,
       this.radius,
       { r: 255, g: 195, b: 40, a: 1 },
       { r: 253, g: 60, b: 180, a: 0 },
