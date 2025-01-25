@@ -90,6 +90,7 @@ export default function RoutineDetailsPage({
     try {
       await fetchExerciseLogDetails();
     } catch (error) {
+      console.log(error);
       toast.error("Failed to fetch workout details");
       setIsError(true);
     } finally {

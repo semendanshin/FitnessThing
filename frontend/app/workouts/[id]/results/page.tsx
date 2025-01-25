@@ -182,7 +182,7 @@ export default function RoutineDetailsPage({
                 {" x "}
                 {workoutExercise?.exercise?.name}
               </p>
-              <p className="text-sm font-light w-fit">
+              <p className="text-sm font-light min-w-fit">
                 {workoutExercise?.setLogs?.[0]?.weight}
                 {" кг"}
                 {" x "}
