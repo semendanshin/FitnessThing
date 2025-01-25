@@ -68,7 +68,11 @@ export default function RoutineDetailsPage({
       .exerciseServiceGetExerciseHistory(exerciseId)
       .then((response) => {
         console.log(response.data);
-        setExerciseLogHistory(response.data.exerciseLogs!);
+        setExerciseLogHistory(
+          response.data.exerciseLogs!.filter(
+            (log) => log.exerciseLog?.workoutId != id,
+          ),
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -241,12 +245,24 @@ export default function RoutineDetailsPage({
   }
 
   function TodayContent() {
-    const [weight, setWeight] = useState<number>(
-      exerciseLogHistory[0]?.setLogs![0]?.weight!,
-    );
-    const [reps, setReps] = useState<number>(
-      exerciseLogHistory[0]?.setLogs![0]?.reps!,
-    );
+    const [weight, setWeight] = useState<number>(0);
+    const [reps, setReps] = useState<number>(0);
+
+    useEffect(() => {
+      if (exerciseLogDetails.setLogs?.length) {
+        console.log("из текущей тренировки");
+        const lastIndex = exerciseLogDetails.setLogs.length - 1;
+
+        setWeight(exerciseLogDetails.setLogs[lastIndex]?.weight!);
+        setReps(exerciseLogDetails.setLogs[lastIndex]?.reps!);
+      } else if (exerciseLogHistory.length) {
+        console.log("из истории");
+        const lastIndex = exerciseLogHistory.length - 1;
+
+        setWeight(exerciseLogHistory[0]!.setLogs![lastIndex]?.weight!);
+        setReps(exerciseLogHistory[0]!.setLogs![lastIndex]?.reps!);
+      }
+    }, [exerciseLogDetails, exerciseLogHistory]);
 
     function IncrementButtons({
       value,
