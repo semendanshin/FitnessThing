@@ -7,6 +7,7 @@ import { NextUIProvider } from "@nextui-org/system";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { init, swipeBehavior } from "@telegram-apps/sdk-react";
+import { I18nProvider } from "@react-aria/i18n";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -47,7 +48,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
       navigate={router.push}
     >
       <NextThemesProvider {...themeProps}>
-        <TelegramMiniAppProvider>{children}</TelegramMiniAppProvider>
+        <TelegramMiniAppProvider>
+          <I18nProvider locale="ru">{children}</I18nProvider>
+        </TelegramMiniAppProvider>
       </NextThemesProvider>
     </NextUIProvider>
   );

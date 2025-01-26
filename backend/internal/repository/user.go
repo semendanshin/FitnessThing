@@ -35,14 +35,14 @@ func (u userEntity) toDomain() domain.User {
 	return domain.User{
 		Model: domain.Model{
 			ID:        domain.ID(u.ID.Bytes),
-			CreatedAt: u.CreatedAt.Time,
-			UpdatedAt: u.UpdatedAt.Time,
+			CreatedAt: timeFromPgtype(u.CreatedAt),
+			UpdatedAt: timeFromPgtype(u.UpdatedAt),
 		},
 		Email:       u.Email,
 		Password:    u.Password,
 		FirstName:   u.FirstName,
 		LastName:    u.LastName,
-		DateOfBirth: u.DateOfBirth.Time,
+		DateOfBirth: timeFromPgtype(u.DateOfBirth),
 		Weight:      u.Weight.Float32,
 		Height:      u.Height.Float32,
 	}
@@ -66,7 +66,7 @@ func userFromDomain(user domain.User) userEntity {
 func (r *PGXRepository) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetUserByEmail")
 	defer span.Finish()
-	
+
 	const query = `
 		select id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at
 		from users u 
@@ -148,7 +148,7 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 func (r *PGXRepository) UpdateUser(ctx context.Context, user domain.User) (domain.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.UpdateUser")
 	defer span.Finish()
-	
+
 	const query = `
 		update users
 		set email=$2, first_name=$3, last_name=$4, date_of_birth=$5, height=$6, weight=$7, updated_at=$8

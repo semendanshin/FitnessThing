@@ -9,21 +9,11 @@ import (
 )
 
 func timeToPgtype(t time.Time) pgtype.Timestamptz {
-	var valid bool
-	if !t.IsZero() {
-		valid = true
-	}
-
-	return pgtype.Timestamptz{Time: t, Valid: valid}
+	return pgtype.Timestamptz{Time: t, Valid: !t.IsZero()}
 }
 
 func floatToPgtype(f float32) pgtype.Float4 {
-	var valid bool
-	if f != 0 {
-		valid = true
-	}
-
-	return pgtype.Float4{Float32: f, Valid: valid}
+	return pgtype.Float4{Float32: f, Valid: f != 0}
 }
 
 func uuidToPgtype(id domain.ID) pgtype.UUID {
@@ -36,4 +26,12 @@ func durationFromPgtype(d pgtype.Interval) time.Duration {
 
 func intervalToPgtype(d time.Duration) pgtype.Interval {
 	return pgtype.Interval{Microseconds: int64(d / time.Microsecond), Valid: d != 0}
+}
+
+func timeFromPgtype(t pgtype.Timestamptz) time.Time {
+	if !t.Valid {
+		return time.Time{}
+	}
+
+	return t.Time
 }

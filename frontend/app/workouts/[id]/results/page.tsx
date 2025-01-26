@@ -28,6 +28,8 @@ export default function RoutineDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const referer = document.referrer;
+  const returnableReferers = ["profile"];
 
   const [workoutDetails, setWorkoutDetails] =
     useState<WorkoutGetWorkoutResponse>();
@@ -389,7 +391,13 @@ export default function RoutineDetailsPage({
   return (
     <>
       <div className="py-4 flex flex-col flex-grow max-w-full gap-4">
-        <PageHeader title="Так держать!" />
+        <PageHeader
+          enableBackButton={returnableReferers.reduce(
+            (acc, option) => acc || referer.includes(option),
+            false,
+          )}
+          title="Так держать!"
+        />
         <div className="flex flex-col gap-4 px-4">
           <WorkoutResultsCard />
           {(workoutDetails?.workout?.routineId === undefined ||

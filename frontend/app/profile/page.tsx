@@ -1,11 +1,20 @@
 "use client";
-import { Avatar, Button, Card, CardBody, Divider } from "@nextui-org/react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Avatar } from "@nextui-org/avatar";
+import { Button } from "@nextui-org/button";
+import { Card } from "@nextui-org/card";
+import { Divider } from "@nextui-org/divider";
 
-import { Loading } from "@/components/loading";
 import { authApi, errUnauthorized } from "@/api/api";
+import { Loading } from "@/components/loading";
+import {
+  ChevronRightIcon,
+  EditIcon,
+  ListIcon,
+  TrophyIcon,
+} from "@/config/icons";
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -65,6 +74,28 @@ export default function ProfilePage() {
     router.push("/auth/login");
   }
 
+  function SubPageButton({
+    href,
+    label,
+    icon,
+  }: {
+    href: string;
+    label: string;
+    icon?: React.ReactNode;
+  }) {
+    return (
+      <Card isPressable className="p-3" onPress={() => router.push(href)}>
+        <div className="flex flex-row justify-between items-center w-full">
+          <div className="flex flex-row items-center gap-2">
+            {icon}
+            <p>{label}</p>
+          </div>
+          <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <div className="p-4 flex-grow gap-4">
       {/* <h1 className="text-2xl font-bold leading-tight">Профиль</h1> */}
@@ -75,14 +106,31 @@ export default function ProfilePage() {
             {user.firstName} {user.lastName}
           </h2>
         </div>
-        <Card className="flex flex-row flex-grow p-0 gap-4 justify-between">
+        {/* <Card className="flex flex-row flex-grow p-0 gap-4 justify-between">
           <CardBody>
             <p>
               <b>Email:</b>
             </p>
             <p>{user.email}</p>
           </CardBody>
-        </Card>
+        </Card> */}
+        <Divider />
+        {/* Кнопочки история трениировок и еще какие-то которые я не придумал */}
+        <SubPageButton
+          href="/profile/edit"
+          icon={<EditIcon className="w-4 h-4" fill="currentColor" />}
+          label="Редактировать профиль"
+        />
+        <SubPageButton
+          href="/profile/workouts"
+          icon={<ListIcon className="w-4 h-4" fill="currentColor" />}
+          label="История тренировок"
+        />
+        <SubPageButton
+          href="/profile/records"
+          icon={<TrophyIcon className="w-4 h-4" fill="currentColor" />}
+          label="Рекорды"
+        />
         {/*  Light and dark mode switch */}
         <Divider />
         <Button
