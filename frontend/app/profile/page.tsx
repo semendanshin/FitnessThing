@@ -98,7 +98,6 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 flex-grow gap-4">
-      {/* <h1 className="text-2xl font-bold leading-tight">Профиль</h1> */}
       <div className="grid grid-cols-1 gap-4 py-4">
         <div className="flex flex-col gap-4 items-center justify-around">
           <Avatar size="lg" src="https://i.pravatar.cc/300" />
@@ -106,14 +105,6 @@ export default function ProfilePage() {
             {user.firstName} {user.lastName}
           </h2>
         </div>
-        {/* <Card className="flex flex-row flex-grow p-0 gap-4 justify-between">
-          <CardBody>
-            <p>
-              <b>Email:</b>
-            </p>
-            <p>{user.email}</p>
-          </CardBody>
-        </Card> */}
         <Divider />
         {/* Кнопочки история трениировок и еще какие-то которые я не придумал */}
         <SubPageButton

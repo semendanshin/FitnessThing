@@ -7,6 +7,7 @@ import { Avatar } from "@nextui-org/avatar";
 import { DatePicker } from "@nextui-org/date-picker";
 import { Button } from "@nextui-org/button";
 import { CalendarDate } from "@internationalized/date";
+import { toast } from "react-toastify";
 
 import { PageHeader } from "@/components/page-header";
 import { WorkoutUser } from "@/api/api.generated";
@@ -39,15 +40,23 @@ function DataForm({ user }: { user: WorkoutUser }) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    await authApi.v1.userServiceUpdateUser({
-      firstName: userFirstName ? userFirstName : undefined,
-      lastName: userLastName ? userLastName : undefined,
-      dateOfBirth: userDateOfBirth
-        ? userDateOfBirth.toDate("UTC").toISOString()
-        : undefined,
-      weight: userWeight > 0 ? userWeight : undefined,
-      height: userHeight > 0 ? userHeight : undefined,
-    });
+    await authApi.v1
+      .userServiceUpdateUser({
+        firstName: userFirstName ? userFirstName : undefined,
+        lastName: userLastName ? userLastName : undefined,
+        dateOfBirth: userDateOfBirth
+          ? userDateOfBirth.toDate("UTC").toISOString()
+          : undefined,
+        weight: userWeight > 0 ? userWeight : undefined,
+        height: userHeight > 0 ? userHeight : undefined,
+      })
+      .then(() => {
+        toast.success("Данные успешно обновлены");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Ошибка при обновлении данных");
+      });
   }
 
   return (
