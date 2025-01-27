@@ -426,7 +426,7 @@ export default function RoutineDetailsPage({
   function HistoryContent() {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-6">
           {exerciseLogHistory.map(
             (exerciseLog, index) =>
               exerciseLog.setLogs!.length > 0 &&
@@ -441,7 +441,7 @@ export default function RoutineDetailsPage({
                       month: "long",
                     })}
                   </p>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
                     {exerciseLog.setLogs?.map((setLog, index) => (
                       <SetLogCard key={index} setLog={setLog} setNum={index} />
                     ))}

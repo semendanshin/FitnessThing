@@ -5373,6 +5373,248 @@ var _ interface {
 	ErrorName() string
 } = DeleteWorkoutRequestValidationError{}
 
+// Validate checks the field values on GetWorkoutsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetWorkoutsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetWorkoutsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetWorkoutsRequestMultiError, or nil if none found.
+func (m *GetWorkoutsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetWorkoutsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	if len(errors) > 0 {
+		return GetWorkoutsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetWorkoutsRequestMultiError is an error wrapping multiple validation errors
+// returned by GetWorkoutsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type GetWorkoutsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetWorkoutsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetWorkoutsRequestMultiError) AllErrors() []error { return m }
+
+// GetWorkoutsRequestValidationError is the validation error returned by
+// GetWorkoutsRequest.Validate if the designated constraints aren't met.
+type GetWorkoutsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetWorkoutsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetWorkoutsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetWorkoutsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetWorkoutsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetWorkoutsRequestValidationError) ErrorName() string {
+	return "GetWorkoutsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetWorkoutsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetWorkoutsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetWorkoutsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetWorkoutsRequestValidationError{}
+
+// Validate checks the field values on GetWorkoutsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetWorkoutsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetWorkoutsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetWorkoutsResponseMultiError, or nil if none found.
+func (m *GetWorkoutsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetWorkoutsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetWorkouts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetWorkoutsResponseValidationError{
+						field:  fmt.Sprintf("Workouts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetWorkoutsResponseValidationError{
+						field:  fmt.Sprintf("Workouts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetWorkoutsResponseValidationError{
+					field:  fmt.Sprintf("Workouts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetWorkoutsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetWorkoutsResponseMultiError is an error wrapping multiple validation
+// errors returned by GetWorkoutsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetWorkoutsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetWorkoutsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetWorkoutsResponseMultiError) AllErrors() []error { return m }
+
+// GetWorkoutsResponseValidationError is the validation error returned by
+// GetWorkoutsResponse.Validate if the designated constraints aren't met.
+type GetWorkoutsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetWorkoutsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetWorkoutsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetWorkoutsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetWorkoutsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetWorkoutsResponseValidationError) ErrorName() string {
+	return "GetWorkoutsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetWorkoutsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetWorkoutsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetWorkoutsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetWorkoutsResponseValidationError{}
+
 // Validate checks the field values on WorkoutsListResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -9106,6 +9348,174 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LogoutRequestValidationError{}
+
+// Validate checks the field values on GetWorkoutsResponse_WorkoutDetails with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *GetWorkoutsResponse_WorkoutDetails) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetWorkoutsResponse_WorkoutDetails
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// GetWorkoutsResponse_WorkoutDetailsMultiError, or nil if none found.
+func (m *GetWorkoutsResponse_WorkoutDetails) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetWorkoutsResponse_WorkoutDetails) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetWorkout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetWorkoutsResponse_WorkoutDetailsValidationError{
+					field:  "Workout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetWorkoutsResponse_WorkoutDetailsValidationError{
+					field:  "Workout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWorkout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetWorkoutsResponse_WorkoutDetailsValidationError{
+				field:  "Workout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetExerciseLogs() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetWorkoutsResponse_WorkoutDetailsValidationError{
+						field:  fmt.Sprintf("ExerciseLogs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetWorkoutsResponse_WorkoutDetailsValidationError{
+						field:  fmt.Sprintf("ExerciseLogs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetWorkoutsResponse_WorkoutDetailsValidationError{
+					field:  fmt.Sprintf("ExerciseLogs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetWorkoutsResponse_WorkoutDetailsMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetWorkoutsResponse_WorkoutDetailsMultiError is an error wrapping multiple
+// validation errors returned by
+// GetWorkoutsResponse_WorkoutDetails.ValidateAll() if the designated
+// constraints aren't met.
+type GetWorkoutsResponse_WorkoutDetailsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetWorkoutsResponse_WorkoutDetailsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetWorkoutsResponse_WorkoutDetailsMultiError) AllErrors() []error { return m }
+
+// GetWorkoutsResponse_WorkoutDetailsValidationError is the validation error
+// returned by GetWorkoutsResponse_WorkoutDetails.Validate if the designated
+// constraints aren't met.
+type GetWorkoutsResponse_WorkoutDetailsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) ErrorName() string {
+	return "GetWorkoutsResponse_WorkoutDetailsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetWorkoutsResponse_WorkoutDetailsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetWorkoutsResponse_WorkoutDetails.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetWorkoutsResponse_WorkoutDetailsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetWorkoutsResponse_WorkoutDetailsValidationError{}
 
 // Validate checks the field values on WorkoutReportResponse_AdditionalInfo
 // with the rules defined in the proto definition for this message. If any

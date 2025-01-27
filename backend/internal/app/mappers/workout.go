@@ -81,3 +81,28 @@ func SetLogsToProto(setLogs []domain.ExerciseSetLog) []*desc.SetLog {
 
 	return setLogsList
 }
+
+func ExerciseLogsToProto(exerciseLogs []domain.ExerciseLog) []*desc.ExerciseLog {
+	result := make([]*desc.ExerciseLog, 0, len(exerciseLogs))
+	for _, exerciseLog := range exerciseLogs {
+		result = append(result, ExerciseLogToProto(exerciseLog))
+	}
+
+	return result
+}
+
+func WorkoutDTOToProto(workoutDTO dto.WorkoutDTO) *desc.GetWorkoutsResponse_WorkoutDetails {
+	return &desc.GetWorkoutsResponse_WorkoutDetails{
+		Workout:      WorkoutToProto(workoutDTO.Workout),
+		ExerciseLogs: ExerciseLogsToProto(workoutDTO.ExerciseLogs),
+	}
+}
+
+func WorkoutsDTOToProto(workoutDTOs []dto.WorkoutDTO) []*desc.GetWorkoutsResponse_WorkoutDetails {
+	result := make([]*desc.GetWorkoutsResponse_WorkoutDetails, 0, len(workoutDTOs))
+	for _, workoutDTO := range workoutDTOs {
+		result = append(result, WorkoutDTOToProto(workoutDTO))
+	}
+
+	return result
+}

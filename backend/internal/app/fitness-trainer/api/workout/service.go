@@ -10,6 +10,7 @@ import (
 )
 
 type Service interface {
+	GetWorkouts(ctx context.Context, userID domain.ID, limit, offset int) ([]dto.WorkoutDTO, error)
 	StartWorkout(ctx context.Context, userID domain.ID, routineID *domain.ID) (domain.Workout, error)
 	GetWorkout(ctx context.Context, userID, workoutID domain.ID) (dto.WorkoutDetailsDTO, error)
 	DeleteWorkout(ctx context.Context, userID, workoutID domain.ID) error

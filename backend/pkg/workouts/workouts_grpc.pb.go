@@ -818,7 +818,7 @@ type WorkoutServiceClient interface {
 	// Метод для получения списка активных тренировок
 	GetActiveWorkouts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutsListResponse, error)
 	// Метод для получения списка всех тренировок
-	GetWorkouts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutsListResponse, error)
+	GetWorkouts(ctx context.Context, in *GetWorkoutsRequest, opts ...grpc.CallOption) (*GetWorkoutsResponse, error)
 	// Метод для создания записи о выполнении упражнения
 	LogExercise(ctx context.Context, in *LogExerciseRequest, opts ...grpc.CallOption) (*ExerciseLog, error)
 	// Метод для получения записи о выполнении упражнения
@@ -889,9 +889,9 @@ func (c *workoutServiceClient) GetActiveWorkouts(ctx context.Context, in *emptyp
 	return out, nil
 }
 
-func (c *workoutServiceClient) GetWorkouts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutsListResponse, error) {
+func (c *workoutServiceClient) GetWorkouts(ctx context.Context, in *GetWorkoutsRequest, opts ...grpc.CallOption) (*GetWorkoutsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WorkoutsListResponse)
+	out := new(GetWorkoutsResponse)
 	err := c.cc.Invoke(ctx, WorkoutService_GetWorkouts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -1012,7 +1012,7 @@ type WorkoutServiceServer interface {
 	// Метод для получения списка активных тренировок
 	GetActiveWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error)
 	// Метод для получения списка всех тренировок
-	GetWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error)
+	GetWorkouts(context.Context, *GetWorkoutsRequest) (*GetWorkoutsResponse, error)
 	// Метод для создания записи о выполнении упражнения
 	LogExercise(context.Context, *LogExerciseRequest) (*ExerciseLog, error)
 	// Метод для получения записи о выполнении упражнения
@@ -1055,7 +1055,7 @@ func (UnimplementedWorkoutServiceServer) DeleteWorkout(context.Context, *DeleteW
 func (UnimplementedWorkoutServiceServer) GetActiveWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActiveWorkouts not implemented")
 }
-func (UnimplementedWorkoutServiceServer) GetWorkouts(context.Context, *emptypb.Empty) (*WorkoutsListResponse, error) {
+func (UnimplementedWorkoutServiceServer) GetWorkouts(context.Context, *GetWorkoutsRequest) (*GetWorkoutsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkouts not implemented")
 }
 func (UnimplementedWorkoutServiceServer) LogExercise(context.Context, *LogExerciseRequest) (*ExerciseLog, error) {
@@ -1182,7 +1182,7 @@ func _WorkoutService_GetActiveWorkouts_Handler(srv interface{}, ctx context.Cont
 }
 
 func _WorkoutService_GetWorkouts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetWorkoutsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1194,7 +1194,7 @@ func _WorkoutService_GetWorkouts_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: WorkoutService_GetWorkouts_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkoutServiceServer).GetWorkouts(ctx, req.(*emptypb.Empty))
+		return srv.(WorkoutServiceServer).GetWorkouts(ctx, req.(*GetWorkoutsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

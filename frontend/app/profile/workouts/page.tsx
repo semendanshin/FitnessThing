@@ -1,11 +1,175 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, ScrollShadow } from "@nextui-org/react";
+
 import { PageHeader } from "@/components/page-header";
+import { Loading } from "@/components/loading";
+import { authApi, errUnauthorized } from "@/api/api";
+import { GetWorkoutsResponseWorkoutDetails } from "@/api/api.generated";
+import InfiniteScroll, {
+  useInfiniteScroll,
+} from "@/components/infinite-scroll";
+
+const limit = 10;
+
+function WorkoutHistoryCard({
+  workoutDetails,
+  onClick,
+}: {
+  workoutDetails: GetWorkoutsResponseWorkoutDetails;
+  onClick: () => void;
+}) {
+  function getWorkoutDuration(
+    workoutDetails: GetWorkoutsResponseWorkoutDetails,
+  ) {
+    const startDate = new Date(workoutDetails?.workout?.createdAt!);
+    const workoutDuration = new Date(
+      new Date(workoutDetails?.workout?.finishedAt!).getTime() -
+        startDate.getTime(),
+    );
+
+    const hours = workoutDuration.getUTCHours();
+    const minutes = workoutDuration.getUTCMinutes();
+
+    if (hours === 0) {
+      return `${minutes} мин.`;
+    }
+
+    return `${hours} ч. ${minutes} мин.`;
+  }
+
+  return (
+    <Card isPressable className="flex flex-col p-3 gap-2" onPress={onClick}>
+      <div className="flex justify-between items-center">
+        <p className="text-md font-bold">
+          {"Тренировка "}
+          {new Date(workoutDetails.workout?.createdAt!).toLocaleString(
+            "ru-RU",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            },
+          )}
+        </p>
+      </div>
+      <div className="flex justify-between items-center gap-2 w-full">
+        <div className="flex flex-row items-center gap-2">
+          <p className="text-xs font-semibold">{"Упражнения: "}</p>
+          <p className="text-xs">{workoutDetails.exerciseLogs?.length}</p>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <p className="text-xs font-semibold">{"Время: "}</p>
+          <p className="text-xs">{getWorkoutDuration(workoutDetails)}</p>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function WorkoutHistoryPage({
+  workouts,
+  fetchMore,
+  hasMore,
+}: {
+  workouts: GetWorkoutsResponseWorkoutDetails[];
+  fetchMore: () => Promise<void>;
+  hasMore: boolean;
+}) {
+  const router = useRouter();
+
+  return (
+    <ScrollShadow>
+      <InfiniteScroll
+        showLoading
+        className="flex flex-col gap-4 p-4"
+        fetchMore={fetchMore}
+        hasMore={hasMore}
+      >
+        {workouts.map((workout) => (
+          <WorkoutHistoryCard
+            key={workout.workout?.id}
+            workoutDetails={workout}
+            onClick={() => {
+              router.push(`/workouts/${workout.workout?.id}/results`);
+            }}
+          />
+        ))}
+      </InfiniteScroll>
+    </ScrollShadow>
+  );
+}
 
 export default function WorkoutsHistoryPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const { offset, setOffset, hasMore, setHasMore } = useInfiniteScroll();
+
+  const [exerciseLogHistory, setExerciseLogHistory] = useState<
+    GetWorkoutsResponseWorkoutDetails[]
+  >([]);
+
+  const router = useRouter();
+
+  async function fetchExerciseLogHistory() {
+    await authApi.v1
+      .workoutServiceGetWorkouts({ offset, limit })
+      .then((response) => {
+        console.log(response.data);
+        setExerciseLogHistory((prev) => [...prev, ...response.data.workouts!]);
+        setHasMore(response.data.workouts!.length === limit);
+        setOffset(offset + limit);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error === errUnauthorized || error.response?.status === 401) {
+          router.push("/auth/login");
+
+          return;
+        }
+        throw error;
+      });
+  }
+
+  async function fetchData() {
+    setIsLoading(true);
+    try {
+      await fetchExerciseLogHistory();
+      setIsError(false);
+    } catch {
+      setIsError(true);
+    }
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-4">
+        <h2 className="text-lg text-red-500">Ошибка при загрузке данных</h2>
+        <p>Проверьте соединение с сервером или обновите страницу.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="py-4 flex flex-col h-full">
       <PageHeader enableBackButton title="История" />
+      <WorkoutHistoryPage
+        fetchMore={fetchExerciseLogHistory}
+        hasMore={hasMore}
+        workouts={exerciseLogHistory}
+      />
     </div>
   );
 }

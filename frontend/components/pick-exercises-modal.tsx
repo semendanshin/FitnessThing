@@ -176,7 +176,7 @@ export function ModalSelectExercise({
       });
   }
 
-  const fetchMore = async (offset: number, limit: number) => {
+  const fetchMore = async () => {
     setHasMore(false);
     // await authApi.v1
     //     .exerciseServiceGetExercises(
@@ -258,9 +258,6 @@ export function ModalSelectExercise({
                   className="flex flex-col gap-2"
                   fetchMore={fetchMore}
                   hasMore={hasMore}
-                  limit={10}
-                  offset={offset}
-                  setOffset={setOffset}
                 >
                   {isLoading ? (
                     <>

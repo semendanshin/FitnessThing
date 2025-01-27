@@ -9,6 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+export interface GetWorkoutsResponseWorkoutDetails {
+  workout?: WorkoutWorkout;
+  exerciseLogs?: WorkoutExerciseLog[];
+}
+
 export interface RoutineServiceAddExerciseToRoutineBody {
   exerciseId: string;
 }
@@ -192,6 +197,10 @@ export interface WorkoutGetMuscleGroupsResponse {
 export interface WorkoutGetWorkoutResponse {
   workout?: WorkoutWorkout;
   exerciseLogs?: WorkoutExerciseLogDetails[];
+}
+
+export interface WorkoutGetWorkoutsResponse {
+  workouts?: GetWorkoutsResponseWorkoutDetails[];
 }
 
 export interface WorkoutLoginRequest {
@@ -990,10 +999,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/v1/workouts
      * @secure
      */
-    workoutServiceGetWorkouts: (params: RequestParams = {}) =>
-      this.request<WorkoutWorkoutsListResponse, RpcStatus>({
+    workoutServiceGetWorkouts: (
+      query?: {
+        /** @format int32 */
+        offset?: number;
+        /** @format int32 */
+        limit?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutGetWorkoutsResponse, RpcStatus>({
         path: `/v1/workouts`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,

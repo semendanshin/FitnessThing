@@ -500,7 +500,7 @@ service WorkoutService {
   }
 
   // Метод для получения списка всех тренировок
-  rpc GetWorkouts(google.protobuf.Empty) returns (WorkoutsListResponse) {
+  rpc GetWorkouts(GetWorkoutsRequest) returns (GetWorkoutsResponse) {
     option (google.api.http) = {
       get: "/v1/workouts"
     };
@@ -597,6 +597,20 @@ message DeleteWorkoutRequest {
   string workout_id = 1 [
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+message GetWorkoutsRequest {
+  int32 offset = 1;
+  int32 limit = 2;
+}
+
+message GetWorkoutsResponse {
+  message WorkoutDetails {
+    Workout workout = 1;
+    repeated ExerciseLog exercise_logs = 2;
+  }
+  
+  repeated WorkoutDetails workouts = 1;
 }
 
 message WorkoutsListResponse {

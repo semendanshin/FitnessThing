@@ -1,31 +1,25 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useIntersectionObserver } from "@siberiacancode/reactuse";
 
 import { Loading } from "./loading";
 
 export default function InfiniteScroll({
   fetchMore,
-  offset,
-  setOffset,
   hasMore,
-  limit,
   showLoading,
   showError,
   showEnd,
   children,
   ...props
 }: {
-  fetchMore: (offset: number, limit: number) => Promise<void>;
-  offset: number;
-  setOffset: Dispatch<SetStateAction<number>>;
+  fetchMore: () => Promise<void>;
   hasMore: boolean;
-  children: React.ReactNode;
-  limit: number;
   showLoading?: boolean;
   showError?: boolean;
   showEnd?: boolean;
+  children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -35,7 +29,7 @@ export default function InfiniteScroll({
 
     setIsLoading(true);
     try {
-      await fetchMore(offset, limit);
+      await fetchMore();
       setIsError(false);
     } catch (error) {
       console.log(error);
@@ -47,10 +41,9 @@ export default function InfiniteScroll({
 
   const { ref } = useIntersectionObserver<HTMLDivElement>({
     threshold: 0,
-    rootMargin: "200px",
+    rootMargin: "0px",
     onChange: (entry) => {
       if (entry.isIntersecting && !isLoading && hasMore) {
-        setOffset((prev) => prev + limit);
         fetchData();
       }
     },

@@ -163,3 +163,24 @@ func (r *PGXRepository) DeleteWorkout(ctx context.Context, id domain.ID) error {
 
 	return nil
 }
+
+func (r *PGXRepository) GetWorkouts(ctx context.Context, userID domain.ID, limit, offset int) ([]domain.Workout, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetWorkouts")
+	defer span.Finish()
+
+	query := `
+		SELECT id, user_id, routine_id, created_at, notes, rating, finished_at, updated_at
+		FROM workouts
+		WHERE user_id = $1 AND finished_at IS NOT NULL
+		ORDER BY created_at DESC
+		LIMIT $2 OFFSET $3
+	`
+
+	var workouts []workoutEntity
+	if err := pgxscan.Select(ctx, r.pool, &workouts, query, uuidToPgtype(userID), limit, offset); err != nil {
+		logger.Errorf("failed to get workouts: %v", err)
+		return nil, domain.ErrInternal
+	}
+
+	return toWorkoutsDomain(workouts), nil
+}

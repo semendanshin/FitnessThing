@@ -475,3 +475,28 @@ func (s *Service) AddCommentToWorkout(ctx context.Context, userID, workoutID dom
 
 	return workout, nil
 }
+
+func (s *Service) GetWorkouts(ctx context.Context, userID domain.ID, limit, offset int) ([]dto.WorkoutDTO, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.GetWorkouts")
+	defer span.Finish()
+
+	workouts, err := s.workoutRepository.GetWorkouts(ctx, userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	workoutsDTO := make([]dto.WorkoutDTO, 0, len(workouts))
+	for _, workout := range workouts {
+		exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByWorkoutID(ctx, workout.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		workoutsDTO = append(workoutsDTO, dto.WorkoutDTO{
+			Workout:      workout,
+			ExerciseLogs: exerciseLogs,
+		})
+	}
+
+	return workoutsDTO, nil
+}

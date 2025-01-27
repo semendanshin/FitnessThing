@@ -53,6 +53,7 @@ type muscleGroupRepository interface {
 }
 
 type workoutRepository interface {
+	GetWorkouts(ctx context.Context, userID domain.ID, limit, offset int) ([]domain.Workout, error)
 	CreateWorkout(ctx context.Context, workout domain.Workout) (domain.Workout, error)
 	GetWorkoutByID(ctx context.Context, id domain.ID) (domain.Workout, error)
 	GetActiveWorkouts(ctx context.Context, userID domain.ID) ([]domain.Workout, error)
