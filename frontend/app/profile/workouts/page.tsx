@@ -93,7 +93,7 @@ function WorkoutHistoryPage({
             key={workout.workout?.id}
             workoutDetails={workout}
             onClick={() => {
-              router.push(`/workouts/${workout.workout?.id}/results`);
+              router.push(`/profile/workouts/${workout.workout?.id}`);
             }}
           />
         ))}
