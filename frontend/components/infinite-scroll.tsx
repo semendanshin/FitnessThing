@@ -65,12 +65,9 @@ export default function InfiniteScroll({
 }
 
 export function useInfiniteScroll() {
-  const [offset, setOffset] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   return {
-    offset,
-    setOffset,
     hasMore,
     setHasMore,
   };

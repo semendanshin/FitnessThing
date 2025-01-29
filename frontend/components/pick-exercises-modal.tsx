@@ -96,7 +96,7 @@ export function ModalSelectExercise({
   const [serachQuery, setSearchQuery] = useState("");
   const [muscleGroup, setMuscleGroup] = useState("");
 
-  const { offset, setOffset, hasMore, setHasMore } = useInfiniteScroll();
+  const { hasMore, setHasMore } = useInfiniteScroll();
 
   const [exercises, setExercises] = useState<any[]>([]);
   const [muscleGroups, setMuscleGroups] = useState<any[]>([]);

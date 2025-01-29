@@ -105,8 +105,9 @@ function WorkoutHistoryPage({
 export default function WorkoutsHistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [offset, setOffset] = useState(0);
 
-  const { offset, setOffset, hasMore, setHasMore } = useInfiniteScroll();
+  const { hasMore, setHasMore } = useInfiniteScroll();
 
   const [exerciseLogHistory, setExerciseLogHistory] = useState<
     GetWorkoutsResponseWorkoutDetails[]
