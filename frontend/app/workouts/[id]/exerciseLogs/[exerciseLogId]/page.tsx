@@ -449,7 +449,6 @@ export default function RoutineDetailsPage({
             exerciseLogId,
             { powerRating: powerRatingRef.current },
           );
-          await fetchExerciseLogDetails();
         } catch (error) {
           console.log(error);
           toast.error("Failed to update power rating");
@@ -513,7 +512,6 @@ export default function RoutineDetailsPage({
               notes: notes,
             },
           );
-          await fetchExerciseLogDetails();
         } catch (error) {
           console.log(error);
           toast.error("Failed to update exercise log");
