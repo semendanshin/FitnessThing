@@ -11,7 +11,6 @@ import { Input, Textarea } from "@nextui-org/input";
 import clsx from "clsx";
 import { Form } from "@nextui-org/form";
 
-import { PageHeader } from "@/components/page-header";
 import {
   HollowStarIcon,
   PersonIcon,
@@ -24,10 +23,10 @@ import { Loading } from "@/components/loading";
 
 export function WorkoutResults({
   id,
-  enableBackButton,
+  className,
 }: {
   id: string;
-  enableBackButton?: boolean;
+  className?: string;
 }) {
   const [workoutDetails, setWorkoutDetails] =
     useState<WorkoutGetWorkoutResponse>();
@@ -388,16 +387,13 @@ export function WorkoutResults({
 
   return (
     <>
-      <div className="py-4 flex flex-col flex-grow max-w-full gap-4">
-        <PageHeader enableBackButton={enableBackButton} title="Так держать!" />
-        <div className="flex flex-col gap-4 px-4">
-          <WorkoutResultsCard />
-          {(workoutDetails?.workout?.routineId === undefined ||
-            workoutDetails?.workout?.routineId === "") && (
-            <SaveWorkoutAsRoutineCard />
-          )}
-          <RateWorkoutCard />
-        </div>
+      <div className={clsx("flex flex-col gap-4", className)}>
+        <WorkoutResultsCard />
+        {(workoutDetails?.workout?.routineId === undefined ||
+          workoutDetails?.workout?.routineId === "") && (
+          <SaveWorkoutAsRoutineCard />
+        )}
+        <RateWorkoutCard />
       </div>
       <SaveWorkoutAsRoutineModal />
     </>

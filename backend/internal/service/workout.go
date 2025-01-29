@@ -264,11 +264,6 @@ func (s *Service) DeleteWorkout(ctx context.Context, userID, workoutID domain.ID
 		return domain.ErrNotFound
 	}
 
-	if !workout.FinishedAt.IsZero() {
-		logger.Errorf("user %s tried to delete finished workout %s", userID, workoutID)
-		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
-	}
-
 	err = s.workoutRepository.DeleteWorkout(ctx, workoutID)
 	if err != nil {
 		return err
