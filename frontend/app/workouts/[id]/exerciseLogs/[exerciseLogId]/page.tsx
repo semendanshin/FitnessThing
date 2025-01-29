@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { Divider } from "@nextui-org/divider";
 
 import { PageHeader } from "@/components/page-header";
-import { TrashCanIcon } from "@/config/icons";
+import { BoltIcon, TrashCanIcon } from "@/config/icons";
 import { Loading } from "@/components/loading";
 import { WorkoutExerciseLogDetails, WorkoutSetLog } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -554,40 +554,62 @@ export default function RoutineDetailsPage({
 
   function HistoryContent() {
     return (
-      <Card>
-        <CardBody className="flex flex-col gap-6">
-          {exerciseLogHistory.map(
-            (exerciseLog, index) =>
-              exerciseLog.setLogs!.length > 0 &&
-              exerciseLog.exerciseLog?.workoutId != id && (
-                <div key={index} className="flex flex-col gap-2">
-                  <p className="text-lg font-bold">
-                    {new Date(
-                      exerciseLog.exerciseLog?.createdAt!,
-                    ).toLocaleDateString("ru-RU", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    })}
-                  </p>
+      <div className="flex flex-col gap-4">
+        {exerciseLogHistory.map(
+          (exerciseLog, index) =>
+            exerciseLog.setLogs!.length > 0 &&
+            exerciseLog.exerciseLog?.workoutId != id && (
+              <Card key={index}>
+                <CardBody className="flex flex-col gap-2">
+                  <div className="flex flex-row justify-between items-center">
+                    <p className="text-lg font-bold">
+                      {new Date(
+                        exerciseLog.exerciseLog?.createdAt!,
+                      ).toLocaleDateString("ru-RU", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+
+                    {exerciseLog.exerciseLog?.powerRating! !== 0 && (
+                      <div className="flex flex-row items-center">
+                        <BoltIcon className="w-3 h-3" />
+                        <p className="text-sm font-semibold">
+                          {exerciseLog.exerciseLog?.powerRating}/10
+                        </p>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex flex-col gap-1">
                     {exerciseLog.setLogs?.map((setLog, index) => (
                       <SetLogCard key={index} setLog={setLog} setNum={index} />
                     ))}
                   </div>
-                </div>
-              ),
-          )}
-          {exerciseLogHistory.length === 0 && (
-            <div className="flex flex-col gap-2">
-              <p>Пока тут пусто(</p>
-              <p className="text-sm font-light">
-                Сначала потренируйся, а потом мы покажем историю
-              </p>
-            </div>
-          )}
-        </CardBody>
-      </Card>
+                  {exerciseLog.exerciseLog?.notes && (
+                    <Textarea
+                      isReadOnly
+                      className="w-full"
+                      classNames={{
+                        input: "text-xs font-light",
+                      }}
+                      maxRows={4}
+                      value={exerciseLog.exerciseLog?.notes}
+                    />
+                  )}
+                </CardBody>
+              </Card>
+            ),
+        )}
+        {exerciseLogHistory.length === 0 && (
+          <div className="flex flex-col gap-2">
+            <p>Пока тут пусто(</p>
+            <p className="text-sm font-light">
+              Сначала потренируйся, а потом мы покажем историю
+            </p>
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -609,7 +631,7 @@ export default function RoutineDetailsPage({
             </DropdownItem>
           </PageHeader>
           <section className="flex flex-col flex-grow gap-4 px-4 justify-start">
-            <Tabs aria-label="Options">
+            <Tabs aria-label="Options" classNames={{ panel: "p-0" }}>
               <Tab key="today" title="Сегодня">
                 <TodayContent />
               </Tab>
