@@ -183,10 +183,10 @@ export function WorkoutResults({
                 {workoutExercise?.exercise?.name}
               </p>
               <p className="text-sm font-light min-w-fit">
-                {workoutExercise?.setLogs?.[0]?.weight}
+                {workoutExercise?.setLogs?.[0]?.weight || 0}
                 {" кг"}
                 {" x "}
-                {workoutExercise?.setLogs?.[0]?.reps}
+                {workoutExercise?.setLogs?.[0]?.reps || 0}
                 {" раз"}
               </p>
             </div>
