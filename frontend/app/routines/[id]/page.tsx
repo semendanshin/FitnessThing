@@ -86,7 +86,9 @@ export default function RoutineDetailsPage({
   async function submitPickExercise(exerciseIds: string[]) {
     console.log(exerciseIds);
     try {
-      await Promise.all(exerciseIds.map((eId) => addExerciseToRoutine(eId)));
+      for (const exerciseId of exerciseIds) {
+        await addExerciseToRoutine(exerciseId);
+      }
       await fetchRoutineDetails();
     } catch (error) {
       console.log(error);

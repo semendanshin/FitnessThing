@@ -137,28 +137,26 @@ export default function RoutineDetailsPage({
 
   async function addExercisesToWorkout(exerciseIds: string[]) {
     try {
-      await Promise.all(
-        exerciseIds.map((exerciseId) =>
-          authApi.v1
-            .workoutServiceLogExercise(id, {
-              exerciseId,
-            })
-            .then((response) => {
-              console.log(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-              if (error === errUnauthorized || error.response?.status === 401) {
-                router.push("/auth/login");
+      for (const exerciseId of exerciseIds) {
+        await authApi.v1
+          .workoutServiceLogExercise(id, {
+            exerciseId,
+          })
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error === errUnauthorized || error.response?.status === 401) {
+              router.push("/auth/login");
 
-                return;
-              }
-              throw error;
-            }),
-        ),
-      );
+              return;
+            }
+            throw error;
+          });
+      }
       onClose();
-      await fetchData();
+      await fetchWorkoutDetails();
     } catch (error) {
       console.log(error);
       toast.error("Failed to add exercises to workout");
