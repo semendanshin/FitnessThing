@@ -49,11 +49,13 @@ func SetLogToProto(setLog domain.ExerciseSetLog) *desc.SetLog {
 
 func ExerciseLogToProto(exerciseLog domain.ExerciseLog) *desc.ExerciseLog {
 	return &desc.ExerciseLog{
-		Id:         exerciseLog.ID.String(),
-		WorkoutId:  exerciseLog.WorkoutID.String(),
-		ExerciseId: exerciseLog.ExerciseID.String(),
-		CreatedAt:  timestamppb.New(exerciseLog.CreatedAt),
-		UpdatedAt:  timestamppb.New(exerciseLog.UpdatedAt),
+		Id:          exerciseLog.ID.String(),
+		WorkoutId:   exerciseLog.WorkoutID.String(),
+		ExerciseId:  exerciseLog.ExerciseID.String(),
+		PowerRating: int32(exerciseLog.PowerRating),
+		Notes:       exerciseLog.Notes,
+		CreatedAt:   timestamppb.New(exerciseLog.CreatedAt),
+		UpdatedAt:   timestamppb.New(exerciseLog.UpdatedAt),
 	}
 }
 

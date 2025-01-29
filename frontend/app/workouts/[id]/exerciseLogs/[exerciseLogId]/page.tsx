@@ -3,7 +3,7 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Form } from "@nextui-org/form";
-import { Input } from "@nextui-org/react";
+import { Input, Slider, Textarea } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { DropdownItem } from "@nextui-org/dropdown";
 import {
@@ -15,7 +15,7 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Divider } from "@nextui-org/divider";
 
@@ -333,100 +333,229 @@ export default function RoutineDetailsPage({
   }
 
   function TodayContent() {
-    const [weight, setWeight] = useState<number>(0);
-    const [reps, setReps] = useState<number>(0);
+    function SetLogsCard() {
+      const [weight, setWeight] = useState<number>(0);
+      const [reps, setReps] = useState<number>(0);
 
-    useEffect(() => {
-      if (exerciseLogDetails.setLogs?.length) {
-        console.log("из текущей тренировки");
-        const lastIndex = exerciseLogDetails.setLogs.length - 1;
+      useEffect(() => {
+        if (exerciseLogDetails.setLogs?.length) {
+          const lastIndex = exerciseLogDetails.setLogs.length - 1;
 
-        setWeight(exerciseLogDetails.setLogs[lastIndex]?.weight!);
-        setReps(exerciseLogDetails.setLogs[lastIndex]?.reps!);
-      } else if (exerciseLogHistory.length) {
-        console.log("из истории");
-        const lastIndex = exerciseLogHistory.length - 1;
+          setWeight(exerciseLogDetails.setLogs[lastIndex]?.weight!);
+          setReps(exerciseLogDetails.setLogs[lastIndex]?.reps!);
+        } else if (exerciseLogHistory.length) {
+          const lastIndex = exerciseLogHistory.length - 1;
 
-        setWeight(exerciseLogHistory[0]!.setLogs![lastIndex]?.weight!);
-        setReps(exerciseLogHistory[0]!.setLogs![lastIndex]?.reps!);
+          setWeight(exerciseLogHistory[0]!.setLogs![lastIndex]?.weight!);
+          setReps(exerciseLogHistory[0]!.setLogs![lastIndex]?.reps!);
+        }
+      }, [exerciseLogDetails, exerciseLogHistory]);
+
+      async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        try {
+          await authApi.v1.workoutServiceLogSet(id, exerciseLogId, {
+            weight: weight!,
+            reps: reps!,
+          });
+          await fetchExerciseLogDetails();
+        } catch (error) {
+          console.log(error);
+          toast.error("Failed to add exercises to workout");
+        }
       }
-    }, [exerciseLogDetails, exerciseLogHistory]);
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-      event.preventDefault();
-      try {
-        await authApi.v1.workoutServiceLogSet(id, exerciseLogId, {
-          weight: weight!,
-          reps: reps!,
-        });
-        await fetchExerciseLogDetails();
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to add exercises to workout");
+      async function onDeleteSet(setId: string) {
+        try {
+          await authApi.v1.workoutServiceDeleteSetLog(id, exerciseLogId, setId);
+          await fetchExerciseLogDetails();
+        } catch (error) {
+          console.log(error);
+          toast.error("Failed to delete set");
+        }
       }
+
+      return (
+        <Card>
+          <CardBody>
+            <div className="flex flex-col gap-4">
+              <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+                <div className="flex flex-row justify-around gap-4">
+                  <div className="flex flex-col gap-1 w-1/2">
+                    <InputWithIncrement
+                      label="Вес"
+                      placeholder="10"
+                      setValue={setWeight}
+                      type="number"
+                      value={weight}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 w-1/2">
+                    <InputWithIncrement
+                      label="Повторы"
+                      placeholder="10"
+                      setValue={setReps}
+                      type="number"
+                      value={reps}
+                    />
+                  </div>
+                </div>
+                <Button
+                  className="w-full"
+                  color="primary"
+                  size="sm"
+                  type="submit"
+                >
+                  Добавить
+                </Button>
+              </Form>
+              <Divider />
+              <div className="flex flex-col gap-2">
+                {exerciseLogDetails.setLogs?.map((setLog, index) => (
+                  <SetLogCard
+                    key={index}
+                    enableDelete
+                    setLog={setLog}
+                    setNum={index}
+                    onDelete={() => onDeleteSet(setLog.id!)}
+                    onPress={() => {
+                      setExerciseLogForUpdate(setLog);
+                      onOpen();
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      );
     }
 
-    async function onDeleteSet(setId: string) {
-      try {
-        await authApi.v1.workoutServiceDeleteSetLog(id, exerciseLogId, setId);
-        await fetchExerciseLogDetails();
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to delete set");
+    function PowerRatingCard() {
+      const [powerRating, setPowerRating] = useState<number>(
+        exerciseLogDetails.exerciseLog?.powerRating!,
+      );
+      const timeoutRef = useRef<NodeJS.Timeout>();
+      const powerRatingRef = useRef(powerRating);
+
+      useEffect(() => {
+        powerRatingRef.current = powerRating;
+      }, [powerRating]);
+
+      async function handlePowerRatingChange() {
+        try {
+          await authApi.v1.workoutServiceAddPowerRatingToExerciseLog(
+            id,
+            exerciseLogId,
+            { powerRating: powerRatingRef.current },
+          );
+          await fetchExerciseLogDetails();
+        } catch (error) {
+          console.log(error);
+          toast.error("Failed to update power rating");
+        }
       }
+
+      useEffect(() => {
+        return () => {
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+      }, []);
+
+      const handleChange = (value: number | number[]) => {
+        value = value as number;
+
+        setPowerRating(value);
+
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        timeoutRef.current = setTimeout(() => {
+          handlePowerRatingChange();
+        }, 500);
+      };
+
+      return (
+        <Card>
+          <CardBody>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-row gap-2 items-center">
+                <p>Оценка усилия:</p>
+                <p>{powerRating}</p>
+              </div>
+              <Slider
+                aria-label="Power rating"
+                className="w-full"
+                color="primary"
+                maxValue={10}
+                minValue={0}
+                size="sm"
+                step={1}
+                value={powerRating}
+                onChange={handleChange}
+              />
+            </div>
+          </CardBody>
+        </Card>
+      );
+    }
+
+    function NotesCard() {
+      const [notes, setNotes] = useState<string>(
+        exerciseLogDetails.exerciseLog?.notes!,
+      );
+
+      async function submitNotesChange() {
+        try {
+          await authApi.v1.workoutServiceAddNotesToExerciseLog(
+            id,
+            exerciseLogId,
+            {
+              notes: notes,
+            },
+          );
+          await fetchExerciseLogDetails();
+        } catch (error) {
+          console.log(error);
+          toast.error("Failed to update exercise log");
+        }
+      }
+
+      return (
+        <Card>
+          <CardBody className="flex flex-col gap-4">
+            <p>Заметки:</p>
+            <Textarea
+              className="w-full"
+              placeholder="Заметки"
+              value={notes}
+              onValueChange={(value) => setNotes(value)}
+            />
+            <Button
+              className="w-full"
+              color="primary"
+              size="sm"
+              onPress={submitNotesChange}
+            >
+              Сохранить
+            </Button>
+          </CardBody>
+        </Card>
+      );
     }
 
     return (
       <div className="flex flex-col gap-4">
-        <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-          <div className="flex flex-row justify-around gap-4">
-            <div className="flex flex-col gap-1 w-1/2">
-              <InputWithIncrement
-                label="Вес"
-                placeholder="10"
-                setValue={setWeight}
-                type="number"
-                value={weight}
-              />
-            </div>
-            <div className="flex flex-col gap-1 w-1/2">
-              <InputWithIncrement
-                label="Повторы"
-                placeholder="10"
-                setValue={setReps}
-                type="number"
-                value={reps}
-              />
-            </div>
-          </div>
-          <Button className="w-full" color="primary" size="sm" type="submit">
-            Добавить
-          </Button>
-        </Form>
-        <Divider />
-        <div className="flex flex-col gap-2">
-          {exerciseLogDetails.setLogs?.map((setLog, index) => (
-            <SetLogCard
-              key={index}
-              enableDelete
-              setLog={setLog}
-              setNum={index}
-              onDelete={() => onDeleteSet(setLog.id!)}
-              onPress={() => {
-                setExerciseLogForUpdate(setLog);
-                onOpen();
-              }}
-            />
-          ))}
-        </div>
+        <SetLogsCard />
+        <PowerRatingCard />
+        <NotesCard />
       </div>
     );
   }
 
   function HistoryContent() {
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-6">
+      <Card>
+        <CardBody className="flex flex-col gap-6">
           {exerciseLogHistory.map(
             (exerciseLog, index) =>
               exerciseLog.setLogs!.length > 0 &&
@@ -457,15 +586,7 @@ export default function RoutineDetailsPage({
               </p>
             </div>
           )}
-        </div>
-      </div>
-    );
-  }
-
-  function TabContent({ children }: { children: JSX.Element }) {
-    return (
-      <Card>
-        <CardBody>{children}</CardBody>
+        </CardBody>
       </Card>
     );
   }
@@ -490,14 +611,10 @@ export default function RoutineDetailsPage({
           <section className="flex flex-col flex-grow gap-4 px-4 justify-start">
             <Tabs aria-label="Options">
               <Tab key="today" title="Сегодня">
-                <TabContent>
-                  <TodayContent />
-                </TabContent>
+                <TodayContent />
               </Tab>
               <Tab key="history" title="История">
-                <TabContent>
-                  <HistoryContent />
-                </TabContent>
+                <HistoryContent />
               </Tab>
             </Tabs>
           </section>

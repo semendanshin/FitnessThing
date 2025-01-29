@@ -55,6 +55,15 @@ export interface WorkoutServiceAddCommentToWorkoutBody {
   comment?: string;
 }
 
+export interface WorkoutServiceAddNotesToExerciseLogBody {
+  notes?: string;
+}
+
+export interface WorkoutServiceAddPowerRatingToExerciseLogBody {
+  /** @format int32 */
+  powerRating?: number;
+}
+
 export type WorkoutServiceCompleteWorkoutBody = object;
 
 export interface WorkoutServiceLogExerciseBody {
@@ -1191,6 +1200,56 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}`,
         method: "DELETE",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags WorkoutService
+     * @name WorkoutServiceAddNotesToExerciseLog
+     * @summary Добавление заметки к выполнению упражнения
+     * @request POST:/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/notes
+     * @secure
+     */
+    workoutServiceAddNotesToExerciseLog: (
+      workoutId: string,
+      exerciseLogId: string,
+      body: WorkoutServiceAddNotesToExerciseLogBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}/notes`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags WorkoutService
+     * @name WorkoutServiceAddPowerRatingToExerciseLog
+     * @summary Добавить оценку усилий при выполнении упражнения
+     * @request POST:/v1/workouts/{workoutId}/log/exercise/{exerciseLogId}/power_rating
+     * @secure
+     */
+    workoutServiceAddPowerRatingToExerciseLog: (
+      workoutId: string,
+      exerciseLogId: string,
+      body: WorkoutServiceAddPowerRatingToExerciseLogBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/workouts/${workoutId}/log/exercise/${exerciseLogId}/power_rating`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
