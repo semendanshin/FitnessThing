@@ -960,6 +960,122 @@ func local_request_WorkoutService_DeleteExerciseLog_0(ctx context.Context, marsh
 	return msg, metadata, err
 }
 
+func request_WorkoutService_AddPowerRatingToExerciseLog_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddPowerRatingToExerciseLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	msg, err := client.AddPowerRatingToExerciseLog(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_WorkoutService_AddPowerRatingToExerciseLog_0(ctx context.Context, marshaler runtime.Marshaler, server WorkoutServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddPowerRatingToExerciseLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	msg, err := server.AddPowerRatingToExerciseLog(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_WorkoutService_AddNotesToExerciseLog_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddNotesToExerciseLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	msg, err := client.AddNotesToExerciseLog(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_WorkoutService_AddNotesToExerciseLog_0(ctx context.Context, marshaler runtime.Marshaler, server WorkoutServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AddNotesToExerciseLogRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["workout_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workout_id")
+	}
+	protoReq.WorkoutId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workout_id", err)
+	}
+	val, ok = pathParams["exercise_log_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_log_id")
+	}
+	protoReq.ExerciseLogId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_log_id", err)
+	}
+	msg, err := server.AddNotesToExerciseLog(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_WorkoutService_LogSet_0(ctx context.Context, marshaler runtime.Marshaler, client WorkoutServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq LogSetRequest
@@ -2002,6 +2118,46 @@ func RegisterWorkoutServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 		forward_WorkoutService_DeleteExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_WorkoutService_AddPowerRatingToExerciseLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/AddPowerRatingToExerciseLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/power_rating"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_WorkoutService_AddPowerRatingToExerciseLog_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_AddPowerRatingToExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_WorkoutService_AddNotesToExerciseLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/AddNotesToExerciseLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/notes"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_WorkoutService_AddNotesToExerciseLog_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_AddNotesToExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_WorkoutService_LogSet_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2872,6 +3028,40 @@ func RegisterWorkoutServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 		forward_WorkoutService_DeleteExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_WorkoutService_AddPowerRatingToExerciseLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/AddPowerRatingToExerciseLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/power_rating"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_WorkoutService_AddPowerRatingToExerciseLog_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_AddPowerRatingToExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_WorkoutService_AddNotesToExerciseLog_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/fitness_trainer.api.workout.WorkoutService/AddNotesToExerciseLog", runtime.WithHTTPPathPattern("/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/notes"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_WorkoutService_AddNotesToExerciseLog_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_WorkoutService_AddNotesToExerciseLog_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_WorkoutService_LogSet_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2995,39 +3185,43 @@ func RegisterWorkoutServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_WorkoutService_StartWorkout_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
-	pattern_WorkoutService_GetWorkout_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
-	pattern_WorkoutService_DeleteWorkout_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
-	pattern_WorkoutService_GetActiveWorkouts_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "workouts", "active"}, ""))
-	pattern_WorkoutService_GetWorkouts_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
-	pattern_WorkoutService_LogExercise_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"v1", "workouts", "workout_id", "log", "exercise"}, ""))
-	pattern_WorkoutService_GetExerciseLogDetails_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
-	pattern_WorkoutService_DeleteExerciseLog_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
-	pattern_WorkoutService_LogSet_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set"}, ""))
-	pattern_WorkoutService_UpdateSetLog_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
-	pattern_WorkoutService_DeleteSetLog_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
-	pattern_WorkoutService_CompleteWorkout_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "complete"}, ""))
-	pattern_WorkoutService_GetWorkoutReport_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "report"}, ""))
-	pattern_WorkoutService_RateWorkout_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "rate"}, ""))
-	pattern_WorkoutService_AddCommentToWorkout_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "comment"}, ""))
+	pattern_WorkoutService_StartWorkout_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
+	pattern_WorkoutService_GetWorkout_0                  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
+	pattern_WorkoutService_DeleteWorkout_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "workouts", "workout_id"}, ""))
+	pattern_WorkoutService_GetActiveWorkouts_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "workouts", "active"}, ""))
+	pattern_WorkoutService_GetWorkouts_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "workouts"}, ""))
+	pattern_WorkoutService_LogExercise_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"v1", "workouts", "workout_id", "log", "exercise"}, ""))
+	pattern_WorkoutService_GetExerciseLogDetails_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
+	pattern_WorkoutService_DeleteExerciseLog_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id"}, ""))
+	pattern_WorkoutService_AddPowerRatingToExerciseLog_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "power_rating"}, ""))
+	pattern_WorkoutService_AddNotesToExerciseLog_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "notes"}, ""))
+	pattern_WorkoutService_LogSet_0                      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set"}, ""))
+	pattern_WorkoutService_UpdateSetLog_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
+	pattern_WorkoutService_DeleteSetLog_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"v1", "workouts", "workout_id", "log", "exercise", "exercise_log_id", "set", "set_id"}, ""))
+	pattern_WorkoutService_CompleteWorkout_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "complete"}, ""))
+	pattern_WorkoutService_GetWorkoutReport_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "report"}, ""))
+	pattern_WorkoutService_RateWorkout_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "rate"}, ""))
+	pattern_WorkoutService_AddCommentToWorkout_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "workouts", "workout_id", "comment"}, ""))
 )
 
 var (
-	forward_WorkoutService_StartWorkout_0          = runtime.ForwardResponseMessage
-	forward_WorkoutService_GetWorkout_0            = runtime.ForwardResponseMessage
-	forward_WorkoutService_DeleteWorkout_0         = runtime.ForwardResponseMessage
-	forward_WorkoutService_GetActiveWorkouts_0     = runtime.ForwardResponseMessage
-	forward_WorkoutService_GetWorkouts_0           = runtime.ForwardResponseMessage
-	forward_WorkoutService_LogExercise_0           = runtime.ForwardResponseMessage
-	forward_WorkoutService_GetExerciseLogDetails_0 = runtime.ForwardResponseMessage
-	forward_WorkoutService_DeleteExerciseLog_0     = runtime.ForwardResponseMessage
-	forward_WorkoutService_LogSet_0                = runtime.ForwardResponseMessage
-	forward_WorkoutService_UpdateSetLog_0          = runtime.ForwardResponseMessage
-	forward_WorkoutService_DeleteSetLog_0          = runtime.ForwardResponseMessage
-	forward_WorkoutService_CompleteWorkout_0       = runtime.ForwardResponseMessage
-	forward_WorkoutService_GetWorkoutReport_0      = runtime.ForwardResponseMessage
-	forward_WorkoutService_RateWorkout_0           = runtime.ForwardResponseMessage
-	forward_WorkoutService_AddCommentToWorkout_0   = runtime.ForwardResponseMessage
+	forward_WorkoutService_StartWorkout_0                = runtime.ForwardResponseMessage
+	forward_WorkoutService_GetWorkout_0                  = runtime.ForwardResponseMessage
+	forward_WorkoutService_DeleteWorkout_0               = runtime.ForwardResponseMessage
+	forward_WorkoutService_GetActiveWorkouts_0           = runtime.ForwardResponseMessage
+	forward_WorkoutService_GetWorkouts_0                 = runtime.ForwardResponseMessage
+	forward_WorkoutService_LogExercise_0                 = runtime.ForwardResponseMessage
+	forward_WorkoutService_GetExerciseLogDetails_0       = runtime.ForwardResponseMessage
+	forward_WorkoutService_DeleteExerciseLog_0           = runtime.ForwardResponseMessage
+	forward_WorkoutService_AddPowerRatingToExerciseLog_0 = runtime.ForwardResponseMessage
+	forward_WorkoutService_AddNotesToExerciseLog_0       = runtime.ForwardResponseMessage
+	forward_WorkoutService_LogSet_0                      = runtime.ForwardResponseMessage
+	forward_WorkoutService_UpdateSetLog_0                = runtime.ForwardResponseMessage
+	forward_WorkoutService_DeleteSetLog_0                = runtime.ForwardResponseMessage
+	forward_WorkoutService_CompleteWorkout_0             = runtime.ForwardResponseMessage
+	forward_WorkoutService_GetWorkoutReport_0            = runtime.ForwardResponseMessage
+	forward_WorkoutService_RateWorkout_0                 = runtime.ForwardResponseMessage
+	forward_WorkoutService_AddCommentToWorkout_0         = runtime.ForwardResponseMessage
 )
 
 // RegisterUserServiceHandlerFromEndpoint is same as RegisterUserServiceHandler but

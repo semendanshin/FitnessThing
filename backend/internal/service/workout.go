@@ -495,3 +495,81 @@ func (s *Service) GetWorkouts(ctx context.Context, userID domain.ID, limit, offs
 
 	return workoutsDTO, nil
 }
+
+func (s *Service) AddNotesToExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, notes string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.AddNotesToExerciseLog")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to add notes to exercise log %s for workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to add notes to exercise instance of finished workout %s", userID, workoutID)
+		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	exerciseLog, err := s.exerciseLogRepository.GetExerciseLogByID(ctx, exerciseLogID)
+	if err != nil {
+		return err
+	}
+
+	if exerciseLog.WorkoutID != workoutID {
+		logger.Errorf("user %s tried to add notes to exercise log %s for workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	exerciseLog.Notes = notes
+
+	_, err = s.exerciseLogRepository.UpdateExerciseLog(ctx, exerciseLogID, exerciseLog)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) AddPowerRatingToExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, powerRating int) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.AddPowerRatingToExerciseLog")
+	defer span.Finish()
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	if workout.UserID != userID {
+		logger.Errorf("user %s tried to add power rating to exercise log %s of workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	if !workout.FinishedAt.IsZero() {
+		logger.Errorf("user %s tried to add power rating to exercise instance of finished workout %s", userID, workoutID)
+		return fmt.Errorf("%w: workout %s is already finished", domain.ErrInvalidArgument, workoutID)
+	}
+
+	exerciseLog, err := s.exerciseLogRepository.GetExerciseLogByID(ctx, exerciseLogID)
+	if err != nil {
+		return err
+	}
+
+	if exerciseLog.WorkoutID != workoutID {
+		logger.Errorf("user %s tried to add notes to exercise log %s for workout %s", userID, exerciseLogID, workoutID)
+		return domain.ErrNotFound
+	}
+
+	exerciseLog.PowerRating = powerRating
+
+	_, err = s.exerciseLogRepository.UpdateExerciseLog(ctx, exerciseLogID, exerciseLog)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

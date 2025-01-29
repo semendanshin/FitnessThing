@@ -788,21 +788,23 @@ var RoutineService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	WorkoutService_StartWorkout_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/StartWorkout"
-	WorkoutService_GetWorkout_FullMethodName            = "/fitness_trainer.api.workout.WorkoutService/GetWorkout"
-	WorkoutService_DeleteWorkout_FullMethodName         = "/fitness_trainer.api.workout.WorkoutService/DeleteWorkout"
-	WorkoutService_GetActiveWorkouts_FullMethodName     = "/fitness_trainer.api.workout.WorkoutService/GetActiveWorkouts"
-	WorkoutService_GetWorkouts_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/GetWorkouts"
-	WorkoutService_LogExercise_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/LogExercise"
-	WorkoutService_GetExerciseLogDetails_FullMethodName = "/fitness_trainer.api.workout.WorkoutService/GetExerciseLogDetails"
-	WorkoutService_DeleteExerciseLog_FullMethodName     = "/fitness_trainer.api.workout.WorkoutService/DeleteExerciseLog"
-	WorkoutService_LogSet_FullMethodName                = "/fitness_trainer.api.workout.WorkoutService/LogSet"
-	WorkoutService_UpdateSetLog_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/UpdateSetLog"
-	WorkoutService_DeleteSetLog_FullMethodName          = "/fitness_trainer.api.workout.WorkoutService/DeleteSetLog"
-	WorkoutService_CompleteWorkout_FullMethodName       = "/fitness_trainer.api.workout.WorkoutService/CompleteWorkout"
-	WorkoutService_GetWorkoutReport_FullMethodName      = "/fitness_trainer.api.workout.WorkoutService/GetWorkoutReport"
-	WorkoutService_RateWorkout_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/RateWorkout"
-	WorkoutService_AddCommentToWorkout_FullMethodName   = "/fitness_trainer.api.workout.WorkoutService/AddCommentToWorkout"
+	WorkoutService_StartWorkout_FullMethodName                = "/fitness_trainer.api.workout.WorkoutService/StartWorkout"
+	WorkoutService_GetWorkout_FullMethodName                  = "/fitness_trainer.api.workout.WorkoutService/GetWorkout"
+	WorkoutService_DeleteWorkout_FullMethodName               = "/fitness_trainer.api.workout.WorkoutService/DeleteWorkout"
+	WorkoutService_GetActiveWorkouts_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/GetActiveWorkouts"
+	WorkoutService_GetWorkouts_FullMethodName                 = "/fitness_trainer.api.workout.WorkoutService/GetWorkouts"
+	WorkoutService_LogExercise_FullMethodName                 = "/fitness_trainer.api.workout.WorkoutService/LogExercise"
+	WorkoutService_GetExerciseLogDetails_FullMethodName       = "/fitness_trainer.api.workout.WorkoutService/GetExerciseLogDetails"
+	WorkoutService_DeleteExerciseLog_FullMethodName           = "/fitness_trainer.api.workout.WorkoutService/DeleteExerciseLog"
+	WorkoutService_AddPowerRatingToExerciseLog_FullMethodName = "/fitness_trainer.api.workout.WorkoutService/AddPowerRatingToExerciseLog"
+	WorkoutService_AddNotesToExerciseLog_FullMethodName       = "/fitness_trainer.api.workout.WorkoutService/AddNotesToExerciseLog"
+	WorkoutService_LogSet_FullMethodName                      = "/fitness_trainer.api.workout.WorkoutService/LogSet"
+	WorkoutService_UpdateSetLog_FullMethodName                = "/fitness_trainer.api.workout.WorkoutService/UpdateSetLog"
+	WorkoutService_DeleteSetLog_FullMethodName                = "/fitness_trainer.api.workout.WorkoutService/DeleteSetLog"
+	WorkoutService_CompleteWorkout_FullMethodName             = "/fitness_trainer.api.workout.WorkoutService/CompleteWorkout"
+	WorkoutService_GetWorkoutReport_FullMethodName            = "/fitness_trainer.api.workout.WorkoutService/GetWorkoutReport"
+	WorkoutService_RateWorkout_FullMethodName                 = "/fitness_trainer.api.workout.WorkoutService/RateWorkout"
+	WorkoutService_AddCommentToWorkout_FullMethodName         = "/fitness_trainer.api.workout.WorkoutService/AddCommentToWorkout"
 )
 
 // WorkoutServiceClient is the client API for WorkoutService service.
@@ -825,6 +827,10 @@ type WorkoutServiceClient interface {
 	GetExerciseLogDetails(ctx context.Context, in *GetExerciseLogDetailRequest, opts ...grpc.CallOption) (*ExerciseLogResponse, error)
 	// Удалить запись о выполнении упражнения
 	DeleteExerciseLog(ctx context.Context, in *DeleteExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Добавить оценку усилий при выполнении упражнения
+	AddPowerRatingToExerciseLog(ctx context.Context, in *AddPowerRatingToExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Добавление заметки к выполнению упражнения
+	AddNotesToExerciseLog(ctx context.Context, in *AddNotesToExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для создания записи о выполнении подхода
 	LogSet(ctx context.Context, in *LogSetRequest, opts ...grpc.CallOption) (*SetLogResponse, error)
 	// Метод для изменения записи о выполнении подхода
@@ -929,6 +935,26 @@ func (c *workoutServiceClient) DeleteExerciseLog(ctx context.Context, in *Delete
 	return out, nil
 }
 
+func (c *workoutServiceClient) AddPowerRatingToExerciseLog(ctx context.Context, in *AddPowerRatingToExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkoutService_AddPowerRatingToExerciseLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workoutServiceClient) AddNotesToExerciseLog(ctx context.Context, in *AddNotesToExerciseLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkoutService_AddNotesToExerciseLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workoutServiceClient) LogSet(ctx context.Context, in *LogSetRequest, opts ...grpc.CallOption) (*SetLogResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SetLogResponse)
@@ -1019,6 +1045,10 @@ type WorkoutServiceServer interface {
 	GetExerciseLogDetails(context.Context, *GetExerciseLogDetailRequest) (*ExerciseLogResponse, error)
 	// Удалить запись о выполнении упражнения
 	DeleteExerciseLog(context.Context, *DeleteExerciseLogRequest) (*emptypb.Empty, error)
+	// Добавить оценку усилий при выполнении упражнения
+	AddPowerRatingToExerciseLog(context.Context, *AddPowerRatingToExerciseLogRequest) (*emptypb.Empty, error)
+	// Добавление заметки к выполнению упражнения
+	AddNotesToExerciseLog(context.Context, *AddNotesToExerciseLogRequest) (*emptypb.Empty, error)
 	// Метод для создания записи о выполнении подхода
 	LogSet(context.Context, *LogSetRequest) (*SetLogResponse, error)
 	// Метод для изменения записи о выполнении подхода
@@ -1066,6 +1096,12 @@ func (UnimplementedWorkoutServiceServer) GetExerciseLogDetails(context.Context, 
 }
 func (UnimplementedWorkoutServiceServer) DeleteExerciseLog(context.Context, *DeleteExerciseLogRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteExerciseLog not implemented")
+}
+func (UnimplementedWorkoutServiceServer) AddPowerRatingToExerciseLog(context.Context, *AddPowerRatingToExerciseLogRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPowerRatingToExerciseLog not implemented")
+}
+func (UnimplementedWorkoutServiceServer) AddNotesToExerciseLog(context.Context, *AddNotesToExerciseLogRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddNotesToExerciseLog not implemented")
 }
 func (UnimplementedWorkoutServiceServer) LogSet(context.Context, *LogSetRequest) (*SetLogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogSet not implemented")
@@ -1253,6 +1289,42 @@ func _WorkoutService_DeleteExerciseLog_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkoutService_AddPowerRatingToExerciseLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddPowerRatingToExerciseLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkoutServiceServer).AddPowerRatingToExerciseLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkoutService_AddPowerRatingToExerciseLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkoutServiceServer).AddPowerRatingToExerciseLog(ctx, req.(*AddPowerRatingToExerciseLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkoutService_AddNotesToExerciseLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddNotesToExerciseLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkoutServiceServer).AddNotesToExerciseLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkoutService_AddNotesToExerciseLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkoutServiceServer).AddNotesToExerciseLog(ctx, req.(*AddNotesToExerciseLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkoutService_LogSet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogSetRequest)
 	if err := dec(in); err != nil {
@@ -1417,6 +1489,14 @@ var WorkoutService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteExerciseLog",
 			Handler:    _WorkoutService_DeleteExerciseLog_Handler,
+		},
+		{
+			MethodName: "AddPowerRatingToExerciseLog",
+			Handler:    _WorkoutService_AddPowerRatingToExerciseLog_Handler,
+		},
+		{
+			MethodName: "AddNotesToExerciseLog",
+			Handler:    _WorkoutService_AddNotesToExerciseLog_Handler,
 		},
 		{
 			MethodName: "LogSet",

@@ -6429,6 +6429,235 @@ var _ interface {
 	ErrorName() string
 } = DeleteExerciseLogRequestValidationError{}
 
+// Validate checks the field values on AddPowerRatingToExerciseLogRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *AddPowerRatingToExerciseLogRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddPowerRatingToExerciseLogRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// AddPowerRatingToExerciseLogRequestMultiError, or nil if none found.
+func (m *AddPowerRatingToExerciseLogRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddPowerRatingToExerciseLogRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WorkoutId
+
+	// no validation rules for ExerciseLogId
+
+	if val := m.GetPowerRating(); val < 0 || val > 10 {
+		err := AddPowerRatingToExerciseLogRequestValidationError{
+			field:  "PowerRating",
+			reason: "value must be inside range [0, 10]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AddPowerRatingToExerciseLogRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddPowerRatingToExerciseLogRequestMultiError is an error wrapping multiple
+// validation errors returned by
+// AddPowerRatingToExerciseLogRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AddPowerRatingToExerciseLogRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddPowerRatingToExerciseLogRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddPowerRatingToExerciseLogRequestMultiError) AllErrors() []error { return m }
+
+// AddPowerRatingToExerciseLogRequestValidationError is the validation error
+// returned by AddPowerRatingToExerciseLogRequest.Validate if the designated
+// constraints aren't met.
+type AddPowerRatingToExerciseLogRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddPowerRatingToExerciseLogRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddPowerRatingToExerciseLogRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddPowerRatingToExerciseLogRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddPowerRatingToExerciseLogRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddPowerRatingToExerciseLogRequestValidationError) ErrorName() string {
+	return "AddPowerRatingToExerciseLogRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddPowerRatingToExerciseLogRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddPowerRatingToExerciseLogRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddPowerRatingToExerciseLogRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddPowerRatingToExerciseLogRequestValidationError{}
+
+// Validate checks the field values on AddNotesToExerciseLogRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddNotesToExerciseLogRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddNotesToExerciseLogRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddNotesToExerciseLogRequestMultiError, or nil if none found.
+func (m *AddNotesToExerciseLogRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddNotesToExerciseLogRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for WorkoutId
+
+	// no validation rules for ExerciseLogId
+
+	// no validation rules for Notes
+
+	if len(errors) > 0 {
+		return AddNotesToExerciseLogRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddNotesToExerciseLogRequestMultiError is an error wrapping multiple
+// validation errors returned by AddNotesToExerciseLogRequest.ValidateAll() if
+// the designated constraints aren't met.
+type AddNotesToExerciseLogRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddNotesToExerciseLogRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddNotesToExerciseLogRequestMultiError) AllErrors() []error { return m }
+
+// AddNotesToExerciseLogRequestValidationError is the validation error returned
+// by AddNotesToExerciseLogRequest.Validate if the designated constraints
+// aren't met.
+type AddNotesToExerciseLogRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddNotesToExerciseLogRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddNotesToExerciseLogRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddNotesToExerciseLogRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddNotesToExerciseLogRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddNotesToExerciseLogRequestValidationError) ErrorName() string {
+	return "AddNotesToExerciseLogRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddNotesToExerciseLogRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddNotesToExerciseLogRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddNotesToExerciseLogRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddNotesToExerciseLogRequestValidationError{}
+
 // Validate checks the field values on LogSetRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

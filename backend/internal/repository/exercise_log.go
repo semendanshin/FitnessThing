@@ -150,3 +150,23 @@ func (r *PGXRepository) DeleteExerciseLog(ctx context.Context, id domain.ID) err
 
 	return nil
 }
+
+func (r *PGXRepository) UpdateExerciseLog(ctx context.Context, id domain.ID, exerciseLog domain.ExerciseLog) (domain.ExerciseLog, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.UpdateExerciseLog")
+	defer span.Finish()
+
+	query := `
+		UPDATE exercise_logs
+		SET notes = $1, power_rating = $2, updated_at = now()
+		WHERE id = $3
+		RETURNING *
+	`
+
+	exerciseLogEntity := exerciseLogFromDomain(exerciseLog)
+
+	if err := pgxscan.Get(ctx, r.pool, &exerciseLogEntity, query, exerciseLogEntity.Notes, exerciseLogEntity.PowerRating, exerciseLogEntity.ID); err != nil {
+		return domain.ExerciseLog{}, err
+	}
+
+	return exerciseLogEntity.toDomain(), nil
+}

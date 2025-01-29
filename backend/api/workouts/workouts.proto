@@ -528,6 +528,22 @@ service WorkoutService {
     };
   }
 
+  // Добавить оценку усилий при выполнении упражнения
+  rpc AddPowerRatingToExerciseLog(AddPowerRatingToExerciseLogRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/power_rating"
+      body: "*"
+    };
+  }
+
+  // Добавление заметки к выполнению упражнения
+  rpc AddNotesToExerciseLog(AddNotesToExerciseLogRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workouts/{workout_id}/log/exercise/{exercise_log_id}/notes"
+      body: "*"
+    };
+  }
+
   // Метод для создания записи о выполнении подхода
   rpc LogSet(LogSetRequest) returns (SetLogResponse) {
     option (google.api.http) = {
@@ -653,6 +669,29 @@ message DeleteExerciseLogRequest {
   string exercise_log_id = 2 [
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+message AddPowerRatingToExerciseLogRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 power_rating = 3 [
+    (validate.rules).int32.gte = 0,
+    (validate.rules).int32.lte = 10
+  ];
+}
+
+message AddNotesToExerciseLogRequest {
+  string workout_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_log_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string notes = 3;
 }
 
 message LogSetRequest {

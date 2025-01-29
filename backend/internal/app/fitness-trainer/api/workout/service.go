@@ -22,6 +22,8 @@ type Service interface {
 	LogExercise(ctx context.Context, userID, workoutID, exerciseID domain.ID) (domain.ExerciseLog, error)
 	GetExerciseLog(ctx context.Context, userID, exerciseLogID domain.ID) (dto.ExerciseLogDTO, error)
 	DeleteExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID) error
+	AddNotesToExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, notes string) error
+	AddPowerRatingToExerciseLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, powerRating int) error
 
 	LogSet(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, setlogDTO dto.CreateSetLogDTO) (domain.ExerciseSetLog, error)
 	DeleteSetLog(ctx context.Context, userID, workoutID, exerciseLogID domain.ID, setLogID domain.ID) error

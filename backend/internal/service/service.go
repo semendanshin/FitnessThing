@@ -67,6 +67,7 @@ type exerciseLogRepository interface {
 	CreateExerciseLog(ctx context.Context, exerciseLog domain.ExerciseLog) (domain.ExerciseLog, error)
 	GetExerciseLogsByExerciseIDAndUserID(ctx context.Context, exerciseID, userID domain.ID) ([]domain.ExerciseLog, error)
 	DeleteExerciseLog(ctx context.Context, id domain.ID) error
+	UpdateExerciseLog(ctx context.Context, id domain.ID, exerciseLog domain.ExerciseLog) (domain.ExerciseLog, error)
 }
 
 type setLogRepository interface {
