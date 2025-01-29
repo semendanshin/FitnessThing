@@ -449,6 +449,14 @@ export default function RoutineDetailsPage({
                 </div>
               ),
           )}
+          {exerciseLogHistory.length === 0 && (
+            <div className="flex flex-col gap-2">
+              <p>Пока тут пусто(</p>
+              <p className="text-sm font-light">
+                Сначала потренируйся, а потом мы покажем историю
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
