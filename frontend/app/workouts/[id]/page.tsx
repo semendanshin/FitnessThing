@@ -218,9 +218,9 @@ export default function RoutineDetailsPage({
             Удалить
           </DropdownItem>
         </PageHeader>
-        <section className="flex flex-col gap-4 h-full overflow-y-scroll px-4 pt-4">
+        <section className="flex flex-col gap-4 h-full overflow-y-scroll">
           <ScrollShadow size={50}>
-            <div className="flex flex-col gap-2 ">
+            <div className="flex flex-col gap-2 p-4 ">
               {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
                 <ExerciseLogCard
                   key={index}
