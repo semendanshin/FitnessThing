@@ -299,6 +299,7 @@ export function WorkoutResults({
         <Button
           className="w-full"
           color="primary"
+          size="sm"
           onPress={() => {
             submitComment(comment);
           }}
@@ -318,6 +319,7 @@ export function WorkoutResults({
         <Button
           className="w-full"
           color="primary"
+          size="sm"
           onPress={() => {
             console.log("Save workout as template");
             onOpen();
