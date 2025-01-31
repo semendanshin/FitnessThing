@@ -288,6 +288,13 @@ service RoutineService {
     };
   }
 
+  // Получить информацию об упражнении в рутине
+  rpc GetExerciseInstanceDetails(GetExerciseInstanceDetailsRequest) returns (GetExerciseInstanceDetailsResponse) {
+    option (google.api.http) = {
+      get: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}"
+    };
+  }
+
   // Удаление упражнения из рутины
   rpc RemoveExerciseInstanceFromRoutine(RemoveExerciseInstanceFromRoutineRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -349,7 +356,7 @@ message GetRoutineDetailRequest {
   ];
 }
 
-message ExerciseInstanceDetailsResponse {
+message ExerciseInstanceDetails {
   ExerciseInstance exercise_instance = 1;
   Exercise exercise = 2;
   repeated Set sets = 3;
@@ -357,7 +364,7 @@ message ExerciseInstanceDetailsResponse {
 
 message RoutineDetailResponse {
   Routine routine = 1;
-  repeated ExerciseInstanceDetailsResponse exercise_instances = 2;
+  repeated ExerciseInstanceDetails exercise_instances = 2;
 }
 
 message ExerciseInstanceResponse {
@@ -381,6 +388,19 @@ message DeleteRoutineRequest {
   string routine_id = 1 [
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+message GetExerciseInstanceDetailsRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string exercise_instance_id = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetExerciseInstanceDetailsResponse {
+  ExerciseInstanceDetails exercise_instance_details = 1;
 }
 
 message RemoveExerciseInstanceFromRoutineRequest {
@@ -425,7 +445,7 @@ message AddSetToExerciseInstanceRequest {
     (validate.rules).int32.gt = 0
   ];
   float weight = 5 [
-    (validate.rules).float.gt = 0
+    (validate.rules).float.gte = 0
   ];
   google.protobuf.Duration time = 6;
 }
@@ -440,16 +460,16 @@ message UpdateSetInExerciseInstanceRequest {
   string set_id = 3 [
     (google.api.field_behavior) = REQUIRED
   ];
-  SetType set_type = 4 [
+  optional SetType set_type = 4 [
     (google.api.field_behavior) = REQUIRED
   ];
-  int32 reps = 5 [
+  optional int32 reps = 5 [
     (validate.rules).int32.gt = 0
   ];
-  float weight = 6 [
-    (validate.rules).float.gt = 0
+  optional float weight = 6 [
+    (validate.rules).float.gte = 0
   ];
-  google.protobuf.Duration time = 7;
+  optional google.protobuf.Duration time = 7;
 }
 
 message RemoveSetFromExerciseInstanceRequest {

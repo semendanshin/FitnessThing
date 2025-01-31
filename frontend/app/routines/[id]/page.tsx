@@ -14,12 +14,16 @@ import {
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
-import { PlusIcon, TrashCanIcon } from "@/config/icons";
+import { ChevronRightIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
 import { PageHeader } from "@/components/page-header";
 import { Loading } from "@/components/loading";
-import { WorkoutRoutineDetailResponse } from "@/api/api.generated";
+import {
+  WorkoutExerciseInstanceDetails,
+  WorkoutRoutineDetailResponse,
+} from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 
 export default function RoutineDetailsPage({
@@ -118,79 +122,50 @@ export default function RoutineDetailsPage({
     return <Loading />;
   }
 
-  function ExercieInstanceCard({ exerciseInstance }: any) {
-    const [isButtonLoading, setIsButtonLoading] = useState(false);
-
-    async function onExerciseInstanceDelete() {
-      try {
-        setIsButtonLoading(true);
-        await authApi.v1.routineServiceRemoveExerciseInstanceFromRoutine(
-          id,
-          exerciseInstance.exerciseInstance.id,
-        );
-        await fetchRoutineDetails();
-      } catch (error) {
-        console.log(error);
-        toast.error("Ошибка при удалении упражнения");
-        if (
-          error === errUnauthorized ||
-          (error as any).response?.status === 401
-        ) {
-          router.push("/auth/login");
-
-          return;
-        }
-      } finally {
-        setIsButtonLoading(false);
-      }
-    }
+  function ExercieInstanceCard({
+    exerciseInstanceDetails,
+  }: {
+    exerciseInstanceDetails: WorkoutExerciseInstanceDetails;
+  }) {
+    const setsCount = exerciseInstanceDetails.sets?.length || 0;
 
     return (
       <Card
-        key={exerciseInstance.exerciseInstance.id}
+        key={exerciseInstanceDetails.exerciseInstance!.id}
         fullWidth
+        as={Link}
         className="flex flex-row flex-grow p-2 gap-4 justify-between"
+        href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
         shadow="sm"
       >
         <div className="flex flex-col items-start justify-between p-2">
           <CardHeader className="p-0">
-            <p className="text-m font-bold">{exerciseInstance.exercise.name}</p>
+            <p className="text-m font-bold">
+              {exerciseInstanceDetails.exercise!.name}
+            </p>
           </CardHeader>
           <CardBody className="p-0">
             <div className="flex flex-row gap-1">
               <p className="text-xs text-gray-400 whitespace-nowrap">
-                {exerciseInstance.exerciseInstance.sets?.length || 0}{" "}
+                {setsCount}{" "}
                 {"подход" +
-                  ((exerciseInstance.exerciseInstance.sets?.length || 0) %
-                    10 ===
-                  1
+                  (setsCount % 10 === 1
                     ? ""
-                    : (exerciseInstance.exerciseInstance.sets?.length || 0) %
-                          10 >=
-                          2 &&
-                        (exerciseInstance.exerciseInstance.sets?.length || 0) %
-                          10 <=
-                          4
+                    : setsCount % 10 >= 2 && setsCount % 10 <= 4
                       ? "а"
                       : "ов")}
                 {" •"}
               </p>
               <p className="text-xs text-gray-400 whitespace-nowrap">
-                {exerciseInstance.exercise.targetMuscleGroups.join(", ")}
+                {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
+                  ", ",
+                )}
               </p>
             </div>
           </CardBody>
         </div>
         <div className="flex flex-col items-center justify-center p-2">
-          <Button
-            isIconOnly
-            color="danger"
-            isLoading={isButtonLoading}
-            size="sm"
-            onPress={onExerciseInstanceDelete}
-          >
-            {isButtonLoading ? "" : <TrashCanIcon className="w-3 h-3" />}
-          </Button>
+          <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
         </div>
       </Card>
     );
@@ -301,7 +276,7 @@ export default function RoutineDetailsPage({
 
   return (
     <>
-      <div className="flex-grow py-4">
+      <div className="flex flex-col py-4 gap-4">
         <PageHeader enableBackButton title={routineDetails.routine?.name!}>
           <DropdownItem key="rename" color="primary" onPress={onRenameOpen}>
             Переименовать
@@ -316,19 +291,21 @@ export default function RoutineDetailsPage({
           </DropdownItem>
         </PageHeader>
         {routineDetails.routine?.description ? (
-          <div className="py-2 px-4">
+          <div className="px-4">
             <p className="text-sm text-gray-500">
               {routineDetails.routine?.description}
             </p>
           </div>
         ) : null}
-        <div className="grid grid-cols-1 gap-4 p-4">
-          {routineDetails.exerciseInstances?.map((exerciseInstance: any) => (
-            <ExercieInstanceCard
-              key={exerciseInstance.exerciseInstance.id}
-              exerciseInstance={exerciseInstance}
-            />
-          ))}
+        <div className="grid grid-cols-1 gap-4 px-4">
+          {routineDetails.exerciseInstances?.map(
+            (exerciseInstanceDetails: WorkoutExerciseInstanceDetails) => (
+              <ExercieInstanceCard
+                key={exerciseInstanceDetails.exerciseInstance!.id}
+                exerciseInstanceDetails={exerciseInstanceDetails}
+              />
+            ),
+          )}
           <Button color="primary" onPress={onOpen}>
             <PlusIcon className="w-4 h-4" />
             Добавить упражнение

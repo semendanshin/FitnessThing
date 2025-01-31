@@ -3390,22 +3390,22 @@ var _ interface {
 	ErrorName() string
 } = GetRoutineDetailRequestValidationError{}
 
-// Validate checks the field values on ExerciseInstanceDetailsResponse with the
-// rules defined in the proto definition for this message. If any rules are
+// Validate checks the field values on ExerciseInstanceDetails with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *ExerciseInstanceDetailsResponse) Validate() error {
+func (m *ExerciseInstanceDetails) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ExerciseInstanceDetailsResponse with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// ExerciseInstanceDetailsResponseMultiError, or nil if none found.
-func (m *ExerciseInstanceDetailsResponse) ValidateAll() error {
+// ValidateAll checks the field values on ExerciseInstanceDetails with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExerciseInstanceDetailsMultiError, or nil if none found.
+func (m *ExerciseInstanceDetails) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
+func (m *ExerciseInstanceDetails) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -3416,7 +3416,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 		switch v := interface{}(m.GetExerciseInstance()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+				errors = append(errors, ExerciseInstanceDetailsValidationError{
 					field:  "ExerciseInstance",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -3424,7 +3424,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+				errors = append(errors, ExerciseInstanceDetailsValidationError{
 					field:  "ExerciseInstance",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -3433,7 +3433,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetExerciseInstance()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ExerciseInstanceDetailsResponseValidationError{
+			return ExerciseInstanceDetailsValidationError{
 				field:  "ExerciseInstance",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -3445,7 +3445,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 		switch v := interface{}(m.GetExercise()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+				errors = append(errors, ExerciseInstanceDetailsValidationError{
 					field:  "Exercise",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -3453,7 +3453,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+				errors = append(errors, ExerciseInstanceDetailsValidationError{
 					field:  "Exercise",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -3462,7 +3462,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetExercise()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ExerciseInstanceDetailsResponseValidationError{
+			return ExerciseInstanceDetailsValidationError{
 				field:  "Exercise",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -3477,7 +3477,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+					errors = append(errors, ExerciseInstanceDetailsValidationError{
 						field:  fmt.Sprintf("Sets[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -3485,7 +3485,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, ExerciseInstanceDetailsResponseValidationError{
+					errors = append(errors, ExerciseInstanceDetailsValidationError{
 						field:  fmt.Sprintf("Sets[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -3494,7 +3494,7 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return ExerciseInstanceDetailsResponseValidationError{
+				return ExerciseInstanceDetailsValidationError{
 					field:  fmt.Sprintf("Sets[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -3505,19 +3505,19 @@ func (m *ExerciseInstanceDetailsResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return ExerciseInstanceDetailsResponseMultiError(errors)
+		return ExerciseInstanceDetailsMultiError(errors)
 	}
 
 	return nil
 }
 
-// ExerciseInstanceDetailsResponseMultiError is an error wrapping multiple
-// validation errors returned by ExerciseInstanceDetailsResponse.ValidateAll()
-// if the designated constraints aren't met.
-type ExerciseInstanceDetailsResponseMultiError []error
+// ExerciseInstanceDetailsMultiError is an error wrapping multiple validation
+// errors returned by ExerciseInstanceDetails.ValidateAll() if the designated
+// constraints aren't met.
+type ExerciseInstanceDetailsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ExerciseInstanceDetailsResponseMultiError) Error() string {
+func (m ExerciseInstanceDetailsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -3526,12 +3526,11 @@ func (m ExerciseInstanceDetailsResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ExerciseInstanceDetailsResponseMultiError) AllErrors() []error { return m }
+func (m ExerciseInstanceDetailsMultiError) AllErrors() []error { return m }
 
-// ExerciseInstanceDetailsResponseValidationError is the validation error
-// returned by ExerciseInstanceDetailsResponse.Validate if the designated
-// constraints aren't met.
-type ExerciseInstanceDetailsResponseValidationError struct {
+// ExerciseInstanceDetailsValidationError is the validation error returned by
+// ExerciseInstanceDetails.Validate if the designated constraints aren't met.
+type ExerciseInstanceDetailsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -3539,24 +3538,24 @@ type ExerciseInstanceDetailsResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e ExerciseInstanceDetailsResponseValidationError) Field() string { return e.field }
+func (e ExerciseInstanceDetailsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ExerciseInstanceDetailsResponseValidationError) Reason() string { return e.reason }
+func (e ExerciseInstanceDetailsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ExerciseInstanceDetailsResponseValidationError) Cause() error { return e.cause }
+func (e ExerciseInstanceDetailsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ExerciseInstanceDetailsResponseValidationError) Key() bool { return e.key }
+func (e ExerciseInstanceDetailsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ExerciseInstanceDetailsResponseValidationError) ErrorName() string {
-	return "ExerciseInstanceDetailsResponseValidationError"
+func (e ExerciseInstanceDetailsValidationError) ErrorName() string {
+	return "ExerciseInstanceDetailsValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ExerciseInstanceDetailsResponseValidationError) Error() string {
+func (e ExerciseInstanceDetailsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -3568,14 +3567,14 @@ func (e ExerciseInstanceDetailsResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sExerciseInstanceDetailsResponse.%s: %s%s",
+		"invalid %sExerciseInstanceDetails.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ExerciseInstanceDetailsResponseValidationError{}
+var _ error = ExerciseInstanceDetailsValidationError{}
 
 var _ interface {
 	Field() string
@@ -3583,7 +3582,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ExerciseInstanceDetailsResponseValidationError{}
+} = ExerciseInstanceDetailsValidationError{}
 
 // Validate checks the field values on RoutineDetailResponse with the rules
 // defined in the proto definition for this message. If any rules are
@@ -4223,6 +4222,249 @@ var _ interface {
 	ErrorName() string
 } = DeleteRoutineRequestValidationError{}
 
+// Validate checks the field values on GetExerciseInstanceDetailsRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *GetExerciseInstanceDetailsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetExerciseInstanceDetailsRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// GetExerciseInstanceDetailsRequestMultiError, or nil if none found.
+func (m *GetExerciseInstanceDetailsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetExerciseInstanceDetailsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoutineId
+
+	// no validation rules for ExerciseInstanceId
+
+	if len(errors) > 0 {
+		return GetExerciseInstanceDetailsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetExerciseInstanceDetailsRequestMultiError is an error wrapping multiple
+// validation errors returned by
+// GetExerciseInstanceDetailsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetExerciseInstanceDetailsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetExerciseInstanceDetailsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetExerciseInstanceDetailsRequestMultiError) AllErrors() []error { return m }
+
+// GetExerciseInstanceDetailsRequestValidationError is the validation error
+// returned by GetExerciseInstanceDetailsRequest.Validate if the designated
+// constraints aren't met.
+type GetExerciseInstanceDetailsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetExerciseInstanceDetailsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetExerciseInstanceDetailsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetExerciseInstanceDetailsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetExerciseInstanceDetailsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetExerciseInstanceDetailsRequestValidationError) ErrorName() string {
+	return "GetExerciseInstanceDetailsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetExerciseInstanceDetailsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetExerciseInstanceDetailsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetExerciseInstanceDetailsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetExerciseInstanceDetailsRequestValidationError{}
+
+// Validate checks the field values on GetExerciseInstanceDetailsResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *GetExerciseInstanceDetailsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetExerciseInstanceDetailsResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// GetExerciseInstanceDetailsResponseMultiError, or nil if none found.
+func (m *GetExerciseInstanceDetailsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetExerciseInstanceDetailsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetExerciseInstanceDetails()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetExerciseInstanceDetailsResponseValidationError{
+					field:  "ExerciseInstanceDetails",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetExerciseInstanceDetailsResponseValidationError{
+					field:  "ExerciseInstanceDetails",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExerciseInstanceDetails()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetExerciseInstanceDetailsResponseValidationError{
+				field:  "ExerciseInstanceDetails",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetExerciseInstanceDetailsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetExerciseInstanceDetailsResponseMultiError is an error wrapping multiple
+// validation errors returned by
+// GetExerciseInstanceDetailsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetExerciseInstanceDetailsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetExerciseInstanceDetailsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetExerciseInstanceDetailsResponseMultiError) AllErrors() []error { return m }
+
+// GetExerciseInstanceDetailsResponseValidationError is the validation error
+// returned by GetExerciseInstanceDetailsResponse.Validate if the designated
+// constraints aren't met.
+type GetExerciseInstanceDetailsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetExerciseInstanceDetailsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetExerciseInstanceDetailsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetExerciseInstanceDetailsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetExerciseInstanceDetailsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetExerciseInstanceDetailsResponseValidationError) ErrorName() string {
+	return "GetExerciseInstanceDetailsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetExerciseInstanceDetailsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetExerciseInstanceDetailsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetExerciseInstanceDetailsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetExerciseInstanceDetailsResponseValidationError{}
+
 // Validate checks the field values on RemoveExerciseInstanceFromRoutineRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, the first error encountered is returned, or nil if
@@ -4535,10 +4777,10 @@ func (m *AddSetToExerciseInstanceRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetWeight() <= 0 {
+	if m.GetWeight() < 0 {
 		err := AddSetToExerciseInstanceRequestValidationError{
 			field:  "Weight",
-			reason: "value must be greater than 0",
+			reason: "value must be greater than or equal to 0",
 		}
 		if !all {
 			return err
@@ -4685,57 +4927,71 @@ func (m *UpdateSetInExerciseInstanceRequest) validate(all bool) error {
 
 	// no validation rules for SetId
 
-	// no validation rules for SetType
-
-	if m.GetReps() <= 0 {
-		err := UpdateSetInExerciseInstanceRequestValidationError{
-			field:  "Reps",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
+	if m.SetType != nil {
+		// no validation rules for SetType
 	}
 
-	if m.GetWeight() <= 0 {
-		err := UpdateSetInExerciseInstanceRequestValidationError{
-			field:  "Weight",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	if m.Reps != nil {
 
-	if all {
-		switch v := interface{}(m.GetTime()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpdateSetInExerciseInstanceRequestValidationError{
-					field:  "Time",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+		if m.GetReps() <= 0 {
+			err := UpdateSetInExerciseInstanceRequestValidationError{
+				field:  "Reps",
+				reason: "value must be greater than 0",
 			}
-		case interface{ Validate() error }:
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.Weight != nil {
+
+		if m.GetWeight() < 0 {
+			err := UpdateSetInExerciseInstanceRequestValidationError{
+				field:  "Weight",
+				reason: "value must be greater than or equal to 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if m.Time != nil {
+
+		if all {
+			switch v := interface{}(m.GetTime()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateSetInExerciseInstanceRequestValidationError{
+						field:  "Time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateSetInExerciseInstanceRequestValidationError{
+						field:  "Time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpdateSetInExerciseInstanceRequestValidationError{
+				return UpdateSetInExerciseInstanceRequestValidationError{
 					field:  "Time",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UpdateSetInExerciseInstanceRequestValidationError{
-				field:  "Time",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
 	if len(errors) > 0 {

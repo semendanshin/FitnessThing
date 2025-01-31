@@ -47,8 +47,8 @@ func ExerciseInstancesToProto(instances []domain.ExerciseInstance) []*desc.Exerc
 	return result
 }
 
-func ExerciseInstanceDetailToProto(instance dto.ExerciseInstanceDetailsDTO) *desc.ExerciseInstanceDetailsResponse {
-	return &desc.ExerciseInstanceDetailsResponse{
+func ExerciseInstanceDetailToProto(instance dto.ExerciseInstanceDetailsDTO) *desc.ExerciseInstanceDetails {
+	return &desc.ExerciseInstanceDetails{
 		ExerciseInstance: &desc.ExerciseInstance{
 			Id:         instance.ID.String(),
 			RoutineId:  instance.RoutineID.String(),
@@ -57,11 +57,12 @@ func ExerciseInstanceDetailToProto(instance dto.ExerciseInstanceDetailsDTO) *des
 			UpdatedAt:  timestamppb.New(instance.UpdatedAt),
 		},
 		Exercise: ExerciseToProto(instance.Exercise),
+		Sets:    SetsToProto(instance.Sets),
 	}
 }
 
-func ExerciseInstanceDetailsToProto(instances []dto.ExerciseInstanceDetailsDTO) []*desc.ExerciseInstanceDetailsResponse {
-	result := make([]*desc.ExerciseInstanceDetailsResponse, 0, len(instances))
+func ExerciseInstanceDetailsToProto(instances []dto.ExerciseInstanceDetailsDTO) []*desc.ExerciseInstanceDetails {
+	result := make([]*desc.ExerciseInstanceDetails, 0, len(instances))
 	for _, instance := range instances {
 		result = append(result, ExerciseInstanceDetailToProto(instance))
 	}

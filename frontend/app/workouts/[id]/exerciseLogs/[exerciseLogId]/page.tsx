@@ -264,6 +264,18 @@ export default function RoutineDetailsPage({
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
+      if (weight < 0) {
+        setErrors({ ...errors, weight: "Вес не может быть отрицательным" });
+
+        return;
+      }
+
+      if (reps <= 0) {
+        setErrors({ ...errors, reps: "Повторы должны быть больше 0" });
+
+        return;
+      }
+
       try {
         await authApi.v1.workoutServiceUpdateSetLog(
           id,

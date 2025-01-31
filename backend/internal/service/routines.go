@@ -4,6 +4,7 @@ import (
 	"context"
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/domain/dto"
+	"fitness-trainer/internal/logger"
 
 	"github.com/opentracing/opentracing-go"
 )
@@ -88,7 +89,10 @@ func (s *Service) GetRoutineByID(ctx context.Context, id domain.ID) (dto.Routine
 			return dto.RoutineDetailsDTO{}, err
 		}
 
-		// TODO: add sets
+		sets, err := s.setRepository.GetSetsByExerciseInstanceID(ctx, instance.ID)
+		if err != nil {
+			return dto.RoutineDetailsDTO{}, err
+		}
 
 		result.ExerciseInstances[i] = dto.ExerciseInstanceDetailsDTO{
 			ID:         instance.ID,
@@ -97,7 +101,7 @@ func (s *Service) GetRoutineByID(ctx context.Context, id domain.ID) (dto.Routine
 			CreatedAt:  instance.CreatedAt,
 			UpdatedAt:  instance.UpdatedAt,
 			Exercise:   exercise,
-			Sets:       []domain.Set{},
+			Sets:       sets,
 		}
 	}
 
@@ -110,6 +114,40 @@ func (s *Service) AddExerciseToRoutine(ctx context.Context, routineID domain.ID,
 
 	exerciseInstance := domain.NewExerciseInstance(routineID, exerciseID)
 	return s.exerciseInstanceRepository.CreateExerciseInstance(ctx, exerciseInstance)
+}
+
+func (s *Service) GetExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID domain.ID) (dto.ExerciseInstanceDetailsDTO, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.GetExerciseInstance")
+	defer span.Finish()
+
+	exerciseInstance, err := s.exerciseInstanceRepository.GetExerciseInstanceByID(ctx, exerciseInstanceID)
+	if err != nil {
+		return dto.ExerciseInstanceDetailsDTO{}, err
+	}
+
+	if exerciseInstance.RoutineID != routineID {
+		return dto.ExerciseInstanceDetailsDTO{}, domain.ErrUnauthorized
+	}
+
+	exercise, err := s.exerciseRepository.GetExerciseByID(ctx, exerciseInstance.ExerciseID)
+	if err != nil {
+		return dto.ExerciseInstanceDetailsDTO{}, err
+	}
+
+	sets, err := s.setRepository.GetSetsByExerciseInstanceID(ctx, exerciseInstanceID)
+	if err != nil {
+		return dto.ExerciseInstanceDetailsDTO{}, err
+	}
+
+	return dto.ExerciseInstanceDetailsDTO{
+		ID:         exerciseInstance.ID,
+		RoutineID:  exerciseInstance.RoutineID,
+		ExerciseID: exerciseInstance.ExerciseID,
+		CreatedAt:  exerciseInstance.CreatedAt,
+		UpdatedAt:  exerciseInstance.UpdatedAt,
+		Exercise:   exercise,
+		Sets:       sets,
+	}, nil
 }
 
 func (s *Service) RemoveExerciseInstanceFromRoutine(ctx context.Context, userID domain.ID, routineID domain.ID, exerciseInstanceID domain.ID) error {
@@ -153,4 +191,98 @@ func (s *Service) UpdateRoutine(ctx context.Context, id domain.ID, dto dto.Updat
 	}
 
 	return s.routineRepository.UpdateRoutine(ctx, id, routine)
+}
+
+func (s *Service) AddSetToExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID domain.ID, dto dto.CreateSetDTO) (domain.Set, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.AddSetToExerciseInstance")
+	defer span.Finish()
+
+	set := domain.NewSet(exerciseInstanceID, dto.SetType, dto.Reps.V, dto.Weight.V, dto.Time.V)
+	return s.setRepository.CreateSet(ctx, set)
+}
+
+func (s *Service) RemoveSetFromExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID, setID domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.RemoveSetFromExerciseInstance")
+	defer span.Finish()
+
+	routine, err := s.routineRepository.GetRoutineByID(ctx, routineID)
+	if err != nil {
+		return err
+	}
+
+	if routine.UserID != userID {
+		logger.Errorf("user %s is not authorized to remove set from exercise instance %s", userID, exerciseInstanceID)
+		return domain.ErrNotFound
+	}
+
+	exerciseInstance, err := s.exerciseInstanceRepository.GetExerciseInstanceByID(ctx, exerciseInstanceID)
+	if err != nil {
+		return err
+	}
+
+	if exerciseInstance.RoutineID != routineID {
+		logger.Errorf("exercise instance %s does not belong to routine %s", exerciseInstanceID, routineID)
+		return domain.ErrNotFound
+	}
+
+	set, err := s.setRepository.GetSetByID(ctx, setID)
+	if err != nil {
+		return err
+	}
+
+	if set.ExerciseInstanceID != exerciseInstanceID {
+		logger.Errorf("set %s does not belong to exercise instance %s", setID, exerciseInstanceID)
+		return domain.ErrNotFound
+	}
+
+	return s.setRepository.DeleteSet(ctx, setID)
+}
+
+func (s *Service) UpdateSetInExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID, setID domain.ID, dto dto.UpdateSetDTO) (domain.Set, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.UpdateSet")
+	defer span.Finish()
+
+	routine, err := s.routineRepository.GetRoutineByID(ctx, routineID)
+	if err != nil {
+		return domain.Set{}, err
+	}
+
+	if routine.UserID != userID {
+		logger.Errorf("user %s is not authorized to update set %s", userID, setID)
+		return domain.Set{}, domain.ErrUnauthorized
+	}
+
+	exerciseInstance, err := s.exerciseInstanceRepository.GetExerciseInstanceByID(ctx, exerciseInstanceID)
+	if err != nil {
+		return domain.Set{}, err
+	}
+
+	if exerciseInstance.RoutineID != routineID {
+		logger.Errorf("exercise instance %s does not belong to routine %s", exerciseInstanceID, routineID)
+		return domain.Set{}, domain.ErrNotFound
+	}
+
+	set, err := s.setRepository.GetSetByID(ctx, setID)
+	if err != nil {
+		return domain.Set{}, err
+	}
+
+	if set.ExerciseInstanceID != exerciseInstanceID {
+		logger.Errorf("set %s does not belong to exercise instance %s", setID, exerciseInstanceID)
+		return domain.Set{}, domain.ErrNotFound
+	}
+
+	if dto.Reps.IsValid {
+		set.Reps = dto.Reps.V
+	}
+
+	if dto.Weight.IsValid {
+		set.Weight = dto.Weight.V
+	}
+
+	if dto.Time.IsValid {
+		set.Time = dto.Time.V
+	}
+
+	return s.setRepository.UpdateSet(ctx, setID, set)
 }

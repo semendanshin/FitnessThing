@@ -330,6 +330,7 @@ const (
 	RoutineService_GetRoutineDetail_FullMethodName                  = "/fitness_trainer.api.workout.RoutineService/GetRoutineDetail"
 	RoutineService_DeleteRoutine_FullMethodName                     = "/fitness_trainer.api.workout.RoutineService/DeleteRoutine"
 	RoutineService_AddExerciseToRoutine_FullMethodName              = "/fitness_trainer.api.workout.RoutineService/AddExerciseToRoutine"
+	RoutineService_GetExerciseInstanceDetails_FullMethodName        = "/fitness_trainer.api.workout.RoutineService/GetExerciseInstanceDetails"
 	RoutineService_RemoveExerciseInstanceFromRoutine_FullMethodName = "/fitness_trainer.api.workout.RoutineService/RemoveExerciseInstanceFromRoutine"
 	RoutineService_AddSetToExerciseInstance_FullMethodName          = "/fitness_trainer.api.workout.RoutineService/AddSetToExerciseInstance"
 	RoutineService_UpdateSetInExerciseInstance_FullMethodName       = "/fitness_trainer.api.workout.RoutineService/UpdateSetInExerciseInstance"
@@ -352,6 +353,8 @@ type RoutineServiceClient interface {
 	DeleteRoutine(ctx context.Context, in *DeleteRoutineRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Добавление упражнения в рутину
 	AddExerciseToRoutine(ctx context.Context, in *AddExerciseToRoutineRequest, opts ...grpc.CallOption) (*RoutineInstanceResponse, error)
+	// Получить информацию об упражнении в рутине
+	GetExerciseInstanceDetails(ctx context.Context, in *GetExerciseInstanceDetailsRequest, opts ...grpc.CallOption) (*GetExerciseInstanceDetailsResponse, error)
 	// Удаление упражнения из рутины
 	RemoveExerciseInstanceFromRoutine(ctx context.Context, in *RemoveExerciseInstanceFromRoutineRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Метод для добавления сета в упражнение
@@ -430,6 +433,16 @@ func (c *routineServiceClient) AddExerciseToRoutine(ctx context.Context, in *Add
 	return out, nil
 }
 
+func (c *routineServiceClient) GetExerciseInstanceDetails(ctx context.Context, in *GetExerciseInstanceDetailsRequest, opts ...grpc.CallOption) (*GetExerciseInstanceDetailsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetExerciseInstanceDetailsResponse)
+	err := c.cc.Invoke(ctx, RoutineService_GetExerciseInstanceDetails_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *routineServiceClient) RemoveExerciseInstanceFromRoutine(ctx context.Context, in *RemoveExerciseInstanceFromRoutineRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -486,6 +499,8 @@ type RoutineServiceServer interface {
 	DeleteRoutine(context.Context, *DeleteRoutineRequest) (*emptypb.Empty, error)
 	// Добавление упражнения в рутину
 	AddExerciseToRoutine(context.Context, *AddExerciseToRoutineRequest) (*RoutineInstanceResponse, error)
+	// Получить информацию об упражнении в рутине
+	GetExerciseInstanceDetails(context.Context, *GetExerciseInstanceDetailsRequest) (*GetExerciseInstanceDetailsResponse, error)
 	// Удаление упражнения из рутины
 	RemoveExerciseInstanceFromRoutine(context.Context, *RemoveExerciseInstanceFromRoutineRequest) (*emptypb.Empty, error)
 	// Метод для добавления сета в упражнение
@@ -521,6 +536,9 @@ func (UnimplementedRoutineServiceServer) DeleteRoutine(context.Context, *DeleteR
 }
 func (UnimplementedRoutineServiceServer) AddExerciseToRoutine(context.Context, *AddExerciseToRoutineRequest) (*RoutineInstanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddExerciseToRoutine not implemented")
+}
+func (UnimplementedRoutineServiceServer) GetExerciseInstanceDetails(context.Context, *GetExerciseInstanceDetailsRequest) (*GetExerciseInstanceDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExerciseInstanceDetails not implemented")
 }
 func (UnimplementedRoutineServiceServer) RemoveExerciseInstanceFromRoutine(context.Context, *RemoveExerciseInstanceFromRoutineRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveExerciseInstanceFromRoutine not implemented")
@@ -663,6 +681,24 @@ func _RoutineService_AddExerciseToRoutine_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutineService_GetExerciseInstanceDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetExerciseInstanceDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutineServiceServer).GetExerciseInstanceDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutineService_GetExerciseInstanceDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutineServiceServer).GetExerciseInstanceDetails(ctx, req.(*GetExerciseInstanceDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RoutineService_RemoveExerciseInstanceFromRoutine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveExerciseInstanceFromRoutineRequest)
 	if err := dec(in); err != nil {
@@ -765,6 +801,10 @@ var RoutineService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddExerciseToRoutine",
 			Handler:    _RoutineService_AddExerciseToRoutine_Handler,
+		},
+		{
+			MethodName: "GetExerciseInstanceDetails",
+			Handler:    _RoutineService_GetExerciseInstanceDetails_Handler,
 		},
 		{
 			MethodName: "RemoveExerciseInstanceFromRoutine",

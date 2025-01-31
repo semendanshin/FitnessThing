@@ -82,6 +82,7 @@ func Run() error {
 		Repo,        // Workout
 		Repo,        // ExerciseLog
 		Repo,        // SetLog
+		Repo,        // Set
 	)
 
 	App := app.New(

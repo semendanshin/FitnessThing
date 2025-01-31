@@ -42,10 +42,32 @@ func exerciseInstanceFromDomain(exerciseInstance domain.ExerciseInstance) exerci
 	}
 }
 
+func (r *PGXRepository) GetExerciseInstanceByID(ctx context.Context, id domain.ID) (domain.ExerciseInstance, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetExerciseInstanceByID")
+	defer span.Finish()
+
+	query := `
+		SELECT * FROM exercise_instances ei
+		WHERE ei.id = $1
+	`
+
+	var exerciseInstance exerciseInstanceEntity
+	err := pgxscan.Get(ctx, r.pool, &exerciseInstance, query, uuidToPgtype(id))
+	if err != nil {
+		logger.Errorf("failed to get exercise instance by id: %v", err)
+		if err == pgx.ErrNoRows {
+			return domain.ExerciseInstance{}, domain.ErrNotFound
+		}
+		return domain.ExerciseInstance{}, err
+	}
+
+	return exerciseInstance.toDomain(), nil
+}
+
 func (r *PGXRepository) GetExerciseInstancesByRoutineID(ctx context.Context, routineID domain.ID) ([]domain.ExerciseInstance, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetExerciseInstancesByRoutineID")
 	defer span.Finish()
-	
+
 	query := `
 		SELECT * FROM exercise_instances ei
 		WHERE ei.routine_id = $1
@@ -93,7 +115,7 @@ func (r *PGXRepository) CreateExerciseInstance(ctx context.Context, exerciseInst
 func (r *PGXRepository) DeleteExerciseInstance(ctx context.Context, id domain.ID) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.DeleteExerciseInstance")
 	defer span.Finish()
-	
+
 	query := `
 		DELETE FROM exercise_instances
 		WHERE id = $1

@@ -167,9 +167,10 @@ func NewRoutine(userID ID, name, description string) Routine {
 type SetType string
 
 const (
-	SetTypeReps   SetType = "reps"
-	SetTypeWeight SetType = "weight"
-	SetTypeTime   SetType = "time"
+	SetTypeUnknown SetType = ""
+	SetTypeReps    SetType = "reps"
+	SetTypeWeight  SetType = "weight"
+	SetTypeTime    SetType = "time"
 )
 
 func (s SetType) String() string {
@@ -212,6 +213,17 @@ type Set struct {
 	Reps               int
 	Weight             float32
 	Time               time.Duration
+}
+
+func NewSet(exerciseInstanceID ID, setType SetType, reps int, weight float32, time time.Duration) Set {
+	return Set{
+		Model:              NewModel(),
+		ExerciseInstanceID: exerciseInstanceID,
+		SetType:            setType,
+		Reps:               reps,
+		Weight:             weight,
+		Time:               time,
+	}
 }
 
 type Workout struct {

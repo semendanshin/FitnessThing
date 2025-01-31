@@ -13,7 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { PlusIcon } from "@/config/icons";
+import { ChevronRightIcon, PlusIcon } from "@/config/icons";
 import { PageHeader } from "@/components/page-header";
 import { Loading } from "@/components/loading";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -78,11 +78,11 @@ export default function RoutinesPage() {
               key={routine.id}
               fullWidth
               as={Link}
-              className="flex flex-row flex-grow p-2 gap-4 justify-between"
+              className="flex flex-row items-center justify-between p-4 cursor-pointer gap-4"
               href={`/routines/${routine.id}`}
               shadow="sm"
             >
-              <div className="flex flex-col items-start justify-between p-2">
+              <div className="flex flex-col items-start justify-between">
                 <CardHeader className="p-0">
                   <p className="text-m font-bold">{routine.name}</p>
                 </CardHeader>
@@ -99,6 +99,9 @@ export default function RoutinesPage() {
                   </p>
                 </CardBody>
               </div>
+              <div className="flex flex-col items-center justify-between">
+                <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+              </div>
             </Card>
           ))}
           <Button color="primary" onPress={onOpen}>
@@ -114,7 +117,7 @@ export default function RoutinesPage() {
         onClose={onOpenChange}
       >
         <ModalContent>
-          {(onClose) => (
+          {() => (
             <>
               <ModalHeader>
                 <h2>Добавить рутину</h2>

@@ -157,7 +157,7 @@ export interface WorkoutExerciseInstance {
   updatedAt?: string;
 }
 
-export interface WorkoutExerciseInstanceDetailsResponse {
+export interface WorkoutExerciseInstanceDetails {
   exerciseInstance?: WorkoutExerciseInstance;
   exercise?: WorkoutExercise;
   sets?: WorkoutSet[];
@@ -193,6 +193,10 @@ export interface WorkoutExerciseResponse {
 
 export interface WorkoutGetExerciseAlternativesResponse {
   alternatives?: WorkoutExercise[];
+}
+
+export interface WorkoutGetExerciseInstanceDetailsResponse {
+  exerciseInstanceDetails?: WorkoutExerciseInstanceDetails;
 }
 
 export interface WorkoutGetExercisesResponse {
@@ -252,7 +256,7 @@ export interface WorkoutRoutine {
 
 export interface WorkoutRoutineDetailResponse {
   routine?: WorkoutRoutine;
-  exerciseInstances?: WorkoutExerciseInstanceDetailsResponse[];
+  exerciseInstances?: WorkoutExerciseInstanceDetails[];
 }
 
 export interface WorkoutRoutineInstanceResponse {
@@ -799,6 +803,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: body,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags RoutineService
+     * @name RoutineServiceGetExerciseInstanceDetails
+     * @summary Получить информацию об упражнении в рутине
+     * @request GET:/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}
+     * @secure
+     */
+    routineServiceGetExerciseInstanceDetails: (
+      routineId: string,
+      exerciseInstanceId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutGetExerciseInstanceDetailsResponse, RpcStatus>({
+        path: `/v1/routines/${routineId}/exercise_instances/${exerciseInstanceId}`,
+        method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),

@@ -42,6 +42,7 @@ type routineRepository interface {
 }
 
 type exerciseInstanceRepository interface {
+	GetExerciseInstanceByID(ctx context.Context, id domain.ID) (domain.ExerciseInstance, error)
 	GetExerciseInstancesByRoutineID(ctx context.Context, routineID domain.ID) ([]domain.ExerciseInstance, error)
 	CreateExerciseInstance(ctx context.Context, exerciseInstance domain.ExerciseInstance) (domain.ExerciseInstance, error)
 	DeleteExerciseInstance(ctx context.Context, id domain.ID) error
@@ -78,6 +79,14 @@ type setLogRepository interface {
 	UpdateSetLog(ctx context.Context, id domain.ID, setLog domain.ExerciseSetLog) (domain.ExerciseSetLog, error)
 }
 
+type setRepository interface {
+	GetSetsByExerciseInstanceID(ctx context.Context, exerciseInstanceID domain.ID) ([]domain.Set, error)
+	UpdateSet(ctx context.Context, id domain.ID, set domain.Set) (domain.Set, error)
+	CreateSet(ctx context.Context, set domain.Set) (domain.Set, error)
+	GetSetByID(ctx context.Context, id domain.ID) (domain.Set, error)
+	DeleteSet(ctx context.Context, id domain.ID) error
+}
+
 type Service struct {
 	jwtProvider                jwtProvider
 	sessionRepository          sessionRepository
@@ -89,6 +98,7 @@ type Service struct {
 	workoutRepository          workoutRepository
 	exerciseLogRepository      exerciseLogRepository
 	setLogRepository           setLogRepository
+	setRepository              setRepository
 }
 
 func New(
@@ -102,6 +112,7 @@ func New(
 	workoutRepository workoutRepository,
 	exerciseLogRepository exerciseLogRepository,
 	setLogRepository setLogRepository,
+	setRepository setRepository,
 ) *Service {
 	return &Service{
 		jwtProvider:                jwtProvider,
@@ -114,5 +125,6 @@ func New(
 		workoutRepository:          workoutRepository,
 		exerciseLogRepository:      exerciseLogRepository,
 		setLogRepository:           setLogRepository,
+		setRepository:              setRepository,
 	}
 }

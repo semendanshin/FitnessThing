@@ -476,6 +476,41 @@
       }
     },
     "/v1/routines/{routineId}/exercise_instances/{exerciseInstanceId}": {
+      "get": {
+        "summary": "Получить информацию об упражнении в рутине",
+        "operationId": "RoutineService_GetExerciseInstanceDetails",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutGetExerciseInstanceDetailsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "routineId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exerciseInstanceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RoutineService"
+        ]
+      },
       "delete": {
         "summary": "Удаление упражнения из рутины",
         "operationId": "RoutineService_RemoveExerciseInstanceFromRoutine",
@@ -1806,7 +1841,7 @@
       },
       "title": "Структура подхода"
     },
-    "workoutExerciseInstanceDetailsResponse": {
+    "workoutExerciseInstanceDetails": {
       "type": "object",
       "properties": {
         "exerciseInstance": {
@@ -1897,6 +1932,14 @@
             "type": "object",
             "$ref": "#/definitions/workoutExercise"
           }
+        }
+      }
+    },
+    "workoutGetExerciseInstanceDetailsResponse": {
+      "type": "object",
+      "properties": {
+        "exerciseInstanceDetails": {
+          "$ref": "#/definitions/workoutExerciseInstanceDetails"
         }
       }
     },
@@ -2048,7 +2091,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/workoutExerciseInstanceDetailsResponse"
+            "$ref": "#/definitions/workoutExerciseInstanceDetails"
           }
         }
       }
