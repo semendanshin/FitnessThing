@@ -62,6 +62,7 @@ func (r *PGXRepository) GetSetLogsByExerciseLogID(ctx context.Context, exerciseL
 		SELECT id, created_at, exercise_log_id, reps, weight, time, updated_at
 		FROM set_logs
 		WHERE exercise_log_id = $1
+		ORDER BY created_at
 	`
 
 	var setLogs []setLogEntity
@@ -109,7 +110,7 @@ func (r *PGXRepository) GetSetLogByID(ctx context.Context, id domain.ID) (domain
 	return setLog.toDomain(), nil
 }
 
-func (r *PGXRepository) DeleteSetLog(ctx context.Context, id domain.ID) error {	
+func (r *PGXRepository) DeleteSetLog(ctx context.Context, id domain.ID) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.DeleteSetLog")
 	defer span.Finish()
 

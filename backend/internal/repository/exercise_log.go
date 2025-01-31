@@ -63,6 +63,7 @@ func (r *PGXRepository) GetExerciseLogsByWorkoutID(ctx context.Context, workoutI
 		SELECT id, exercise_id, workout_id, notes, power_rating, created_at, updated_at
 		FROM exercise_logs
 		WHERE workout_id = $1
+		ORDER BY created_at
 	`
 
 	var exerciseLogs []exerciseLogEntity
