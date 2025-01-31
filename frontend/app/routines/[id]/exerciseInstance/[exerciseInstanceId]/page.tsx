@@ -219,9 +219,10 @@ export default function ExerciseInstancePage({
     async function onAddSet() {
       await authApi.v1
         .routineServiceAddSetToExerciseInstance(id, exerciseInstanceId, {
-          reps: exerciseInstanceDetails.sets![
-            exerciseInstanceDetails.sets!.length - 1
-          ].reps,
+          reps:
+            exerciseInstanceDetails.sets![
+              exerciseInstanceDetails.sets!.length - 1
+            ]?.reps! || 8,
           setType: WorkoutSetType.SET_TYPE_REPS,
         })
         .then((response) => {

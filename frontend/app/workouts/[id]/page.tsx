@@ -16,15 +16,19 @@ import { Loading } from "@/components/loading";
 import {
   WorkoutExerciseLogDetails,
   WorkoutGetWorkoutResponse,
+  WorkoutRoutineDetailResponse,
+  WorkoutExerciseInstanceDetails,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 
 function ExerciseLogCard({
   exerciseLogDetails,
   workoutId,
+  exerciseInstanceDetails,
 }: {
   exerciseLogDetails: WorkoutExerciseLogDetails;
   workoutId: string;
+  exerciseInstanceDetails?: WorkoutExerciseInstanceDetails;
 }) {
   return (
     <Card
@@ -34,8 +38,24 @@ function ExerciseLogCard({
       href={`/workouts/${workoutId}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
       shadow="sm"
     >
-      <div className="flex flex-col items-start justify-between w-full gap-2">
-        <p className="text-lg font-bold">{exerciseLogDetails.exercise?.name}</p>
+      <div className="flex flex-col items-start justify-between w-full gap-3">
+        <div className="flex flex-col">
+          <p className="text-lg font-bold">
+            {exerciseLogDetails.exercise?.name}
+          </p>
+          {exerciseInstanceDetails && (
+            <div className="text-xs font-light text-default-600">
+              {exerciseInstanceDetails?.sets?.length} подходов x{" "}
+              {(exerciseInstanceDetails?.sets?.reduce(
+                (acc, set) => acc + set.reps!,
+                0,
+              )! /
+                exerciseInstanceDetails.sets?.length!) |
+                0}{" "}
+              раз
+            </div>
+          )}
+        </div>
         {exerciseLogDetails.setLogs!.length > 0 && (
           <CardBody className="flex flex-col w-full gap-1 p-0">
             {exerciseLogDetails.setLogs?.map((setLog, setNum) => (
@@ -73,6 +93,9 @@ export default function RoutineDetailsPage({
   const [workoutDetails, setWorkoutDetails] =
     useState<WorkoutGetWorkoutResponse>({});
 
+  const [routineDetails, setRoutineDetails] =
+    useState<WorkoutRoutineDetailResponse>();
+
   const { id } = use(params);
 
   const router = useRouter();
@@ -85,6 +108,24 @@ export default function RoutineDetailsPage({
       .then((response) => {
         console.log(response.data);
         setWorkoutDetails(response.data!);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error === errUnauthorized || error.response?.status === 401) {
+          router.push("/auth/login");
+
+          return;
+        }
+        throw error;
+      });
+  }
+
+  async function fetchRoutineDetails(id: string) {
+    await authApi.v1
+      .routineServiceGetRoutineDetail(id)
+      .then((response) => {
+        console.log(response.data);
+        setRoutineDetails(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -192,6 +233,12 @@ export default function RoutineDetailsPage({
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (workoutDetails.workout?.routineId) {
+      fetchRoutineDetails(workoutDetails.workout?.routineId);
+    }
+  }, [workoutDetails]);
+
   if (isLoading) {
     return <Loading />;
   }
@@ -224,6 +271,11 @@ export default function RoutineDetailsPage({
               {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
                 <ExerciseLogCard
                   key={index}
+                  exerciseInstanceDetails={routineDetails?.exerciseInstances?.find(
+                    (exerciseInstance) =>
+                      exerciseInstance.exerciseInstance?.exerciseId ===
+                      exerciseLogDetails.exerciseLog?.exerciseId,
+                  )}
                   exerciseLogDetails={exerciseLogDetails}
                   workoutId={id}
                 />

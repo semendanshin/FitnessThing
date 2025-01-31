@@ -3,7 +3,8 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Form } from "@nextui-org/form";
-import { Input, Slider, Textarea } from "@nextui-org/react";
+import { Input, Textarea } from "@nextui-org/input";
+import { Slider } from "@nextui-org/slider";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { DropdownItem } from "@nextui-org/dropdown";
 import {
@@ -22,7 +23,12 @@ import { Divider } from "@nextui-org/divider";
 import { PageHeader } from "@/components/page-header";
 import { BoltIcon, TrashCanIcon } from "@/config/icons";
 import { Loading } from "@/components/loading";
-import { WorkoutExerciseLogDetails, WorkoutSetLog } from "@/api/api.generated";
+import {
+  WorkoutExerciseInstanceDetails,
+  WorkoutExerciseLogDetails,
+  WorkoutSet,
+  WorkoutSetLog,
+} from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 
 export default function RoutineDetailsPage({
@@ -40,6 +46,8 @@ export default function RoutineDetailsPage({
   const [exerciseLogHistory, setExerciseLogHistory] = useState<
     WorkoutExerciseLogDetails[]
   >([]);
+  const [exerciseInstanceDetails, setExerciseInstanceDetails] =
+    useState<WorkoutExerciseInstanceDetails>({});
   const [exerciseLogForUpdate, setExerciseLogForUpdate] =
     useState<WorkoutSetLog>({});
 
@@ -72,8 +80,37 @@ export default function RoutineDetailsPage({
         console.log(response.data);
         setExerciseLogHistory(
           response.data.exerciseLogs!.filter(
-            (log) => log.exerciseLog?.workoutId != id,
+            (log) =>
+              log.exerciseLog?.workoutId != id && log.setLogs?.length! > 0,
           ),
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error === errUnauthorized || error.response?.status === 401) {
+          router.push("/auth/login");
+
+          return;
+        }
+        throw error;
+      });
+  }
+
+  async function tryFetchExerciseInstanceDetails() {
+    const response = await authApi.v1.workoutServiceGetWorkout(id);
+
+    if (!response.data.workout?.routineId) {
+      return;
+    }
+    await authApi.v1
+      .routineServiceGetRoutineDetail(response.data.workout.routineId)
+      .then((response) => {
+        console.log(response.data);
+        setExerciseInstanceDetails(
+          response.data.exerciseInstances?.find(
+            (instance) =>
+              instance.exercise?.id === exerciseLogDetails.exercise?.id,
+          )!,
         );
       })
       .catch((error) => {
@@ -108,6 +145,7 @@ export default function RoutineDetailsPage({
     if (exerciseLogDetails.exercise?.id) {
       fetchExerciseLogHistory(exerciseLogDetails.exercise.id);
     }
+    tryFetchExerciseInstanceDetails();
   }, [exerciseLogDetails.exercise?.id]);
 
   if (isLoading) {
@@ -127,12 +165,14 @@ export default function RoutineDetailsPage({
     setLog,
     setNum,
     enableDelete,
+    isDisabled,
     onDelete,
     onPress,
   }: {
-    setLog: WorkoutSetLog;
+    setLog: WorkoutSetLog | WorkoutSet;
     setNum: number;
     enableDelete?: boolean;
+    isDisabled?: boolean;
     onDelete?: () => Promise<void>;
     onPress?: () => void;
   }) {
@@ -140,14 +180,21 @@ export default function RoutineDetailsPage({
 
     return (
       <Card
-        className="flex flex-row items-center justify-between p-2 w-full"
+        className="flex flex-row items-center justify-between p-2 w-full h-[2.5rem]"
+        isDisabled={isDisabled}
         isPressable={!!onPress}
         onPress={onPress}
       >
         <div className="flex flex-row w-full gap-2 px-2">
           <div className="text-sm font-semibold w-4">{setNum + 1}</div>
-          <div className="text-sm font-semibold w-fit">{setLog?.weight} кг</div>
-          <div className="text-sm font-semibold w-fit">x</div>
+          {"exerciseLogId" in setLog && (
+            <>
+              <div className="text-sm font-semibold w-fit">
+                {setLog?.weight} кг
+              </div>
+              <div className="text-sm font-semibold w-fit">x</div>
+            </>
+          )}
           <div className="text-sm font-semibold w-fit">{setLog?.reps} раз</div>
         </div>
         {enableDelete && (
@@ -436,6 +483,21 @@ export default function RoutineDetailsPage({
                     }}
                   />
                 ))}
+                {exerciseInstanceDetails &&
+                  exerciseInstanceDetails.sets?.length! > 0 && (
+                    <div>
+                      {exerciseInstanceDetails.sets
+                        ?.slice(exerciseLogDetails.setLogs?.length!)
+                        .map((set, index) => (
+                          <SetLogCard
+                            key={index}
+                            isDisabled
+                            setLog={set}
+                            setNum={index + exerciseLogDetails.setLogs?.length!}
+                          />
+                        ))}
+                    </div>
+                  )}
               </div>
             </div>
           </CardBody>
@@ -652,7 +714,6 @@ export default function RoutineDetailsPage({
           </section>
         </div>
       </div>
-      {/* <AddSetLogModal isOpen={isOpen} onClose={onClose} /> */}
       <UpdateSetLogModal
         isOpen={isOpen}
         setLog={exerciseLogForUpdate}
