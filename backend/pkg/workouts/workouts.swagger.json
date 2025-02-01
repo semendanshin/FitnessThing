@@ -1904,6 +1904,13 @@
             "type": "object",
             "$ref": "#/definitions/workoutSetLog"
           }
+        },
+        "expectedSets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workoutExpectedSet"
+          }
         }
       }
     },
@@ -1922,6 +1929,37 @@
           "$ref": "#/definitions/workoutExercise"
         }
       }
+    },
+    "workoutExpectedSet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "exerciseLogId": {
+          "type": "string"
+        },
+        "reps": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        },
+        "time": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Ожидаемый сет"
     },
     "workoutGetExerciseAlternativesResponse": {
       "type": "object",

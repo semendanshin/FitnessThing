@@ -1405,6 +1405,200 @@ var _ interface {
 	ErrorName() string
 } = ExerciseLogValidationError{}
 
+// Validate checks the field values on ExpectedSet with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ExpectedSet) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExpectedSet with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ExpectedSetMultiError, or
+// nil if none found.
+func (m *ExpectedSet) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExpectedSet) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for ExerciseLogId
+
+	// no validation rules for Reps
+
+	// no validation rules for Weight
+
+	if all {
+		switch v := interface{}(m.GetTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "Time",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "Time",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExpectedSetValidationError{
+				field:  "Time",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCreatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "CreatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExpectedSetValidationError{
+				field:  "CreatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUpdatedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExpectedSetValidationError{
+					field:  "UpdatedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpdatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExpectedSetValidationError{
+				field:  "UpdatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ExpectedSetMultiError(errors)
+	}
+
+	return nil
+}
+
+// ExpectedSetMultiError is an error wrapping multiple validation errors
+// returned by ExpectedSet.ValidateAll() if the designated constraints aren't met.
+type ExpectedSetMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExpectedSetMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExpectedSetMultiError) AllErrors() []error { return m }
+
+// ExpectedSetValidationError is the validation error returned by
+// ExpectedSet.Validate if the designated constraints aren't met.
+type ExpectedSetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExpectedSetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExpectedSetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExpectedSetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExpectedSetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExpectedSetValidationError) ErrorName() string { return "ExpectedSetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ExpectedSetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExpectedSet.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExpectedSetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExpectedSetValidationError{}
+
 // Validate checks the field values on SetLog with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -6113,6 +6307,40 @@ func (m *ExerciseLogDetails) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ExerciseLogDetailsValidationError{
 					field:  fmt.Sprintf("SetLogs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetExpectedSets() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ExerciseLogDetailsValidationError{
+						field:  fmt.Sprintf("ExpectedSets[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ExerciseLogDetailsValidationError{
+						field:  fmt.Sprintf("ExpectedSets[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExerciseLogDetailsValidationError{
+					field:  fmt.Sprintf("ExpectedSets[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

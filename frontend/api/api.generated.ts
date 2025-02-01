@@ -181,6 +181,7 @@ export interface WorkoutExerciseLogDetails {
   exerciseLog?: WorkoutExerciseLog;
   exercise?: WorkoutExercise;
   setLogs?: WorkoutSetLog[];
+  expectedSets?: WorkoutExpectedSet[];
 }
 
 export interface WorkoutExerciseLogResponse {
@@ -189,6 +190,21 @@ export interface WorkoutExerciseLogResponse {
 
 export interface WorkoutExerciseResponse {
   exercise?: WorkoutExercise;
+}
+
+/** Ожидаемый сет */
+export interface WorkoutExpectedSet {
+  id?: string;
+  exerciseLogId?: string;
+  /** @format int32 */
+  reps?: number;
+  /** @format float */
+  weight?: number;
+  time?: string;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  updatedAt?: string;
 }
 
 export interface WorkoutGetExerciseAlternativesResponse {

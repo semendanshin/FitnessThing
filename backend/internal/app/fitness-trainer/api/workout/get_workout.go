@@ -13,11 +13,10 @@ import (
 	"github.com/opentracing/opentracing-go"
 )
 
-
 func (i *Implementation) GetWorkout(ctx context.Context, in *desc.GetWorkoutRequest) (*desc.GetWorkoutResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "api.workout.GetWorkout")
 	defer span.Finish()
-	
+
 	if err := in.Validate(); err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
 	}

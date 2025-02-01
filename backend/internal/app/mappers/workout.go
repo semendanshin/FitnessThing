@@ -5,6 +5,7 @@ import (
 	"fitness-trainer/internal/domain/dto"
 	desc "fitness-trainer/pkg/workouts"
 
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -67,11 +68,32 @@ func ExerciseLogDTOsToProto(in []dto.ExerciseLogDTO) []*desc.ExerciseLogDetails 
 	return out
 }
 
+func ExpectedSetsToProto(expectedSets []domain.ExpectedSet) []*desc.ExpectedSet {
+	out := make([]*desc.ExpectedSet, 0, len(expectedSets))
+	for _, expectedSet := range expectedSets {
+		out = append(out, ExpectedSetToProto(expectedSet))
+	}
+	return out
+}
+
+func ExpectedSetToProto(expectedSet domain.ExpectedSet) *desc.ExpectedSet {
+	return &desc.ExpectedSet{
+		Id:            expectedSet.ID.String(),
+		ExerciseLogId: expectedSet.ExerciseLogID.String(),
+		Reps:          int32(expectedSet.Reps),
+		Weight:        expectedSet.Weight,
+		Time:          durationpb.New(expectedSet.Time),
+		CreatedAt:     timestamppb.New(expectedSet.CreatedAt),
+		UpdatedAt:     timestamppb.New(expectedSet.UpdatedAt),
+	}
+}
+
 func ExerciseLogDTOToProto(in dto.ExerciseLogDTO) *desc.ExerciseLogDetails {
 	return &desc.ExerciseLogDetails{
-		ExerciseLog: ExerciseLogToProto(in.ExerviceLog),
-		Exercise:    ExerciseToProto(in.Exercise),
-		SetLogs:     SetLogsToProto(in.SetLogs),
+		ExerciseLog:  ExerciseLogToProto(in.ExerciseLog),
+		Exercise:     ExerciseToProto(in.Exercise),
+		SetLogs:      SetLogsToProto(in.SetLogs),
+		ExpectedSets: ExpectedSetsToProto(in.ExpectedSets),
 	}
 }
 

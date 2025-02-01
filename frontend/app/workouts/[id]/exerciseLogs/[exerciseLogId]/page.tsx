@@ -24,8 +24,8 @@ import { PageHeader } from "@/components/page-header";
 import { BoltIcon, TrashCanIcon } from "@/config/icons";
 import { Loading } from "@/components/loading";
 import {
-  WorkoutExerciseInstanceDetails,
   WorkoutExerciseLogDetails,
+  WorkoutExpectedSet,
   WorkoutSet,
   WorkoutSetLog,
 } from "@/api/api.generated";
@@ -46,8 +46,6 @@ export default function RoutineDetailsPage({
   const [exerciseLogHistory, setExerciseLogHistory] = useState<
     WorkoutExerciseLogDetails[]
   >([]);
-  const [exerciseInstanceDetails, setExerciseInstanceDetails] =
-    useState<WorkoutExerciseInstanceDetails>({});
   const [exerciseLogForUpdate, setExerciseLogForUpdate] =
     useState<WorkoutSetLog>({});
 
@@ -96,34 +94,6 @@ export default function RoutineDetailsPage({
       });
   }
 
-  async function tryFetchExerciseInstanceDetails() {
-    const response = await authApi.v1.workoutServiceGetWorkout(id);
-
-    if (!response.data.workout?.routineId) {
-      return;
-    }
-    await authApi.v1
-      .routineServiceGetRoutineDetail(response.data.workout.routineId)
-      .then((response) => {
-        console.log(response.data);
-        setExerciseInstanceDetails(
-          response.data.exerciseInstances?.find(
-            (instance) =>
-              instance.exercise?.id === exerciseLogDetails.exercise?.id,
-          )!,
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error === errUnauthorized || error.response?.status === 401) {
-          router.push("/auth/login");
-
-          return;
-        }
-        throw error;
-      });
-  }
-
   async function fetchData() {
     setIsLoading(true);
     try {
@@ -145,7 +115,6 @@ export default function RoutineDetailsPage({
     if (exerciseLogDetails.exercise?.id) {
       fetchExerciseLogHistory(exerciseLogDetails.exercise.id);
     }
-    tryFetchExerciseInstanceDetails();
   }, [exerciseLogDetails.exercise?.id]);
 
   if (isLoading) {
@@ -169,7 +138,7 @@ export default function RoutineDetailsPage({
     onDelete,
     onPress,
   }: {
-    setLog: WorkoutSetLog | WorkoutSet;
+    setLog: WorkoutSetLog | WorkoutExpectedSet;
     setNum: number;
     enableDelete?: boolean;
     isDisabled?: boolean;
@@ -483,21 +452,20 @@ export default function RoutineDetailsPage({
                     }}
                   />
                 ))}
-                {exerciseInstanceDetails &&
-                  exerciseInstanceDetails.sets?.length! > 0 && (
-                    <div>
-                      {exerciseInstanceDetails.sets
-                        ?.slice(exerciseLogDetails.setLogs?.length!)
-                        .map((set, index) => (
-                          <SetLogCard
-                            key={index}
-                            isDisabled
-                            setLog={set}
-                            setNum={index + exerciseLogDetails.setLogs?.length!}
-                          />
-                        ))}
-                    </div>
-                  )}
+                {exerciseLogDetails.expectedSets?.length! > 0 && (
+                  <div className="flex flex-col gap-2">
+                    {exerciseLogDetails.expectedSets
+                      ?.slice(exerciseLogDetails.setLogs?.length!)
+                      .map((set, index) => (
+                        <SetLogCard
+                          key={index}
+                          isDisabled
+                          setLog={set}
+                          setNum={index + exerciseLogDetails.setLogs?.length!}
+                        />
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </CardBody>

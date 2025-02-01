@@ -54,7 +54,30 @@ func (s *Service) assignExercisesToWorkout(ctx context.Context, workout domain.W
 	}
 
 	for _, instance := range exerciseInstances {
-		s.LogExercise(ctx, workout.UserID, workout.ID, instance.ExerciseID)
+		exerciseLog, err := s.LogExercise(ctx, workout.UserID, workout.ID, instance.ExerciseID)
+		if err != nil {
+			return err
+		}
+
+		sets, err := s.setRepository.GetSetsByExerciseInstanceID(ctx, instance.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, set := range sets {
+			expectedSet := domain.NewExpectedSet(
+				exerciseLog.ID,
+				set.SetType,
+				set.Reps,
+				set.Weight,
+				set.Time,
+			)
+
+			_, err = s.expectedSetRepository.CreateExpectedSet(ctx, expectedSet)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
@@ -124,10 +147,16 @@ func (s *Service) GetExerciseLog(ctx context.Context, userID, exerciseLogID doma
 		return dto.ExerciseLogDTO{}, err
 	}
 
+	expectedSets, err := s.expectedSetRepository.GetExpectedSetsByExerciseLogID(ctx, exerciseLogID)
+	if err != nil {
+		return dto.ExerciseLogDTO{}, err
+	}
+
 	return dto.ExerciseLogDTO{
-		ExerviceLog: exerciseLog,
-		SetLogs:     setLogs,
-		Exercise:    exercise,
+		ExerciseLog:  exerciseLog,
+		Exercise:     exercise,
+		SetLogs:      setLogs,
+		ExpectedSets: expectedSets,
 	}, nil
 }
 

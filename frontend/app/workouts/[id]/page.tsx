@@ -16,19 +16,15 @@ import { Loading } from "@/components/loading";
 import {
   WorkoutExerciseLogDetails,
   WorkoutGetWorkoutResponse,
-  WorkoutRoutineDetailResponse,
-  WorkoutExerciseInstanceDetails,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 
 function ExerciseLogCard({
   exerciseLogDetails,
   workoutId,
-  exerciseInstanceDetails,
 }: {
   exerciseLogDetails: WorkoutExerciseLogDetails;
   workoutId: string;
-  exerciseInstanceDetails?: WorkoutExerciseInstanceDetails;
 }) {
   return (
     <Card
@@ -43,14 +39,14 @@ function ExerciseLogCard({
           <p className="text-lg font-bold">
             {exerciseLogDetails.exercise?.name}
           </p>
-          {exerciseInstanceDetails && (
+          {exerciseLogDetails.expectedSets!.length > 0 && (
             <div className="text-xs font-light text-default-600">
-              {exerciseInstanceDetails?.sets?.length} подходов x{" "}
-              {(exerciseInstanceDetails?.sets?.reduce(
+              {exerciseLogDetails.expectedSets!.length} подходов x{" "}
+              {(exerciseLogDetails.expectedSets!.reduce(
                 (acc, set) => acc + set.reps!,
                 0,
               )! /
-                exerciseInstanceDetails.sets?.length!) |
+                exerciseLogDetails.expectedSets!.length!) |
                 0}{" "}
               раз
             </div>
@@ -93,9 +89,6 @@ export default function RoutineDetailsPage({
   const [workoutDetails, setWorkoutDetails] =
     useState<WorkoutGetWorkoutResponse>({});
 
-  const [routineDetails, setRoutineDetails] =
-    useState<WorkoutRoutineDetailResponse>();
-
   const { id } = use(params);
 
   const router = useRouter();
@@ -108,24 +101,6 @@ export default function RoutineDetailsPage({
       .then((response) => {
         console.log(response.data);
         setWorkoutDetails(response.data!);
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error === errUnauthorized || error.response?.status === 401) {
-          router.push("/auth/login");
-
-          return;
-        }
-        throw error;
-      });
-  }
-
-  async function fetchRoutineDetails(id: string) {
-    await authApi.v1
-      .routineServiceGetRoutineDetail(id)
-      .then((response) => {
-        console.log(response.data);
-        setRoutineDetails(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -233,12 +208,6 @@ export default function RoutineDetailsPage({
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (workoutDetails.workout?.routineId) {
-      fetchRoutineDetails(workoutDetails.workout?.routineId);
-    }
-  }, [workoutDetails]);
-
   if (isLoading) {
     return <Loading />;
   }
@@ -271,11 +240,6 @@ export default function RoutineDetailsPage({
               {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
                 <ExerciseLogCard
                   key={index}
-                  exerciseInstanceDetails={routineDetails?.exerciseInstances?.find(
-                    (exerciseInstance) =>
-                      exerciseInstance.exerciseInstance?.exerciseId ===
-                      exerciseLogDetails.exerciseLog?.exerciseId,
-                  )}
                   exerciseLogDetails={exerciseLogDetails}
                   workoutId={id}
                 />

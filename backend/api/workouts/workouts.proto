@@ -126,6 +126,17 @@ message ExerciseLog {
   google.protobuf.Timestamp updated_at = 7;
 }
 
+// Ожидаемый сет
+message ExpectedSet {
+  string id = 1;
+  string exercise_log_id = 2;
+  int32 reps = 3;
+  float weight = 4;
+  google.protobuf.Duration time = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
 // Лог выполнения подхода
 message SetLog {
   string id = 1;
@@ -657,6 +668,7 @@ message ExerciseLogDetails {
   ExerciseLog exercise_log = 1;
   Exercise exercise = 2;
   repeated SetLog set_logs = 3;
+  repeated ExpectedSet expected_sets = 4;
 }
 
 message GetWorkoutResponse {

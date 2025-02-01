@@ -266,6 +266,27 @@ func NewExerciseLog(workoutID, exerciseID ID) ExerciseLog {
 	}
 }
 
+type ExpectedSet struct {
+	Model
+
+	ExerciseLogID ID
+	SetType       SetType
+	Reps          int
+	Weight        float32
+	Time          time.Duration
+}
+
+func NewExpectedSet(exerciseLogID ID, setType SetType, reps int, weight float32, time time.Duration) ExpectedSet {
+	return ExpectedSet{
+		Model:         NewModel(),
+		ExerciseLogID: exerciseLogID,
+		SetType:       setType,
+		Reps:          reps,
+		Weight:        weight,
+		Time:          time,
+	}
+}
+
 type ExerciseSetLog struct {
 	Model
 

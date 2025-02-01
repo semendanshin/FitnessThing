@@ -87,6 +87,11 @@ type setRepository interface {
 	DeleteSet(ctx context.Context, id domain.ID) error
 }
 
+type expectedSetRepository interface {
+	GetExpectedSetsByExerciseLogID(ctx context.Context, exerciseLogID domain.ID) ([]domain.ExpectedSet, error)
+	CreateExpectedSet(ctx context.Context, set domain.ExpectedSet) (domain.ExpectedSet, error)
+}
+
 type Service struct {
 	jwtProvider                jwtProvider
 	sessionRepository          sessionRepository
@@ -99,6 +104,7 @@ type Service struct {
 	exerciseLogRepository      exerciseLogRepository
 	setLogRepository           setLogRepository
 	setRepository              setRepository
+	expectedSetRepository      expectedSetRepository
 }
 
 func New(
@@ -113,6 +119,7 @@ func New(
 	exerciseLogRepository exerciseLogRepository,
 	setLogRepository setLogRepository,
 	setRepository setRepository,
+	expectedSetRepository expectedSetRepository,
 ) *Service {
 	return &Service{
 		jwtProvider:                jwtProvider,
@@ -126,5 +133,6 @@ func New(
 		exerciseLogRepository:      exerciseLogRepository,
 		setLogRepository:           setLogRepository,
 		setRepository:              setRepository,
+		expectedSetRepository:      expectedSetRepository,
 	}
 }
