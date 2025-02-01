@@ -241,7 +241,7 @@ export function ModalSelectExercise({
                 />
                 <Select
                   aria-label="Выберите группу мышц"
-                  placeholder="Выберите упражнение"
+                  placeholder="Выберите группу мышц"
                   onChange={(e) => {
                     setMuscleGroup(e.target.value);
                   }}
