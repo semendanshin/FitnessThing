@@ -26,7 +26,6 @@ import { Loading } from "@/components/loading";
 import {
   WorkoutExerciseLogDetails,
   WorkoutExpectedSet,
-  WorkoutSet,
   WorkoutSetLog,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -439,22 +438,23 @@ export default function RoutineDetailsPage({
               </Form>
               <Divider />
               <div className="flex flex-col gap-2">
-                {exerciseLogDetails.setLogs?.map((setLog, index) => (
-                  <SetLogCard
-                    key={index}
-                    enableDelete
-                    setLog={setLog}
-                    setNum={index}
-                    onDelete={() => onDeleteSet(setLog.id!)}
-                    onPress={() => {
-                      setExerciseLogForUpdate(setLog);
-                      onOpen();
-                    }}
-                  />
-                ))}
-                {exerciseLogDetails.expectedSets?.length! > 0 && (
-                  <div className="flex flex-col gap-2">
-                    {exerciseLogDetails.expectedSets
+                <>
+                  {exerciseLogDetails.setLogs?.map((setLog, index) => (
+                    <SetLogCard
+                      key={index}
+                      enableDelete
+                      setLog={setLog}
+                      setNum={index}
+                      onDelete={() => onDeleteSet(setLog.id!)}
+                      onPress={() => {
+                        setExerciseLogForUpdate(setLog);
+                        onOpen();
+                      }}
+                    />
+                  ))}
+                  {exerciseLogDetails.expectedSets?.length! >
+                    exerciseLogDetails.setLogs?.length! &&
+                    exerciseLogDetails.expectedSets
                       ?.slice(exerciseLogDetails.setLogs?.length!)
                       .map((set, index) => (
                         <SetLogCard
@@ -464,8 +464,7 @@ export default function RoutineDetailsPage({
                           setNum={index + exerciseLogDetails.setLogs?.length!}
                         />
                       ))}
-                  </div>
-                )}
+                </>
               </div>
             </div>
           </CardBody>
