@@ -50,7 +50,7 @@ export default function RootLayout({
               enableSystem: true,
             }}
           >
-            <main className="flex mx-auto flex-grow overflow-y-auto mb-[4rem] w-full h-full">
+            <main className="flex mx-auto flex-grow overflow-y-auto mb-[4.5rem] w-full h-full">
               <div className="flex flex-grow max-h-full flex-col w-full">
                 {children}
               </div>
