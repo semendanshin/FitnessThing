@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { DropdownItem } from "@nextui-org/dropdown";
-import { Divider, ScrollShadow, Spinner } from "@nextui-org/react";
+import { ScrollShadow } from "@nextui-org/scroll-shadow";
+import { Spinner } from "@nextui-org/spinner";
 
 import { Loading } from "@/components/loading";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -240,7 +241,7 @@ export default function ExerciseInstancePage({
     }
 
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-4">
         {sets.map((set, index) => (
           <SetCard key={set.id} num={index + 1} set={set} />
         ))}
@@ -256,19 +257,8 @@ export default function ExerciseInstancePage({
   }
 
   function ContentCard() {
-    function AddSetBlock() {
-      return (
-        <Card className="flex flex-col min-h-fit">
-          <CardBody className="flex flex-col gap-4 min-h-fit">
-            <h2 className="text-md font-semibold">Добавить подход</h2>
-            <Divider />
-          </CardBody>
-        </Card>
-      );
-    }
-
     return (
-      <div className="p-4 h-full overflow-y-auto flex flex-col gap-4">
+      <div className="py-4 h-full overflow-y-auto flex flex-col gap-4">
         <ScrollShadow size={30}>
           {/* <AddSetBlock /> */}
           <SetsList sets={exerciseInstanceDetails.sets!} />
@@ -301,7 +291,7 @@ export default function ExerciseInstancePage({
   }
 
   return (
-    <div className="py-4 flex flex-col h-full">
+    <div className="pt-4 flex flex-col h-full">
       <PageHeader
         enableBackButton
         title={exerciseInstanceDetails.exercise?.name!}

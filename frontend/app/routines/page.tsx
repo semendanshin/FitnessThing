@@ -1,15 +1,15 @@
 "use client";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Link } from "@nextui-org/link";
 import {
-  Form,
-  Input,
-  Link,
   Modal,
   ModalContent,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@nextui-org/modal";
+import { Form } from "@nextui-org/form";
+import { Input } from "@nextui-org/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -104,10 +104,12 @@ export default function RoutinesPage() {
               </div>
             </Card>
           ))}
-          <Button color="primary" onPress={onOpen}>
-            <PlusIcon className="w-4 h-4" />
-            Добавить рутину
-          </Button>
+          <Card className="p-2">
+            <Button onPress={onOpen}>
+              <PlusIcon className="w-4 h-4" />
+              Добавить рутину
+            </Button>
+          </Card>
         </div>
       </div>
       <Modal
