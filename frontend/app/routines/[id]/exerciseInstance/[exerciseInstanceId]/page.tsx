@@ -258,7 +258,7 @@ export default function ExerciseInstancePage({
 
   function ContentCard() {
     return (
-      <div className="py-4 h-full overflow-y-auto flex flex-col gap-4">
+      <div className="pb-4 h-full overflow-y-auto flex flex-col gap-4">
         <ScrollShadow size={30}>
           {/* <AddSetBlock /> */}
           <SetsList sets={exerciseInstanceDetails.sets!} />
