@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { DropdownItem } from "@nextui-org/dropdown";
-import { Divider, Spinner } from "@nextui-org/react";
+import { Divider, ScrollShadow, Spinner } from "@nextui-org/react";
 
 import { Loading } from "@/components/loading";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -269,8 +269,10 @@ export default function ExerciseInstancePage({
 
     return (
       <div className="p-4 h-full overflow-y-auto flex flex-col gap-4">
-        {/* <AddSetBlock /> */}
-        <SetsList sets={exerciseInstanceDetails.sets!} />
+        <ScrollShadow size={30}>
+          {/* <AddSetBlock /> */}
+          <SetsList sets={exerciseInstanceDetails.sets!} />
+        </ScrollShadow>
       </div>
     );
   }
