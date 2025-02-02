@@ -220,7 +220,7 @@ export function ModalSelectExercise({
 
   return (
     <Modal
-      className="overflow-y-auto h-full p-2 w-full h-[85vh]"
+      className="overflow-y-auto h-full p-2 w-full h-[85vh] min-h-[450px]"
       isOpen={isOpen}
       placement="center"
       scrollBehavior="inside"
