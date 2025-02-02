@@ -51,8 +51,10 @@ func (r *PGXRepository) GetExerciseInstanceByID(ctx context.Context, id domain.I
 		WHERE ei.id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var exerciseInstance exerciseInstanceEntity
-	err := pgxscan.Get(ctx, r.pool, &exerciseInstance, query, uuidToPgtype(id))
+	err := pgxscan.Get(ctx, engine, &exerciseInstance, query, uuidToPgtype(id))
 	if err != nil {
 		logger.Errorf("failed to get exercise instance by id: %v", err)
 		if err == pgx.ErrNoRows {
@@ -73,8 +75,10 @@ func (r *PGXRepository) GetExerciseInstancesByRoutineID(ctx context.Context, rou
 		WHERE ei.routine_id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var exerciseInstances []exerciseInstanceEntity
-	err := pgxscan.Select(ctx, r.pool, &exerciseInstances, query, uuidToPgtype(routineID))
+	err := pgxscan.Select(ctx, engine, &exerciseInstances, query, uuidToPgtype(routineID))
 	if err != nil {
 		logger.Errorf("failed to get exercise instances by routine id: %v", err)
 		if err == pgx.ErrNoRows {
@@ -101,9 +105,10 @@ func (r *PGXRepository) CreateExerciseInstance(ctx context.Context, exerciseInst
 		RETURNING *
 	`
 
-	entity := exerciseInstanceFromDomain(exerciseInstance)
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	err := pgxscan.Get(ctx, r.pool, &entity, query, entity.ID, entity.RoutineID, entity.ExerciseID, entity.CreatedAt)
+	entity := exerciseInstanceFromDomain(exerciseInstance)
+	err := pgxscan.Get(ctx, engine, &entity, query, entity.ID, entity.RoutineID, entity.ExerciseID, entity.CreatedAt)
 	if err != nil {
 		logger.Errorf("failed to create exercise instance: %v", err)
 		return domain.ExerciseInstance{}, err
@@ -121,7 +126,9 @@ func (r *PGXRepository) DeleteExerciseInstance(ctx context.Context, id domain.ID
 		WHERE id = $1
 	`
 
-	_, err := r.pool.Exec(ctx, query, uuidToPgtype(id))
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	_, err := engine.Exec(ctx, query, uuidToPgtype(id))
 	if err != nil {
 		logger.Errorf("failed to delete exercise instance: %v", err)
 		return err

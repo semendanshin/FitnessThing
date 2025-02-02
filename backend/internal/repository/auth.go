@@ -43,8 +43,10 @@ func (r *PGXRepository) GetSessionByToken(ctx context.Context, token string) (do
 		WHERE s.token = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var session sessionEntity
-	err := pgxscan.Get(ctx, r.pool, &session, query, token)
+	err := pgxscan.Get(ctx, engine, &session, query, token)
 	if err != nil {
 		logger.Errorf("failed to get session by token: %v", err)
 		if err == pgx.ErrNoRows {
@@ -67,8 +69,10 @@ func (r *PGXRepository) SetSessionExpired(ctx context.Context, id domain.ID, exp
 		RETURNING id
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var session sessionEntity
-	err := pgxscan.Get(ctx, r.pool, &session, query, uuidToPgtype(id), timeToPgtype(expiredAt))
+	err := pgxscan.Get(ctx, engine, &session, query, uuidToPgtype(id), timeToPgtype(expiredAt))
 	if err != nil {
 		logger.Errorf("failed to set session expired: %v", err)
 		return err
@@ -87,10 +91,12 @@ func (r *PGXRepository) CreateSession(ctx context.Context, session domain.Sessio
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var sessionEntity sessionEntity
 	err := pgxscan.Get(
 		ctx,
-		r.pool,
+		engine,
 		&sessionEntity,
 		query,
 		uuidToPgtype(session.ID),

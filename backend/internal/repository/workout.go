@@ -73,7 +73,16 @@ func (r *PGXRepository) CreateWorkout(ctx context.Context, workout domain.Workou
 
 	entity := workoutFromDomain(workout)
 
-	if err := pgxscan.Get(ctx, r.pool, &entity.CreatedAt, query, entity.ID, entity.UserID, entity.RoutineID, entity.Notes, entity.Rating, entity.FinishedAt); err != nil {
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	if err := pgxscan.Get(ctx, engine, &entity.CreatedAt, query,
+		entity.ID,
+		entity.UserID,
+		entity.RoutineID,
+		entity.Notes,
+		entity.Rating,
+		entity.FinishedAt,
+	); err != nil {
 		logger.Errorf("failed to create workout: %v", err)
 		return domain.Workout{}, err
 	}
@@ -91,8 +100,10 @@ func (r *PGXRepository) GetWorkoutByID(ctx context.Context, id domain.ID) (domai
 		WHERE id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var workout workoutEntity
-	if err := pgxscan.Get(ctx, r.pool, &workout, query, uuidToPgtype(id)); err != nil {
+	if err := pgxscan.Get(ctx, engine, &workout, query, uuidToPgtype(id)); err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.Workout{}, domain.ErrNotFound
 		}
@@ -113,8 +124,10 @@ func (r *PGXRepository) GetActiveWorkouts(ctx context.Context, userID domain.ID)
 		WHERE user_id = $1 AND finished_at IS NULL
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var workouts []workoutEntity
-	if err := pgxscan.Select(ctx, r.pool, &workouts, query, uuidToPgtype(userID)); err != nil {
+	if err := pgxscan.Select(ctx, engine, &workouts, query, uuidToPgtype(userID)); err != nil {
 		logger.Errorf("failed to get active workouts: %v", err)
 		return nil, domain.ErrInternal
 	}
@@ -134,7 +147,9 @@ func (r *PGXRepository) UpdateWorkout(ctx context.Context, id domain.ID, workout
 		RETURNING updated_at
 	`
 
-	if err := pgxscan.Get(ctx, r.pool, &workoutEntity.UpdatedAt, query, workoutEntity.Notes, workoutEntity.Rating, workoutEntity.FinishedAt, uuidToPgtype(id)); err != nil {
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	if err := pgxscan.Get(ctx, engine, &workoutEntity.UpdatedAt, query, workoutEntity.Notes, workoutEntity.Rating, workoutEntity.FinishedAt, uuidToPgtype(id)); err != nil {
 		logger.Errorf("failed to update workout: %v", err)
 		return domain.Workout{}, err
 	}
@@ -152,8 +167,10 @@ func (r *PGXRepository) DeleteWorkout(ctx context.Context, id domain.ID) error {
 		RETURNING id
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var workout workoutEntity
-	if err := pgxscan.Get(ctx, r.pool, &workout, query, uuidToPgtype(id)); err != nil {
+	if err := pgxscan.Get(ctx, engine, &workout, query, uuidToPgtype(id)); err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.ErrNotFound
 		}
@@ -176,8 +193,10 @@ func (r *PGXRepository) GetWorkouts(ctx context.Context, userID domain.ID, limit
 		LIMIT $2 OFFSET $3
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var workouts []workoutEntity
-	if err := pgxscan.Select(ctx, r.pool, &workouts, query, uuidToPgtype(userID), limit, offset); err != nil {
+	if err := pgxscan.Select(ctx, engine, &workouts, query, uuidToPgtype(userID), limit, offset); err != nil {
 		logger.Errorf("failed to get workouts: %v", err)
 		return nil, domain.ErrInternal
 	}

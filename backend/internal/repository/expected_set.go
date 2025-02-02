@@ -67,8 +67,10 @@ func (r *PGXRepository) GetExpectedSetsByExerciseLogID(ctx context.Context, exer
 		ORDER BY es.created_at
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var expectedSets []expectedSetEntity
-	err := pgxscan.Select(ctx, r.pool, &expectedSets, query, uuidToPgtype(exerciseLogID))
+	err := pgxscan.Select(ctx, engine, &expectedSets, query, uuidToPgtype(exerciseLogID))
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +88,10 @@ func (r *PGXRepository) CreateExpectedSet(ctx context.Context, expectedSet domai
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	expectedSetEntity := expectedSetFromDomain(expectedSet)
-	err := pgxscan.Get(ctx, r.pool, &expectedSetEntity, query, expectedSet.ID, expectedSetEntity.ExerciseLogID, expectedSetEntity.SetType, expectedSetEntity.Reps, expectedSetEntity.Weight, expectedSetEntity.Time)
+	err := pgxscan.Get(ctx, engine, &expectedSetEntity, query, expectedSet.ID, expectedSetEntity.ExerciseLogID, expectedSetEntity.SetType, expectedSetEntity.Reps, expectedSetEntity.Weight, expectedSetEntity.Time)
 	if err != nil {
 		return domain.ExpectedSet{}, err
 	}

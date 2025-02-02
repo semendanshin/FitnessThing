@@ -75,7 +75,9 @@ func (r *PGXRepository) GetUserByEmail(ctx context.Context, email string) (domai
 
 	var user userEntity
 
-	err := pgxscan.Get(ctx, r.pool, &user, query, email)
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	err := pgxscan.Get(ctx, engine, &user, query, email)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.User{}, domain.ErrNotFound
@@ -98,7 +100,9 @@ func (r *PGXRepository) GetUserByID(ctx context.Context, id domain.ID) (domain.U
 
 	var user userEntity
 
-	err := pgxscan.Get(ctx, r.pool, &user, query, id)
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	err := pgxscan.Get(ctx, engine, &user, query, id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.User{}, domain.ErrNotFound
@@ -120,7 +124,9 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 
 	userEntity := userFromDomain(user)
 
-	_, err := r.pool.Exec(ctx, query,
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	err := pgxscan.Get(ctx, engine, &userEntity, query,
 		uuidToPgtype(user.ID),
 		user.Email,
 		user.Password,
@@ -158,8 +164,10 @@ func (r *PGXRepository) UpdateUser(ctx context.Context, user domain.User) (domai
 
 	userEntity := userFromDomain(user)
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	err := pgxscan.Get(
-		ctx, r.pool, &userEntity, query,
+		ctx, engine, &userEntity, query,
 		uuidToPgtype(user.ID),
 		user.Email,
 		user.FirstName,

@@ -66,9 +66,10 @@ func (r *PGXRepository) GetExerciseLogsByWorkoutID(ctx context.Context, workoutI
 		ORDER BY created_at
 	`
 
-	var exerciseLogs []exerciseLogEntity
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	if err := pgxscan.Select(ctx, r.pool, &exerciseLogs, query, uuidToPgtype(workoutID)); err != nil {
+	var exerciseLogs []exerciseLogEntity
+	if err := pgxscan.Select(ctx, engine, &exerciseLogs, query, uuidToPgtype(workoutID)); err != nil {
 		return nil, err
 	}
 
@@ -85,9 +86,10 @@ func (r *PGXRepository) CreateExerciseLog(ctx context.Context, exerciseLog domai
 		RETURNING *
 	`
 
-	exerciseLogEntity := exerciseLogFromDomain(exerciseLog)
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	if err := pgxscan.Get(ctx, r.pool, &exerciseLogEntity, query, exerciseLogEntity.ID, exerciseLogEntity.ExerciseID, exerciseLogEntity.WorkoutID, exerciseLogEntity.Notes, exerciseLogEntity.PowerRating, exerciseLogEntity.CreatedAt); err != nil {
+	exerciseLogEntity := exerciseLogFromDomain(exerciseLog)
+	if err := pgxscan.Get(ctx, engine, &exerciseLogEntity, query, exerciseLogEntity.ID, exerciseLogEntity.ExerciseID, exerciseLogEntity.WorkoutID, exerciseLogEntity.Notes, exerciseLogEntity.PowerRating, exerciseLogEntity.CreatedAt); err != nil {
 		return domain.ExerciseLog{}, err
 	}
 
@@ -104,9 +106,10 @@ func (r *PGXRepository) GetExerciseLogByID(ctx context.Context, id domain.ID) (d
 		WHERE id = $1
 	`
 
-	var exerciseLog exerciseLogEntity
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	if err := pgxscan.Get(ctx, r.pool, &exerciseLog, query, uuidToPgtype(id)); err != nil {
+	var exerciseLog exerciseLogEntity
+	if err := pgxscan.Get(ctx, engine, &exerciseLog, query, uuidToPgtype(id)); err != nil {
 		return domain.ExerciseLog{}, err
 	}
 
@@ -125,8 +128,10 @@ func (r *PGXRepository) GetExerciseLogsByExerciseIDAndUserID(ctx context.Context
 		ORDER BY el.created_at DESC;
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var exerciseLogs []domain.ExerciseLog
-	err := pgxscan.Select(ctx, r.pool, &exerciseLogs, query, exerciseID, userID)
+	err := pgxscan.Select(ctx, engine, &exerciseLogs, query, exerciseID, userID)
 	if err != nil {
 		logger.Errorf("failed to get exercise logs by exercise id and user id: %v", err)
 		return nil, err
@@ -144,7 +149,9 @@ func (r *PGXRepository) DeleteExerciseLog(ctx context.Context, id domain.ID) err
 		WHERE id = $1
 	`
 
-	_, err := r.pool.Exec(ctx, query, uuidToPgtype(id))
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	_, err := engine.Exec(ctx, query, uuidToPgtype(id))
 	if err != nil {
 		return err
 	}
@@ -163,9 +170,10 @@ func (r *PGXRepository) UpdateExerciseLog(ctx context.Context, id domain.ID, exe
 		RETURNING *
 	`
 
-	exerciseLogEntity := exerciseLogFromDomain(exerciseLog)
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	if err := pgxscan.Get(ctx, r.pool, &exerciseLogEntity, query, exerciseLogEntity.Notes, exerciseLogEntity.PowerRating, exerciseLogEntity.ID); err != nil {
+	exerciseLogEntity := exerciseLogFromDomain(exerciseLog)
+	if err := pgxscan.Get(ctx, engine, &exerciseLogEntity, query, exerciseLogEntity.Notes, exerciseLogEntity.PowerRating, exerciseLogEntity.ID); err != nil {
 		return domain.ExerciseLog{}, err
 	}
 

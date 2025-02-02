@@ -6,7 +6,6 @@ import (
 	"fitness-trainer/internal/logger"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/opentracing/opentracing-go"
 )
@@ -70,8 +69,10 @@ func (r *PGXRepository) GetExercises(ctx context.Context, muscleGroups, excluded
 		ORDER BY e.created_at DESC;
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var exercises []exerciseEntity
-	err := pgxscan.Select(ctx, r.pool, &exercises, query, muscleGroups, excludedExercises)
+	err := pgxscan.Select(ctx, engine, &exercises, query, muscleGroups, excludedExercises)
 	if err != nil {
 		logger.Errorf("failed to get exercises: %v", err)
 		return nil, err
@@ -98,8 +99,10 @@ func (r *PGXRepository) GetExerciseByID(ctx context.Context, id domain.ID) (doma
 		GROUP BY e.id;
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var exercise exerciseEntity
-	err := pgxscan.Get(ctx, r.pool, &exercise, query, id)
+	err := pgxscan.Get(ctx, engine, &exercise, query, id)
 	if err != nil {
 		logger.Errorf("failed to get exercise by id: %v", err)
 		return domain.Exercise{}, err
@@ -118,7 +121,6 @@ func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exer
 		RETURNING *
 	`
 
-	// insert multiple records
 	exercieMuscleGroupsQuery := `
 		INSERT INTO exercise_muscle_groups (muscle_group_id, exercise_id)
 		SELECT UNNEST($1::UUID[]), $2
@@ -130,38 +132,36 @@ func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exer
 		convertedMuscleGroupIDs[i] = uuidToPgtype(id)
 	}
 
+	ctx, err := r.contextManager.Begin(ctx)
+	if err != nil {
+	}
+
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	exerciseEntity := exerciseFromDomain(exercise)
 
-	err := r.runInTransaction(ctx, func(tx pgx.Tx) error {
-		innerErr := pgxscan.Get(
-			ctx,
-			tx,
-			&exerciseEntity,
-			exerciseQuery,
-			exerciseEntity.ID,
-			exerciseEntity.Name,
-			exerciseEntity.Description,
-			exerciseEntity.CreatedAt,
-		)
-		if innerErr != nil {
-			return innerErr
-		}
-
-		_, innerErr = tx.Exec(
-			ctx,
-			exercieMuscleGroupsQuery,
-			convertedMuscleGroupIDs,
-			exerciseEntity.ID,
-		)
-		if innerErr != nil {
-			return innerErr
-		}
-
-		return nil
-	})
-
+	err = pgxscan.Get(
+		ctx,
+		engine,
+		&exerciseEntity,
+		exerciseQuery,
+		exerciseEntity.ID,
+		exerciseEntity.Name,
+		exerciseEntity.Description,
+		exerciseEntity.CreatedAt,
+	)
 	if err != nil {
-		return domain.Exercise{}, err
+		return domain.Exercise{}, nil
+	}
+
+	_, err = engine.Exec(
+		ctx,
+		exercieMuscleGroupsQuery,
+		convertedMuscleGroupIDs,
+		exerciseEntity.ID,
+	)
+	if err != nil {
+		return domain.Exercise{}, nil
 	}
 
 	return r.GetExerciseByID(ctx, exercise.ID)

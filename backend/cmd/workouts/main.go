@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"fitness-trainer/internal/app"
+	"fitness-trainer/internal/db"
 	"fitness-trainer/internal/jwt"
 	"fitness-trainer/internal/logger"
 	"fitness-trainer/internal/repository"
@@ -60,7 +61,9 @@ func Run() error {
 		logger.Fatal(err.Error())
 	}
 
-	Repo := repository.NewPGXRepository(pool)
+	ContextManager := db.NewContextManager(pool)
+
+	Repo := repository.NewPGXRepository(ContextManager)
 
 	JWTProvider := jwt.NewProvider(
 		jwt.WithCredentials(
@@ -72,6 +75,7 @@ func Run() error {
 	)
 
 	Service := service.New(
+		ContextManager,
 		JWTProvider, // JWT Provider
 		Repo,        // Auth
 		Repo,        // User

@@ -32,8 +32,10 @@ func (r *PGXRepository) GetMuscleGroups(ctx context.Context) ([]dto.MuscleGroupD
 		SELECT * FROM muscle_groups
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var muscleGroups []muscleGroupEntity
-	if err := pgxscan.Select(ctx, r.pool, &muscleGroups, query); err != nil {
+	if err := pgxscan.Select(ctx, engine, &muscleGroups, query); err != nil {
 		logger.Errorf("failed to get muscle groups: %v", err)
 		return nil, err
 	}
@@ -55,8 +57,10 @@ func (r *PGXRepository) GetMuscleGroupByName(ctx context.Context, name string) (
 		WHERE name = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var muscleGroup muscleGroupEntity
-	if err := pgxscan.Get(ctx, r.pool, &muscleGroup, query, name); err != nil {
+	if err := pgxscan.Get(ctx, engine, &muscleGroup, query, name); err != nil {
 		logger.Errorf("failed to get muscle group by name: %v", err)
 		return dto.MuscleGroupDTO{}, err
 	}

@@ -20,43 +20,78 @@ func (s *Service) CreateRoutine(ctx context.Context, dto dto.CreateRoutineDTO) (
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.CreateRoutine")
 	defer span.Finish()
 
+	ctx, err := s.unitOfWork.Begin(ctx)
+	if err != nil {
+		return domain.Routine{}, err
+	}
+	defer s.unitOfWork.Rollback(ctx)
+
 	routine := domain.NewRoutine(dto.UserID, dto.Name, dto.Description)
 
-	routine, err := s.routineRepository.CreateRoutine(ctx, routine)
+	routine, err = s.routineRepository.CreateRoutine(ctx, routine)
 	if err != nil {
 		return domain.Routine{}, err
 	}
 
 	if dto.WorkoutID.IsValid {
-		s.fillRoutineWithWorkout(ctx, routine, dto.WorkoutID.V)
+		err = s.fillRoutineWithWorkout(ctx, routine, dto.WorkoutID.V)
+		if err != nil {
+			return domain.Routine{}, err
+		}
+	}
+
+	if err := s.unitOfWork.Commit(ctx); err != nil {
+		return domain.Routine{}, err
 	}
 
 	return routine, nil
 }
 
-func (s *Service) fillRoutineWithWorkout(ctx context.Context, routine domain.Routine, workoutID domain.ID) {
+func (s *Service) fillRoutineWithWorkout(ctx context.Context, routine domain.Routine, workoutID domain.ID) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.fillRoutineWithWorkout")
 	defer span.Finish()
 
 	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
 	if err != nil {
-		return
+		return err
 	}
 
 	if routine.UserID != workout.UserID {
-		return
+		return err
 	}
 
 	exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByWorkoutID(ctx, workoutID)
 	if err != nil {
-		return
+		return err
 	}
 
 	for _, exerciseLog := range exerciseLogs {
-		s.AddExerciseToRoutine(ctx, routine.ID, exerciseLog.ExerciseID)
+		exerciseInstance := domain.NewExerciseInstance(routine.ID, exerciseLog.ExerciseID)
+		exerciseInstance, err := s.exerciseInstanceRepository.CreateExerciseInstance(ctx, exerciseInstance)
+		if err != nil {
+			return err
+		}
 
-		// TODO: add sets and reps
+		sets, err := s.setLogRepository.GetSetLogsByExerciseLogID(ctx, exerciseLog.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, set := range sets {
+			set := domain.NewSet(
+				exerciseInstance.ID,
+				domain.SetTypeReps,
+				set.Reps,
+				set.Weight,
+				set.Time,
+			)
+			if _, err := s.setRepository.CreateSet(ctx, set); err != nil {
+				return err
+			}
+		}
 	}
+
+	return nil
 }
 
 func (s *Service) GetRoutineByID(ctx context.Context, id domain.ID) (dto.RoutineDetailsDTO, error) {

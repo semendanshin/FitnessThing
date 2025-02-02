@@ -65,8 +65,10 @@ func (r *PGXRepository) GetSetLogsByExerciseLogID(ctx context.Context, exerciseL
 		ORDER BY created_at
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var setLogs []setLogEntity
-	if err := pgxscan.Select(ctx, r.pool, &setLogs, query, exerciseLogID); err != nil {
+	if err := pgxscan.Select(ctx, engine, &setLogs, query, exerciseLogID); err != nil {
 		return nil, err
 	}
 
@@ -83,9 +85,11 @@ func (r *PGXRepository) CreateSetLog(ctx context.Context, setLog domain.Exercise
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	setLogEntity := setLogFromDomain(setLog)
 
-	if err := pgxscan.Get(ctx, r.pool, &setLogEntity, query, setLogEntity.ID, setLogEntity.CreatedAt, setLogEntity.ExerciseLogID, setLogEntity.Reps, setLogEntity.Weight, setLogEntity.Time); err != nil {
+	if err := pgxscan.Get(ctx, engine, &setLogEntity, query, setLogEntity.ID, setLogEntity.CreatedAt, setLogEntity.ExerciseLogID, setLogEntity.Reps, setLogEntity.Weight, setLogEntity.Time); err != nil {
 		return domain.ExerciseSetLog{}, err
 	}
 
@@ -102,8 +106,10 @@ func (r *PGXRepository) GetSetLogByID(ctx context.Context, id domain.ID) (domain
 		WHERE id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var setLog setLogEntity
-	if err := pgxscan.Get(ctx, r.pool, &setLog, query, id); err != nil {
+	if err := pgxscan.Get(ctx, engine, &setLog, query, id); err != nil {
 		return domain.ExerciseSetLog{}, err
 	}
 
@@ -119,7 +125,9 @@ func (r *PGXRepository) DeleteSetLog(ctx context.Context, id domain.ID) error {
 		WHERE id = $1
 	`
 
-	_, err := r.pool.Exec(ctx, query, uuidToPgtype(id))
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	_, err := engine.Exec(ctx, query, uuidToPgtype(id))
 	if err != nil {
 		return err
 	}
@@ -138,8 +146,10 @@ func (r *PGXRepository) UpdateSetLog(ctx context.Context, id domain.ID, setLog d
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	setLogEntity := setLogFromDomain(setLog)
-	if err := pgxscan.Get(ctx, r.pool, &setLogEntity, query, setLogEntity.ID, setLogEntity.Reps, setLogEntity.Weight, setLogEntity.Time, timeToPgtype(setLog.UpdatedAt)); err != nil {
+	if err := pgxscan.Get(ctx, engine, &setLogEntity, query, setLogEntity.ID, setLogEntity.Reps, setLogEntity.Weight, setLogEntity.Time, timeToPgtype(setLog.UpdatedAt)); err != nil {
 		return domain.ExerciseSetLog{}, err
 	}
 

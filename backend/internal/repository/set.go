@@ -81,8 +81,10 @@ func (r *PGXRepository) GetSetsByExerciseInstanceID(ctx context.Context, exercis
 		WHERE exercise_instance_id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var sets []setEntity
-	if err := pgxscan.Select(ctx, r.pool, &sets, query, exerciseInstanceID); err != nil {
+	if err := pgxscan.Select(ctx, engine, &sets, query, exerciseInstanceID); err != nil {
 		return nil, err
 	}
 
@@ -99,9 +101,10 @@ func (r *PGXRepository) CreateSet(ctx context.Context, set domain.Set) (domain.S
 		RETURNING created_at
 	`
 
-	entity := setFromDomain(set)
+	engine := r.contextManager.GetEngineFromContext(ctx)
 
-	if err := pgxscan.Get(ctx, r.pool, &entity.CreatedAt, query, entity.ID, entity.ExerciseInstanceID, entity.Reps, entity.Weight, entity.Time, entity.SetType); err != nil {
+	entity := setFromDomain(set)
+	if err := pgxscan.Get(ctx, engine, &entity.CreatedAt, query, entity.ID, entity.ExerciseInstanceID, entity.Reps, entity.Weight, entity.Time, entity.SetType); err != nil {
 		logger.Errorf("failed to create set: %v", err)
 		return domain.Set{}, err
 	}
@@ -119,8 +122,10 @@ func (r *PGXRepository) GetSetByID(ctx context.Context, id domain.ID) (domain.Se
 		WHERE id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var set setEntity
-	if err := pgxscan.Get(ctx, r.pool, &set, query, id); err != nil {
+	if err := pgxscan.Get(ctx, engine, &set, query, id); err != nil {
 		return domain.Set{}, err
 	}
 
@@ -136,7 +141,9 @@ func (r *PGXRepository) DeleteSet(ctx context.Context, id domain.ID) error {
 		WHERE id = $1
 	`
 
-	if _, err := r.pool.Exec(ctx, query, id); err != nil {
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	if _, err := engine.Exec(ctx, query, id); err != nil {
 		return err
 	}
 
@@ -156,7 +163,9 @@ func (r *PGXRepository) UpdateSet(ctx context.Context, id domain.ID, set domain.
 
 	entity := setFromDomain(set)
 
-	if err := pgxscan.Get(ctx, r.pool, &entity.UpdatedAt, query, entity.Reps, entity.Weight, entity.Time, entity.SetType, entity.ID); err != nil {
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	if err := pgxscan.Get(ctx, engine,  &entity.UpdatedAt, query, entity.Reps, entity.Weight, entity.Time, entity.SetType, entity.ID); err != nil {
 		return domain.Set{}, err
 	}
 

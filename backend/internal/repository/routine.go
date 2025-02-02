@@ -55,8 +55,10 @@ func (r *PGXRepository) GetRoutines(ctx context.Context, userID domain.ID) ([]do
 		WHERE r.user_id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var routines []routineEntity
-	err := pgxscan.Select(ctx, r.pool, &routines, query, uuidToPgtype(userID))
+	err := pgxscan.Select(ctx, engine, &routines, query, uuidToPgtype(userID))
 	if err != nil {
 		logger.Errorf("failed to get routines: %v", err)
 		return nil, err
@@ -80,8 +82,10 @@ func (r *PGXRepository) CreateRoutine(ctx context.Context, routine domain.Routin
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	entity := routineFromDomain(routine)
-	err := pgxscan.Get(ctx, r.pool, &entity, query, entity.ID, entity.Name, entity.Description, entity.UserID)
+	err := pgxscan.Get(ctx, engine, &entity, query, entity.ID, entity.Name, entity.Description, entity.UserID)
 	if err != nil {
 		logger.Errorf("failed to create routine: %v", err)
 		return domain.Routine{}, err
@@ -99,8 +103,10 @@ func (r *PGXRepository) GetRoutineByID(ctx context.Context, id domain.ID) (domai
 		WHERE r.id = $1
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var routine routineEntity
-	err := pgxscan.Get(ctx, r.pool, &routine, query, uuidToPgtype(id))
+	err := pgxscan.Get(ctx, engine, &routine, query, uuidToPgtype(id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.Routine{}, domain.ErrNotFound
@@ -122,8 +128,10 @@ func (r *PGXRepository) DeleteRoutine(ctx context.Context, id domain.ID) error {
 		RETURNING id
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	var routine routineEntity
-	err := pgxscan.Get(ctx, r.pool, &routine, query, uuidToPgtype(id))
+	err := pgxscan.Get(ctx, engine, &routine, query, uuidToPgtype(id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.ErrNotFound
@@ -146,8 +154,10 @@ func (r *PGXRepository) UpdateRoutine(ctx context.Context, id domain.ID, routine
 		RETURNING *
 	`
 
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
 	entity := routineFromDomain(routine)
-	err := pgxscan.Get(ctx, r.pool, &entity, query, entity.ID, entity.Name, entity.Description)
+	err := pgxscan.Get(ctx, engine, &entity, query, entity.ID, entity.Name, entity.Description)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.Routine{}, domain.ErrNotFound

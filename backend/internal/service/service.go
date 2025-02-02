@@ -92,6 +92,12 @@ type expectedSetRepository interface {
 	CreateExpectedSet(ctx context.Context, set domain.ExpectedSet) (domain.ExpectedSet, error)
 }
 
+type unitOfWork interface {
+	Begin(ctx context.Context) (context.Context, error)
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
+}
+
 type Service struct {
 	jwtProvider                jwtProvider
 	sessionRepository          sessionRepository
@@ -105,9 +111,11 @@ type Service struct {
 	setLogRepository           setLogRepository
 	setRepository              setRepository
 	expectedSetRepository      expectedSetRepository
+	unitOfWork                 unitOfWork
 }
 
 func New(
+	unitOfWork unitOfWork,
 	jwtProvider jwtProvider,
 	sessionRepository sessionRepository,
 	userRepository userRepository,
@@ -122,6 +130,7 @@ func New(
 	expectedSetRepository expectedSetRepository,
 ) *Service {
 	return &Service{
+		unitOfWork:                 unitOfWork,
 		jwtProvider:                jwtProvider,
 		sessionRepository:          sessionRepository,
 		userRepository:             userRepository,

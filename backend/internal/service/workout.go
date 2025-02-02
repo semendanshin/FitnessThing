@@ -15,6 +15,12 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.StartWorkout")
 	defer span.Finish()
 
+	ctx, err := s.unitOfWork.Begin(ctx)
+	if err != nil {
+		return domain.Workout{}, err
+	}
+	defer s.unitOfWork.Rollback(ctx)
+
 	if routineID != nil {
 		_, err := s.routineRepository.GetRoutineByID(ctx, *routineID)
 		if err != nil {
@@ -24,7 +30,7 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID 
 
 	workout := domain.NewWorkout(userID, routineID)
 
-	workout, err := s.workoutRepository.CreateWorkout(ctx, workout)
+	workout, err = s.workoutRepository.CreateWorkout(ctx, workout)
 	if err != nil {
 		return domain.Workout{}, err
 	}
@@ -34,6 +40,11 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID 
 		if err != nil {
 			return domain.Workout{}, err
 		}
+	}
+
+	err = s.unitOfWork.Commit(ctx)
+	if err != nil {
+		return domain.Workout{}, err
 	}
 
 	return workout, nil
