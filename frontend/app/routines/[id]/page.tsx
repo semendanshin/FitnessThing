@@ -306,10 +306,12 @@ export default function RoutineDetailsPage({
               />
             ),
           )}
-          <Button color="primary" onPress={onOpen}>
-            <PlusIcon className="w-4 h-4" />
-            Добавить упражнение
-          </Button>
+          <Card className="p-2">
+            <Button onPress={onOpen}>
+              <PlusIcon className="w-4 h-4" />
+              Добавить упражнение
+            </Button>
+          </Card>
         </div>
       </div>
       <ModalSelectExercise

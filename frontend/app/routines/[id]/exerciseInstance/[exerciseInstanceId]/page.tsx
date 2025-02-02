@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { DropdownItem } from "@nextui-org/dropdown";
-import { Input } from "@nextui-org/input";
+import { Divider, Spinner } from "@nextui-org/react";
 
 import { Loading } from "@/components/loading";
 import { authApi, errUnauthorized } from "@/api/api";
@@ -17,6 +17,7 @@ import {
 } from "@/api/api.generated";
 import { PageHeader } from "@/components/page-header";
 import { PlusIcon, RepeatIcon, TrashCanIcon } from "@/config/icons";
+import { InputWithIncrement } from "@/components/input-with-increments";
 
 export default function ExerciseInstancePage({
   params,
@@ -83,6 +84,7 @@ export default function ExerciseInstancePage({
   }
 
   function SetCard({ num, set }: { num: number; set: WorkoutSet }) {
+    const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(set.reps!);
     const timeoutRef = useRef<NodeJS.Timeout>();
     const valueRef = useRef(value); // Храним актуальное значение
@@ -120,6 +122,7 @@ export default function ExerciseInstancePage({
     }
 
     async function onDelete() {
+      setIsLoading(true);
       await authApi.v1
         .routineServiceRemoveSetFromExerciseInstance(
           id,
@@ -133,18 +136,19 @@ export default function ExerciseInstancePage({
         .catch((error) => {
           console.log(error);
           toast.error("Не удалось удалить подход");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
 
-    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-      const newValue = parseInt(e.target.value) || 0;
+    function onChange(newValue: number) {
+      newValue = Math.max(0, newValue);
 
-      setValue(newValue); // Мгновенное обновление UI
+      setValue(newValue);
 
-      // Сбрасываем предыдущий таймер
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-      // Устанавливаем новый таймер
       timeoutRef.current = setTimeout(() => {
         updateSet();
       }, 1000);
@@ -155,7 +159,7 @@ export default function ExerciseInstancePage({
         <CardBody className="flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row gap-2 items-center">
-              <h2 className="text-sm font-semibold w-4">{num}.</h2>
+              <h2 className="text-md font-semibold w-5 text-center">{num}.</h2>
               <div className="bg-default-100 rounded-small p-2">
                 {(() => {
                   switch (set.setType) {
@@ -167,38 +171,48 @@ export default function ExerciseInstancePage({
                 })()}
               </div>
             </div>
-            <div className="flex flex-row gap-6 items-center">
-              <div className="flex flex-row gap-1 items-center">
-                {(() => {
-                  switch (set.setType) {
-                    case WorkoutSetType.SET_TYPE_REPS:
-                      return (
-                        <div className="flex flex-row gap-1 items-center">
-                          <Input
-                            className="w-16"
-                            size="sm"
-                            type="number"
-                            value={value.toString()}
-                            onChange={onChange}
-                          />
-                          <p>раз</p>
-                        </div>
-                      );
-                    default:
-                      return null;
-                  }
-                })()}
-              </div>
-              <Button
-                isIconOnly
-                className="min-w-fit h-fit py-2 px-2"
-                color="danger"
-                size="sm"
-                onPress={onDelete}
-              >
-                <TrashCanIcon className="w-3 h-3" />
-              </Button>
-            </div>
+            <Button
+              isIconOnly
+              className="min-w-fit h-fit py-2 px-2 w-8 h-8"
+              color="danger"
+              isLoading={isLoading}
+              size="sm"
+              spinner={
+                <Spinner
+                  classNames={{ wrapper: "w-4 h-4" }}
+                  color="white"
+                  size="sm"
+                />
+              }
+              onPress={onDelete}
+            >
+              <TrashCanIcon className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="flex flex-row items-center w-full">
+            {(() => {
+              switch (set.setType) {
+                case WorkoutSetType.SET_TYPE_REPS:
+                  return (
+                    <div className="flex flex-row justify-between items-center w-full">
+                      <p className="text-md font-regular">Повторения</p>
+                      <div className="flex flex-row gap-1 items-center h-8">
+                        <InputWithIncrement
+                          className="w-16"
+                          label=""
+                          placeholder="10"
+                          setValue={onChange}
+                          size="sm"
+                          type="number"
+                          value={value}
+                        />
+                      </div>
+                    </div>
+                  );
+                default:
+                  return null;
+              }
+            })()}
           </div>
         </CardBody>
       </Card>
@@ -206,16 +220,6 @@ export default function ExerciseInstancePage({
   }
 
   function SetsList({ sets }: { sets: WorkoutSet[] }) {
-    return (
-      <div className="flex flex-col gap-4">
-        {sets.map((set, index) => (
-          <SetCard key={set.id} num={index + 1} set={set} />
-        ))}
-      </div>
-    );
-  }
-
-  function ContentCard() {
     async function onAddSet() {
       await authApi.v1
         .routineServiceAddSetToExerciseInstance(id, exerciseInstanceId, {
@@ -235,13 +239,29 @@ export default function ExerciseInstancePage({
         });
     }
 
+    return (
+      <div className="flex flex-col gap-4">
+        {sets.map((set, index) => (
+          <SetCard key={set.id} num={index + 1} set={set} />
+        ))}
+
+        <Card className="p-2">
+          <Button fullWidth onPress={onAddSet}>
+            <PlusIcon className="w-4 h-4" />
+            Добавить подход
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  function ContentCard() {
     function AddSetBlock() {
       return (
-        <Card>
-          <CardBody className="flex flex-col gap-4">
-            <h2 className="text-md font-semibold">
-              скибиди туалет я еще не приудмал че суда написать
-            </h2>
+        <Card className="flex flex-col min-h-fit">
+          <CardBody className="flex flex-col gap-4 min-h-fit">
+            <h2 className="text-md font-semibold">Добавить подход</h2>
+            <Divider />
           </CardBody>
         </Card>
       );
@@ -249,16 +269,8 @@ export default function ExerciseInstancePage({
 
     return (
       <div className="p-4 h-full overflow-y-auto flex flex-col gap-4">
-        <AddSetBlock />
-        {exerciseInstanceDetails.sets!.length > 0 && (
-          <SetsList sets={exerciseInstanceDetails.sets!} />
-        )}
-        <div className="flex justify-center">
-          <Button fullWidth color="primary" onPress={onAddSet}>
-            <PlusIcon className="w-4 h-4" />
-            Добавить подход
-          </Button>
-        </div>
+        {/* <AddSetBlock /> */}
+        <SetsList sets={exerciseInstanceDetails.sets!} />
       </div>
     );
   }

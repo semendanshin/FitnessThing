@@ -3,7 +3,7 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Form } from "@nextui-org/form";
-import { Input, Textarea } from "@nextui-org/input";
+import { Textarea } from "@nextui-org/input";
 import { Slider } from "@nextui-org/slider";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { DropdownItem } from "@nextui-org/dropdown";
@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Divider } from "@nextui-org/divider";
+import { Spinner } from "@nextui-org/react";
 
 import { PageHeader } from "@/components/page-header";
 import { BoltIcon, TrashCanIcon } from "@/config/icons";
@@ -29,6 +30,7 @@ import {
   WorkoutSetLog,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
+import { InputWithIncrement } from "@/components/input-with-increments";
 
 export default function RoutineDetailsPage({
   params,
@@ -153,26 +155,33 @@ export default function RoutineDetailsPage({
         isPressable={!!onPress}
         onPress={onPress}
       >
-        <div className="flex flex-row w-full gap-2 px-2">
-          <div className="text-sm font-semibold w-4">{setNum + 1}</div>
-          {"exerciseLogId" in setLog && (
-            <>
-              <div className="text-sm font-semibold w-fit">
-                {setLog?.weight} кг
-              </div>
-              <div className="text-sm font-semibold w-fit">x</div>
-            </>
-          )}
-          <div className="text-sm font-semibold w-fit">{setLog?.reps} раз</div>
+        <div className="grid grid-cols-[1.5rem_3rem_1rem_auto] gap-2 px-2 w-full">
+          <div className="text-sm font-semibold text-center w-4">
+            {setNum + 1}
+          </div>
+          <div className="text-sm font-semibold justify-self-start">
+            {setLog.weight! > 0 ? `${setLog.weight} кг` : ""}
+          </div>
+          <div className="text-sm font-semibold justify-self-center">x</div>
+          <div className="text-sm font-semibold justify-self-start">
+            {setLog?.reps} раз
+          </div>
         </div>
         {enableDelete && (
           <div className="flex flex-col">
             <Button
               isIconOnly
-              className="h-fit w-fit min-w-fit p-2 w-9 h-6"
+              className="h-fit w-fit min-w-fit p-2"
               color="danger"
               isLoading={isLoading}
               size="sm"
+              spinner={
+                <Spinner
+                  classNames={{ wrapper: "w-3 h-3" }}
+                  color="white"
+                  size="sm"
+                />
+              }
               onPress={async () => {
                 setIsLoading(true);
                 await onDelete!();
@@ -195,69 +204,6 @@ export default function RoutineDetailsPage({
       console.log(error);
       toast.error("Failed to delete exercise log");
     }
-  }
-
-  function IncrementButtons({
-    value,
-    setValue,
-    isSubtract,
-  }: {
-    value: number;
-    setValue: (value: number) => void;
-    isSubtract?: boolean;
-  }) {
-    return (
-      <div className="flex flex-col justify-around p-0">
-        <Button
-          isIconOnly
-          className="min-w-fit w-fit p-3"
-          onPress={() => {
-            if (value > 0 && isSubtract) {
-              setValue(value - 1);
-
-              return;
-            }
-            if (!isSubtract) {
-              setValue(value + 1);
-            }
-          }}
-        >
-          {isSubtract ? "-" : "+"}
-        </Button>
-      </div>
-    );
-  }
-
-  function InputWithIncrement({
-    value,
-    setValue,
-    label,
-    placeholder,
-    type,
-  }: {
-    value: number;
-    setValue: (value: number) => void;
-    label: string;
-    placeholder: string;
-    type: string;
-  }) {
-    return (
-      <>
-        <p>{label}</p>
-        <div className="flex flex-row gap-2 items-center">
-          <IncrementButtons isSubtract setValue={setValue} value={value} />
-          <Input
-            isRequired
-            className="p-0 w-full h-full"
-            placeholder={placeholder}
-            type={type}
-            value={String(value)}
-            onValueChange={(value) => setValue(Number(value))}
-          />
-          <IncrementButtons setValue={setValue} value={value} />
-        </div>
-      </>
-    );
   }
 
   function UpdateSetLogModal({

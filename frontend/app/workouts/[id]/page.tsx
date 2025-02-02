@@ -55,16 +55,21 @@ function ExerciseLogCard({
         {exerciseLogDetails.setLogs!.length > 0 && (
           <CardBody className="flex flex-col w-full gap-1 p-0">
             {exerciseLogDetails.setLogs?.map((setLog, setNum) => (
-              <div key={setLog.id} className="flex flex-row w-full gap-2">
-                <div className="text-sm font-semibold min-w-fit w-3">
-                  {setNum + 1}.
+              <div
+                key={setLog.id}
+                className="grid grid-cols-[1.5rem_3rem_1rem_auto] gap-2 w-full"
+              >
+                <div className="text-sm font-semibold text-center w-4">
+                  {setNum + 1}
                 </div>
-                <div className="text-sm font-semibold w-fit">
-                  {setLog?.weight} кг
+                <div className="text-sm font-semibold justify-self-start">
+                  {setLog.weight! > 0 ? `${setLog.weight} кг` : ""}
                 </div>
-                <div className="text-sm font-semibold w-fit">x</div>
-                <div className="text-sm font-semibold w-fit">
-                  {setLog?.reps}
+                <div className="text-sm font-semibold justify-self-center">
+                  x
+                </div>
+                <div className="text-sm font-semibold justify-self-start">
+                  {setLog?.reps} раз
                 </div>
               </div>
             ))}
