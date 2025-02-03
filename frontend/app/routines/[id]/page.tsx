@@ -17,19 +17,22 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import {
-  draggable,
-  dropTargetForElements,
-} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { DropIndicator } from "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box";
-import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
-  attachClosestEdge,
-  extractClosestEdge,
-} from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
-import invariant from "tiny-invariant";
-import clsx from "clsx";
-import Link from "next/link";
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { ChevronRightIcon, GripVerticalIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
@@ -62,6 +65,23 @@ export default function RoutineDetailsPage({
     onOpen: onRenameOpen,
     onOpenChange: onRenameOpenChange,
   } = useDisclosure();
+
+  const sensors = useSensors(
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 25,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const router = useRouter();
 
@@ -125,41 +145,10 @@ export default function RoutineDetailsPage({
     }
   }
 
-  async function reoderExerciseInstances(
-    sourceIndex: number,
-    targetIndex: number,
-  ) {
-    let newExerciseInstances = reorder({
-      list: routineDetails.exerciseInstances!,
-      startIndex: sourceIndex,
-      finishIndex: targetIndex,
-    });
+  function handleDragStart(event: DragStartEvent) {}
 
-    setRoutineDetails((prev) => ({
-      ...prev,
-      exerciseInstances: newExerciseInstances,
-    }));
-
-    const exerciseInstanceIds = newExerciseInstances.map(
-      (ei) => ei.exerciseInstance!.id!,
-    );
-
-    await authApi.v1
-      .routineServiceSetExerciseOrder(id, {
-        exerciseInstanceIds: exerciseInstanceIds!,
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error === errUnauthorized || error.response?.status === 401) {
-          router.push("/auth/login");
-
-          return;
-        }
-        toast.error("Ошибка при изменении порядка упражнений");
-      });
+  function handleDragEnd(event: DragEndEvent) {
+    console.log(event);
   }
 
   async function fetchData() {
@@ -174,6 +163,34 @@ export default function RoutineDetailsPage({
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  function DraggableWrapper({
+    id,
+    children,
+  }: {
+    id: string;
+    children: React.ReactNode;
+  }) {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        className="select-none touch-manipulation"
+        style={style}
+      >
+        {children}
+      </div>
+    );
   }
 
   function ExercieInstanceCard({
@@ -302,68 +319,54 @@ export default function RoutineDetailsPage({
     }, []);
 
     return (
-      <div className="relative">
-        <Card
-          key={exerciseInstanceDetails.exerciseInstance!.id}
-          ref={ref}
-          fullWidth
-          className={clsx(
-            "flex flex-row flex-grow p-3 gap-2 justify-between select-none",
-            isDragged && "transform scale-95",
-          )}
-          isDisabled={isDragged}
-          shadow="sm"
-          onContextMenu={(e) => {
-            e.preventDefault();
-          }}
-          onPress={() => {
-            router.push(
-              `/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`,
-            );
-          }}
-        >
-          <div className="flex flex-row gap-3">
-            <div className="flex flex-col items-start justify-center">
-              <div className="rounded-md bg-default-100 hover:bg-default-200 cursor-grab flex items-center justify-center p-1">
-                <GripVerticalIcon ref={dragHandleRef} className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="flex flex-col items-start justify-between">
-              <CardHeader className="p-0">
-                <p className="text-m font-bold text-start">
-                  {exerciseInstanceDetails.exercise!.name}
-                </p>
-              </CardHeader>
-              <CardBody className="p-0">
-                <div className="flex flex-row gap-1">
-                  <p className="text-xs text-gray-400 whitespace-nowrap">
-                    {setsCount}{" "}
-                    {"подход" +
-                      (setsCount % 10 === 1
-                        ? ""
-                        : setsCount % 10 >= 2 && setsCount % 10 <= 4
-                          ? "а"
-                          : "ов")}
-                    {" •"}
-                  </p>
-                  <p className="text-xs text-gray-400 whitespace-nowrap">
-                    {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
-                      ", ",
-                    )}
-                  </p>
-                </div>
-              </CardBody>
+      <Card
+        key={exerciseInstanceDetails.exerciseInstance!.id}
+        fullWidth
+        className="flex flex-row flex-grow p-2 gap-4 justify-between"
+        shadow="sm"
+        onPress={() => {
+          router.push(
+            `/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`,
+          );
+        }}
+      >
+        <div className="flex flex-row gap-3">
+          <div className="flex flex-col items-start justify-center">
+            <div className="rounded-md bg-default-100 hover:bg-default-200 cursor-grab flex items-center justify-center p-1">
+              <GripVerticalIcon className="w-4 h-4" />
             </div>
           </div>
-          <Link
-            className="flex flex-col items-center justify-center"
-            href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
-          >
-            <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
-          </Link>
-        </Card>
-        {closestEdge && <DropIndicator edge={closestEdge} gap="1rem" />}
-      </div>
+          <div className="flex flex-col items-start justify-between">
+            <CardHeader className="p-0">
+              <p className="text-m font-bold text-start">
+                {exerciseInstanceDetails.exercise!.name}
+              </p>
+            </CardHeader>
+            <CardBody className="p-0">
+              <div className="flex flex-row gap-1">
+                <p className="text-xs text-gray-400 whitespace-nowrap">
+                  {setsCount}{" "}
+                  {"подход" +
+                    (setsCount % 10 === 1
+                      ? ""
+                      : setsCount % 10 >= 2 && setsCount % 10 <= 4
+                        ? "а"
+                        : "ов")}
+                  {" •"}
+                </p>
+                <p className="text-xs text-gray-400 whitespace-nowrap">
+                  {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
+                    ", ",
+                  )}
+                </p>
+              </div>
+            </CardBody>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center">
+          <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+        </div>
+      </Card>
     );
   }
 
@@ -493,21 +496,38 @@ export default function RoutineDetailsPage({
             </p>
           </div>
         ) : null}
-        <div className="grid grid-cols-1 px-4 gap-4">
-          {routineDetails.exerciseInstances?.map(
-            (exerciseInstanceDetails: WorkoutExerciseInstanceDetails) => (
-              <ExercieInstanceCard
-                key={exerciseInstanceDetails.exerciseInstance!.id}
-                exerciseInstanceDetails={exerciseInstanceDetails}
-              />
-            ),
-          )}
-          <Card className="p-2">
-            <Button onPress={onOpen}>
-              <PlusIcon className="w-4 h-4" />
-              Добавить упражнение
-            </Button>
-          </Card>
+        <div className="grid grid-cols-1 gap-4 px-4">
+          <DndContext
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+          >
+            <SortableContext
+              items={routineDetails.exerciseInstances!.map(
+                (ei) => ei.exerciseInstance!.id!,
+              )}
+              strategy={verticalListSortingStrategy}
+            >
+              {routineDetails.exerciseInstances?.map(
+                (exerciseInstanceDetails: WorkoutExerciseInstanceDetails) => (
+                  <DraggableWrapper
+                    key={exerciseInstanceDetails.exerciseInstance!.id}
+                    id={exerciseInstanceDetails.exerciseInstance!.id!}
+                  >
+                    <ExercieInstanceCard
+                      exerciseInstanceDetails={exerciseInstanceDetails}
+                    />
+                  </DraggableWrapper>
+                ),
+              )}
+              <Card className="p-2">
+                <Button onPress={onOpen}>
+                  <PlusIcon className="w-4 h-4" />
+                  Добавить упражнение
+                </Button>
+              </Card>
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
       <ModalSelectExercise
