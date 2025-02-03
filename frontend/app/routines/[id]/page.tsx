@@ -17,7 +17,6 @@ import { toast } from "react-toastify";
 import {
   DndContext,
   DragEndEvent,
-  DragStartEvent,
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
@@ -141,10 +140,55 @@ export default function RoutineDetailsPage({
     }
   }
 
-  function handleDragStart(event: DragStartEvent) {}
+  async function updateExerciseOreder(ids: string[]) {
+    await authApi.v1
+      .routineServiceSetExerciseOrder(id, { exerciseInstanceIds: ids })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error === errUnauthorized || error.response?.status === 401) {
+          router.push("/auth/login");
+
+          return;
+        }
+        toast.error("Ошибка при обновлении порядка упражнений");
+      });
+  }
 
   function handleDragEnd(event: DragEndEvent) {
-    console.log(event);
+    const { active, over } = event;
+
+    if (active.id === over!.id) {
+      return;
+    }
+
+    const activeIndex = routineDetails.exerciseInstances!.findIndex(
+      (ei) => ei.exerciseInstance!.id === active.id,
+    );
+
+    const overIndex = routineDetails.exerciseInstances!.findIndex(
+      (ei) => ei.exerciseInstance!.id === over!.id,
+    );
+
+    const newExerciseInstances = [...routineDetails.exerciseInstances!];
+
+    newExerciseInstances.splice(activeIndex, 1);
+    newExerciseInstances.splice(
+      overIndex,
+      0,
+      routineDetails.exerciseInstances![activeIndex],
+    );
+
+    updateExerciseOreder(
+      newExerciseInstances.map((ei) => ei.exerciseInstance!.id!),
+    );
+
+    setRoutineDetails((prev) => ({
+      ...prev,
+      exerciseInstances: newExerciseInstances,
+    }));
   }
 
   async function fetchData() {
@@ -375,11 +419,7 @@ export default function RoutineDetailsPage({
           </div>
         ) : null}
         <div className="grid grid-cols-1 gap-4 px-4">
-          <DndContext
-            sensors={sensors}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-          >
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <SortableContext
               items={routineDetails.exerciseInstances!.map(
                 (ei) => ei.exerciseInstance!.id!,
