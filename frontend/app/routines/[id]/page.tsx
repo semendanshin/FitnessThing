@@ -1,7 +1,5 @@
 "use client";
 
-import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/types";
-
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { DropdownItem } from "@nextui-org/dropdown";
@@ -14,7 +12,7 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   DndContext,
@@ -43,8 +41,6 @@ import {
   WorkoutRoutineDetailResponse,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
-// import "@/scripts/drag-drop-touch-patch";
-// import "drag-drop-touch";
 
 export default function RoutineDetailsPage({
   params,
@@ -199,124 +195,6 @@ export default function RoutineDetailsPage({
     exerciseInstanceDetails: WorkoutExerciseInstanceDetails;
   }) {
     const setsCount = exerciseInstanceDetails.sets?.length || 0;
-
-    const ref = useRef<HTMLDivElement>(null);
-    const dragHandleRef = useRef(null);
-    const [isDragged, setIsDragged] = useState<boolean>(false);
-    const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
-
-    const [data] = useState({
-      id: exerciseInstanceDetails.exerciseInstance!.id,
-    });
-
-    useEffect(() => {
-      const el = ref.current;
-      const dragHandleEl = dragHandleRef.current;
-
-      invariant(el);
-      invariant(dragHandleEl);
-
-      return combine(
-        draggable({
-          element: el,
-          getInitialData: () => data,
-          onDragStart: () => {
-            setIsDragged(true);
-
-            if (navigator.vibrate) {
-              navigator.vibrate(100);
-            }
-          },
-          onDrop: () => setIsDragged(false),
-        }),
-        dropTargetForElements({
-          element: el,
-          canDrop: ({ source }) => {
-            return (
-              source.data.id !== exerciseInstanceDetails.exerciseInstance!.id
-            );
-          },
-          getData: ({ input }) => {
-            return attachClosestEdge(data, {
-              element: el,
-              input,
-              allowedEdges: ["top", "bottom"],
-            });
-          },
-          onDrag: ({ self, source }) => {
-            const isSource = source.element === el;
-
-            if (isSource) {
-              setClosestEdge(null);
-
-              return;
-            }
-
-            const closestEdgeValue = extractClosestEdge(self.data);
-
-            const exerciseInstanceIds = routineDetails.exerciseInstances?.map(
-              (ei) => ei.exerciseInstance!.id,
-            );
-
-            const sourceIndex = exerciseInstanceIds?.indexOf(
-              source.data.id as string,
-            )!;
-
-            const currentIndex = exerciseInstanceIds?.indexOf(
-              exerciseInstanceDetails.exerciseInstance!.id,
-            );
-
-            const isItemBeforeSource = currentIndex === sourceIndex - 1;
-            const isItemAfterSource = currentIndex === sourceIndex + 1;
-
-            const isDropIndicatorHidden =
-              (isItemBeforeSource && closestEdgeValue === "bottom") ||
-              (isItemAfterSource && closestEdgeValue === "top");
-
-            if (isDropIndicatorHidden) {
-              setClosestEdge(null);
-
-              return;
-            }
-
-            setClosestEdge(closestEdgeValue);
-          },
-          onDragLeave: () => {
-            setClosestEdge(null);
-          },
-          onDrop: ({ source, self }) => {
-            setClosestEdge(null);
-
-            const exerciseInstanceIds = routineDetails.exerciseInstances?.map(
-              (ei) => ei.exerciseInstance!.id,
-            );
-
-            const sourceIndex = exerciseInstanceIds?.indexOf(
-              source.data.id as string,
-            )!;
-
-            let currentIndex = exerciseInstanceIds?.indexOf(
-              exerciseInstanceDetails.exerciseInstance!.id,
-            )!;
-
-            const closestEdgeValue = extractClosestEdge(self.data);
-
-            const isItemBeforeSource = currentIndex < sourceIndex;
-            const isItemAfterSource = currentIndex > sourceIndex;
-
-            if (closestEdgeValue === "bottom" && isItemBeforeSource) {
-              currentIndex += 1;
-            } else if (closestEdgeValue === "top" && isItemAfterSource) {
-              currentIndex -= 1;
-            }
-
-            console.log(sourceIndex, currentIndex);
-
-            reoderExerciseInstances(sourceIndex, currentIndex);
-          },
-        }),
-      );
-    }, []);
 
     return (
       <Card
