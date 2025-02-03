@@ -30,6 +30,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import Link from "next/link";
 
 import { ChevronRightIcon, GripVerticalIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
@@ -40,7 +41,6 @@ import {
   WorkoutRoutineDetailResponse,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
-import Link from "next/link";
 
 export default function RoutineDetailsPage({
   params,
