@@ -29,6 +29,7 @@ import {
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import invariant from "tiny-invariant";
 import clsx from "clsx";
+import Link from "next/link";
 
 import { ChevronRightIcon, GripVerticalIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
@@ -39,6 +40,8 @@ import {
   WorkoutRoutineDetailResponse,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
+// import "@/scripts/drag-drop-touch-patch";
+// import "drag-drop-touch";
 
 export default function RoutineDetailsPage({
   params,
@@ -304,13 +307,15 @@ export default function RoutineDetailsPage({
           key={exerciseInstanceDetails.exerciseInstance!.id}
           ref={ref}
           fullWidth
-          isPressable
           className={clsx(
             "flex flex-row flex-grow p-3 gap-2 justify-between select-none",
             isDragged && "transform scale-95",
           )}
           isDisabled={isDragged}
           shadow="sm"
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
           onPress={() => {
             router.push(
               `/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`,
@@ -350,9 +355,12 @@ export default function RoutineDetailsPage({
               </CardBody>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center">
+          <Link
+            className="flex flex-col items-center justify-center"
+            href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
+          >
             <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
-          </div>
+          </Link>
         </Card>
         {closestEdge && <DropIndicator edge={closestEdge} gap="1rem" />}
       </div>
