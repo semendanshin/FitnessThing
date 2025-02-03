@@ -335,6 +335,14 @@ service RoutineService {
       delete: "/v1/routines/{routine_id}/exercise_instances/{exercise_instance_id}/sets/{set_id}"
     };
   }
+
+  // Метод для установки порядка упражнений в рутине
+  rpc SetExerciseOrder(SetExerciseOrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/routines/{routine_id}/exercise_instances/order"
+      body: "*"
+    };
+  }
 }
 
 message RoutineListResponse {
@@ -499,6 +507,12 @@ message SetResponse {
   Set set = 1;
 }
 
+message SetExerciseOrderRequest {
+  string routine_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  repeated string exercise_instance_ids = 2;
+}
 
 service WorkoutService {  
   // Метод для начала новой тренировки

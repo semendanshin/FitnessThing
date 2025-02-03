@@ -5509,6 +5509,110 @@ var _ interface {
 	ErrorName() string
 } = SetResponseValidationError{}
 
+// Validate checks the field values on SetExerciseOrderRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetExerciseOrderRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetExerciseOrderRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetExerciseOrderRequestMultiError, or nil if none found.
+func (m *SetExerciseOrderRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetExerciseOrderRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoutineId
+
+	if len(errors) > 0 {
+		return SetExerciseOrderRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetExerciseOrderRequestMultiError is an error wrapping multiple validation
+// errors returned by SetExerciseOrderRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SetExerciseOrderRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetExerciseOrderRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetExerciseOrderRequestMultiError) AllErrors() []error { return m }
+
+// SetExerciseOrderRequestValidationError is the validation error returned by
+// SetExerciseOrderRequest.Validate if the designated constraints aren't met.
+type SetExerciseOrderRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetExerciseOrderRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetExerciseOrderRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetExerciseOrderRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetExerciseOrderRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetExerciseOrderRequestValidationError) ErrorName() string {
+	return "SetExerciseOrderRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetExerciseOrderRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetExerciseOrderRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetExerciseOrderRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetExerciseOrderRequestValidationError{}
+
 // Validate checks the field values on StartWorkoutRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

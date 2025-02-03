@@ -18,6 +18,7 @@ type Service interface {
 	AddExerciseToRoutine(ctx context.Context, routineID domain.ID, exerciseID domain.ID) (domain.ExerciseInstance, error)
 	GetExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID domain.ID) (dto.ExerciseInstanceDetailsDTO, error)
 	RemoveExerciseInstanceFromRoutine(ctx context.Context, userID, routineID, exerciseInstanceID domain.ID) error
+	SetExerciseOrder(ctx context.Context, userID, routineID domain.ID, exerciseInstanceIDs []domain.ID) error
 
 	AddSetToExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID domain.ID, dto dto.CreateSetDTO) (domain.Set, error)
 	RemoveSetFromExerciseInstance(ctx context.Context, userID, routineID, exerciseInstanceID, setID domain.ID) error

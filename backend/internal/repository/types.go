@@ -35,3 +35,12 @@ func timeFromPgtype(t pgtype.Timestamptz) time.Time {
 
 	return t.Time
 }
+
+func uuidsToPgtype(ids []domain.ID) []pgtype.UUID {
+	result := make([]pgtype.UUID, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, uuidToPgtype(id))
+	}
+
+	return result
+}

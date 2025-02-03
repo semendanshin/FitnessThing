@@ -46,6 +46,7 @@ type exerciseInstanceRepository interface {
 	GetExerciseInstancesByRoutineID(ctx context.Context, routineID domain.ID) ([]domain.ExerciseInstance, error)
 	CreateExerciseInstance(ctx context.Context, exerciseInstance domain.ExerciseInstance) (domain.ExerciseInstance, error)
 	DeleteExerciseInstance(ctx context.Context, id domain.ID) error
+	SetExerciseOrder(ctx context.Context, routineID domain.ID, exerciseInstanceIDs []domain.ID) error
 }
 
 type muscleGroupRepository interface {

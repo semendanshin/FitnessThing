@@ -335,6 +335,7 @@ const (
 	RoutineService_AddSetToExerciseInstance_FullMethodName          = "/fitness_trainer.api.workout.RoutineService/AddSetToExerciseInstance"
 	RoutineService_UpdateSetInExerciseInstance_FullMethodName       = "/fitness_trainer.api.workout.RoutineService/UpdateSetInExerciseInstance"
 	RoutineService_RemoveSetFromExerciseInstance_FullMethodName     = "/fitness_trainer.api.workout.RoutineService/RemoveSetFromExerciseInstance"
+	RoutineService_SetExerciseOrder_FullMethodName                  = "/fitness_trainer.api.workout.RoutineService/SetExerciseOrder"
 )
 
 // RoutineServiceClient is the client API for RoutineService service.
@@ -363,6 +364,8 @@ type RoutineServiceClient interface {
 	UpdateSetInExerciseInstance(ctx context.Context, in *UpdateSetInExerciseInstanceRequest, opts ...grpc.CallOption) (*SetResponse, error)
 	// Метод для удаления сета из упражнения
 	RemoveSetFromExerciseInstance(ctx context.Context, in *RemoveSetFromExerciseInstanceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Метод для установки порядка упражнений в рутине
+	SetExerciseOrder(ctx context.Context, in *SetExerciseOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type routineServiceClient struct {
@@ -483,6 +486,16 @@ func (c *routineServiceClient) RemoveSetFromExerciseInstance(ctx context.Context
 	return out, nil
 }
 
+func (c *routineServiceClient) SetExerciseOrder(ctx context.Context, in *SetExerciseOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, RoutineService_SetExerciseOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoutineServiceServer is the server API for RoutineService service.
 // All implementations must embed UnimplementedRoutineServiceServer
 // for forward compatibility.
@@ -509,6 +522,8 @@ type RoutineServiceServer interface {
 	UpdateSetInExerciseInstance(context.Context, *UpdateSetInExerciseInstanceRequest) (*SetResponse, error)
 	// Метод для удаления сета из упражнения
 	RemoveSetFromExerciseInstance(context.Context, *RemoveSetFromExerciseInstanceRequest) (*emptypb.Empty, error)
+	// Метод для установки порядка упражнений в рутине
+	SetExerciseOrder(context.Context, *SetExerciseOrderRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedRoutineServiceServer()
 }
 
@@ -551,6 +566,9 @@ func (UnimplementedRoutineServiceServer) UpdateSetInExerciseInstance(context.Con
 }
 func (UnimplementedRoutineServiceServer) RemoveSetFromExerciseInstance(context.Context, *RemoveSetFromExerciseInstanceRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveSetFromExerciseInstance not implemented")
+}
+func (UnimplementedRoutineServiceServer) SetExerciseOrder(context.Context, *SetExerciseOrderRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetExerciseOrder not implemented")
 }
 func (UnimplementedRoutineServiceServer) mustEmbedUnimplementedRoutineServiceServer() {}
 func (UnimplementedRoutineServiceServer) testEmbeddedByValue()                        {}
@@ -771,6 +789,24 @@ func _RoutineService_RemoveSetFromExerciseInstance_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutineService_SetExerciseOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetExerciseOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutineServiceServer).SetExerciseOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutineService_SetExerciseOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutineServiceServer).SetExerciseOrder(ctx, req.(*SetExerciseOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RoutineService_ServiceDesc is the grpc.ServiceDesc for RoutineService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -821,6 +857,10 @@ var RoutineService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveSetFromExerciseInstance",
 			Handler:    _RoutineService_RemoveSetFromExerciseInstance_Handler,
+		},
+		{
+			MethodName: "SetExerciseOrder",
+			Handler:    _RoutineService_SetExerciseOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

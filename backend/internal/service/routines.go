@@ -321,3 +321,22 @@ func (s *Service) UpdateSetInExerciseInstance(ctx context.Context, userID, routi
 
 	return s.setRepository.UpdateSet(ctx, setID, set)
 }
+
+func (s *Service) SetExerciseOrder(ctx context.Context, userID, routineID domain.ID, exerciseInstanceIDs []domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.SetExerciseOrder")
+	defer span.Finish()
+
+	routine, err := s.routineRepository.GetRoutineByID(ctx, routineID)
+	if err != nil {
+		return err
+	}
+
+	if routine.UserID != userID {
+		logger.Errorf("user %s is not authorized to update exercise order", userID)
+		return domain.ErrUnauthorized
+	}
+
+	// TODO: check if all exercise instances belong to the routine
+	
+	return s.exerciseInstanceRepository.SetExerciseOrder(ctx, routineID, exerciseInstanceIDs)
+}

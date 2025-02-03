@@ -27,6 +27,10 @@ export interface RoutineServiceAddSetToExerciseInstanceBody {
   time?: string;
 }
 
+export interface RoutineServiceSetExerciseOrderBody {
+  exerciseInstanceIds?: string[];
+}
+
 export interface RoutineServiceUpdateRoutineBody {
   name?: string;
   description?: string;
@@ -816,6 +820,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<WorkoutRoutineResponse, RpcStatus>({
         path: `/v1/routines/${routineId}`,
         method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags RoutineService
+     * @name RoutineServiceSetExerciseOrder
+     * @summary Метод для установки порядка упражнений в рутине
+     * @request POST:/v1/routines/{routineId}/exercise_instances/order
+     * @secure
+     */
+    routineServiceSetExerciseOrder: (
+      routineId: string,
+      body: RoutineServiceSetExerciseOrderBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/routines/${routineId}/exercise_instances/order`,
+        method: "POST",
         body: body,
         secure: true,
         type: ContentType.Json,

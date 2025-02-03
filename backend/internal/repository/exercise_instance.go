@@ -47,7 +47,8 @@ func (r *PGXRepository) GetExerciseInstanceByID(ctx context.Context, id domain.I
 	defer span.Finish()
 
 	query := `
-		SELECT * FROM exercise_instances ei
+		SELECT ei.id, ei.routine_id, ei.exercise_id, ei.created_at, ei.updated_at
+		FROM exercise_instances ei
 		WHERE ei.id = $1
 	`
 
@@ -71,8 +72,10 @@ func (r *PGXRepository) GetExerciseInstancesByRoutineID(ctx context.Context, rou
 	defer span.Finish()
 
 	query := `
-		SELECT * FROM exercise_instances ei
+		SELECT ei.id, ei.routine_id, ei.exercise_id, ei.created_at, ei.updated_at
+		FROM exercise_instances ei
 		WHERE ei.routine_id = $1
+		ORDER BY ei.position, ei.created_at
 	`
 
 	engine := r.contextManager.GetEngineFromContext(ctx)
@@ -100,15 +103,15 @@ func (r *PGXRepository) CreateExerciseInstance(ctx context.Context, exerciseInst
 	defer span.Finish()
 
 	query := `
-		INSERT INTO exercise_instances (id, routine_id, exercise_id, created_at)
-		VALUES ($1, $2, $3, $4)
-		RETURNING *
+		INSERT INTO exercise_instances (id, routine_id, exercise_id, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, routine_id, exercise_id, created_at, updated_at
 	`
 
 	engine := r.contextManager.GetEngineFromContext(ctx)
 
 	entity := exerciseInstanceFromDomain(exerciseInstance)
-	err := pgxscan.Get(ctx, engine, &entity, query, entity.ID, entity.RoutineID, entity.ExerciseID, entity.CreatedAt)
+	err := pgxscan.Get(ctx, engine, &entity, query, entity.ID, entity.RoutineID, entity.ExerciseID, entity.CreatedAt, entity.UpdatedAt)
 	if err != nil {
 		logger.Errorf("failed to create exercise instance: %v", err)
 		return domain.ExerciseInstance{}, err
@@ -131,6 +134,29 @@ func (r *PGXRepository) DeleteExerciseInstance(ctx context.Context, id domain.ID
 	_, err := engine.Exec(ctx, query, uuidToPgtype(id))
 	if err != nil {
 		logger.Errorf("failed to delete exercise instance: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (r *PGXRepository) SetExerciseOrder(ctx context.Context, routineID domain.ID, exerciseInstanceIDs []domain.ID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.SetExerciseOrder")
+	defer span.Finish()
+
+	query := `
+		UPDATE exercise_instances ei
+		SET position = idx
+		FROM (SELECT unnest($1::UUID[]) AS id, generate_series(0, array_length($1, 1) - 1) AS idx) AS new_order
+		WHERE ei.id = new_order.id
+		AND ei.routine_id = $2
+	`
+
+	engine := r.contextManager.GetEngineFromContext(ctx)
+
+	_, err := engine.Exec(ctx, query, uuidsToPgtype(exerciseInstanceIDs), uuidToPgtype(routineID))
+	if err != nil {
+		logger.Errorf("failed to set exercise order: %v", err)
 		return err
 	}
 
