@@ -40,6 +40,7 @@ import {
   WorkoutRoutineDetailResponse,
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
+import Link from "next/link";
 
 export default function RoutineDetailsPage({
   params,
@@ -246,11 +247,6 @@ export default function RoutineDetailsPage({
         fullWidth
         className="flex flex-row flex-grow p-2 gap-4 justify-between"
         shadow="sm"
-        onPress={() => {
-          router.push(
-            `/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`,
-          );
-        }}
       >
         <div className="flex flex-row gap-3">
           <div className="flex flex-col items-start justify-center">
@@ -285,9 +281,12 @@ export default function RoutineDetailsPage({
             </CardBody>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center">
+        <Link
+          className="flex flex-col items-center justify-center"
+          href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
+        >
           <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
-        </div>
+        </Link>
       </Card>
     );
   }
