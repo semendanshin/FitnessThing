@@ -227,7 +227,7 @@ export default function Home() {
         className="flex flex-col flex-grow max-w-full h-[65vh] relative"
         id="home"
       >
-        <div className="flex flex-col flex-grow absolute w-full h-[75vh] z-0 fade-bottom opacity-80 contrast-[1.25]">
+        <div className="flex flex-col flex-grow absolute w-full h-[75vh] z-0 fade-bottom opacity-80 contrast-[1.15]">
           <canvas id="home-bg" />
         </div>
         <div className="flex-grow flex flex-col justify-center items-center relative z-10 drop-shadow-lg">
