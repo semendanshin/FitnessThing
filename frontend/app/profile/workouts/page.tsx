@@ -64,7 +64,7 @@ function WorkoutHistoryCard({
 
   return (
     <Card isPressable className="flex flex-col p-3 gap-2" onPress={onClick}>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full">
         <p className="text-md font-bold">{"Тренировка"}</p>
         <p className="text-sm font-semibold text-default-600">
           {/* <p className="text-md font-bold"> */}
