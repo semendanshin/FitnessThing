@@ -242,7 +242,7 @@ export default function ExerciseInstancePage({
 
     return (
       <div className="flex flex-col gap-4 p-4">
-        {sets.map((set, index) => (
+        {sets?.map((set, index) => (
           <SetCard key={set.id} num={index + 1} set={set} />
         ))}
 

@@ -223,15 +223,13 @@ export default function RoutineDetailsPage({
 
   function ExercieInstanceCard({
     exerciseInstanceDetails,
-    id,
   }: {
     exerciseInstanceDetails: WorkoutExerciseInstanceDetails;
-    id?: string;
   }) {
     const setsCount = exerciseInstanceDetails.sets?.length || 0;
 
     const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: id! });
+      useSortable({ id: exerciseInstanceDetails.exerciseInstance!.id! });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -438,7 +436,6 @@ export default function RoutineDetailsPage({
                   <ExercieInstanceCard
                     key={exerciseInstanceDetails.exerciseInstance!.id}
                     exerciseInstanceDetails={exerciseInstanceDetails}
-                    id={exerciseInstanceDetails.exerciseInstance!.id}
                   />
                 ),
               )}

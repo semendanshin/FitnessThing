@@ -161,7 +161,8 @@ func (s *Service) GetExerciseInstance(ctx context.Context, userID, routineID, ex
 	}
 
 	if exerciseInstance.RoutineID != routineID {
-		return dto.ExerciseInstanceDetailsDTO{}, domain.ErrUnauthorized
+		logger.Errorf("exercise instance %s does not belong to routine %s", exerciseInstanceID, routineID)
+		return dto.ExerciseInstanceDetailsDTO{}, domain.ErrNotFound
 	}
 
 	exercise, err := s.exerciseRepository.GetExerciseByID(ctx, exerciseInstance.ExerciseID)
@@ -337,6 +338,6 @@ func (s *Service) SetExerciseOrder(ctx context.Context, userID, routineID domain
 	}
 
 	// TODO: check if all exercise instances belong to the routine
-	
+
 	return s.exerciseInstanceRepository.SetExerciseOrder(ctx, routineID, exerciseInstanceIDs)
 }
