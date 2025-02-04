@@ -31,6 +31,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
+import { hapticFeedback } from "@telegram-apps/sdk-react";
 
 import { ChevronRightIcon, GripVerticalIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
@@ -158,8 +159,22 @@ export default function RoutineDetailsPage({
       });
   }
 
+  function onDragStart() {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(100);
+    }
+
+    if (hapticFeedback.impactOccurred.isAvailable()) {
+      hapticFeedback.impactOccurred("medium");
+    }
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
+
+    if (!over || !active) {
+      return;
+    }
 
     if (active.id === over!.id) {
       return;
@@ -206,15 +221,17 @@ export default function RoutineDetailsPage({
     return <Loading />;
   }
 
-  function DraggableWrapper({
+  function ExercieInstanceCard({
+    exerciseInstanceDetails,
     id,
-    children,
   }: {
-    id: string;
-    children: React.ReactNode;
+    exerciseInstanceDetails: WorkoutExerciseInstanceDetails;
+    id?: string;
   }) {
+    const setsCount = exerciseInstanceDetails.sets?.length || 0;
+
     const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id });
+      useSortable({ id: id! });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -224,70 +241,57 @@ export default function RoutineDetailsPage({
     return (
       <div
         ref={setNodeRef}
-        {...attributes}
-        {...listeners}
         className="select-none touch-manipulation"
         style={style}
       >
-        {children}
-      </div>
-    );
-  }
-
-  function ExercieInstanceCard({
-    exerciseInstanceDetails,
-  }: {
-    exerciseInstanceDetails: WorkoutExerciseInstanceDetails;
-  }) {
-    const setsCount = exerciseInstanceDetails.sets?.length || 0;
-
-    return (
-      <Card
-        key={exerciseInstanceDetails.exerciseInstance!.id}
-        fullWidth
-        className="flex flex-row flex-grow p-2 gap-4 justify-between"
-        shadow="sm"
-      >
-        <div className="flex flex-row gap-3">
-          <div className="flex flex-col items-start justify-center">
-            <div className="rounded-md bg-default-100 hover:bg-default-200 cursor-grab flex items-center justify-center p-1">
-              <GripVerticalIcon className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex flex-col items-start justify-between">
-            <CardHeader className="p-0">
-              <p className="text-m font-bold text-start">
-                {exerciseInstanceDetails.exercise!.name}
-              </p>
-            </CardHeader>
-            <CardBody className="p-0">
-              <div className="flex flex-row gap-1">
-                <p className="text-xs text-gray-400 whitespace-nowrap">
-                  {setsCount}{" "}
-                  {"подход" +
-                    (setsCount % 10 === 1
-                      ? ""
-                      : setsCount % 10 >= 2 && setsCount % 10 <= 4
-                        ? "а"
-                        : "ов")}
-                  {" •"}
-                </p>
-                <p className="text-xs text-gray-400 whitespace-nowrap">
-                  {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
-                    ", ",
-                  )}
-                </p>
-              </div>
-            </CardBody>
-          </div>
-        </div>
-        <Link
-          className="flex flex-col items-center justify-center"
-          href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
+        <Card
+          fullWidth
+          className="flex flex-row flex-grow p-2 gap-3 items-center"
+          shadow="sm"
         >
-          <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
-        </Link>
-      </Card>
+          <div
+            className="rounded-md bg-default-100 hover:bg-default-200 cursor-grab flex items-center justify-center p-1"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVerticalIcon className="w-4 h-4" />
+          </div>
+          <Link
+            className="flex items-center justify-between w-full"
+            href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
+          >
+            <div className="flex flex-col items-start justify-between">
+              <CardHeader className="p-0">
+                <p className="text-m font-bold text-start">
+                  {exerciseInstanceDetails.exercise!.name}
+                </p>
+              </CardHeader>
+              <CardBody className="p-0">
+                <div className="flex flex-row gap-1">
+                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                    {setsCount}{" "}
+                    {"подход" +
+                      (setsCount % 10 === 1
+                        ? ""
+                        : setsCount % 10 >= 2 && setsCount % 10 <= 4
+                          ? "а"
+                          : "ов")}
+                    {" •"}
+                  </p>
+                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                    {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
+                      ", ",
+                    )}
+                  </p>
+                </div>
+              </CardBody>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
+            </div>
+          </Link>
+        </Card>
+      </div>
     );
   }
 
@@ -418,7 +422,11 @@ export default function RoutineDetailsPage({
           </div>
         ) : null}
         <div className="grid grid-cols-1 gap-4 px-4">
-          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          <DndContext
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+            onDragStart={onDragStart}
+          >
             <SortableContext
               items={routineDetails.exerciseInstances!.map(
                 (ei) => ei.exerciseInstance!.id!,
@@ -427,14 +435,11 @@ export default function RoutineDetailsPage({
             >
               {routineDetails.exerciseInstances?.map(
                 (exerciseInstanceDetails: WorkoutExerciseInstanceDetails) => (
-                  <DraggableWrapper
+                  <ExercieInstanceCard
                     key={exerciseInstanceDetails.exerciseInstance!.id}
-                    id={exerciseInstanceDetails.exerciseInstance!.id!}
-                  >
-                    <ExercieInstanceCard
-                      exerciseInstanceDetails={exerciseInstanceDetails}
-                    />
-                  </DraggableWrapper>
+                    exerciseInstanceDetails={exerciseInstanceDetails}
+                    id={exerciseInstanceDetails.exerciseInstance!.id}
+                  />
                 ),
               )}
               <Card className="p-2">
