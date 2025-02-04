@@ -40,29 +40,51 @@ function WorkoutHistoryCard({
     return `${hours} ч. ${minutes} мин.`;
   }
 
+  function formatDate(date: string) {
+    const dateObj = new Date(date);
+
+    let formatOpts = {};
+
+    if (Date.now() - dateObj.getTime() < 60 * 60 * 24 * 14 * 1000) {
+      formatOpts = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      };
+    } else {
+      formatOpts = {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      };
+    }
+
+    return dateObj.toLocaleDateString("ru-RU", formatOpts);
+  }
+
   return (
     <Card isPressable className="flex flex-col p-3 gap-2" onPress={onClick}>
       <div className="flex justify-between items-center">
-        <p className="text-md font-bold">
-          {"Тренировка "}
-          {new Date(workoutDetails.workout?.createdAt!).toLocaleString(
-            "ru-RU",
-            {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            },
-          )}
+        <p className="text-md font-bold">{"Тренировка"}</p>
+        <p className="text-sm font-semibold text-default-600">
+          {/* <p className="text-md font-bold"> */}
+          {formatDate(workoutDetails.workout?.createdAt!)}
         </p>
       </div>
       <div className="flex justify-between items-center gap-2 w-full">
         <div className="flex flex-row items-center gap-2">
-          <p className="text-xs font-semibold">{"Упражнения: "}</p>
-          <p className="text-xs">{workoutDetails.exerciseLogs?.length}</p>
+          <p className="text-xs font-semibold text-default-500">
+            {"Упражнения: "}
+          </p>
+          <p className="text-xs text-default-500">
+            {workoutDetails.exerciseLogs?.length}
+          </p>
         </div>
         <div className="flex flex-row items-center gap-2">
-          <p className="text-xs font-semibold">{"Время: "}</p>
-          <p className="text-xs">{getWorkoutDuration(workoutDetails)}</p>
+          <p className="text-xs font-semibold text-default-500">{"Время: "}</p>
+          <p className="text-xs text-default-500">
+            {getWorkoutDuration(workoutDetails)}
+          </p>
         </div>
       </div>
     </Card>
