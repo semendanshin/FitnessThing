@@ -260,13 +260,13 @@ export default function RoutineDetailsPage({
           >
             <div className="flex flex-col items-start justify-between">
               <CardHeader className="p-0">
-                <p className="text-m font-bold text-start">
+                <p className="text-md font-bold text-start">
                   {exerciseInstanceDetails.exercise!.name}
                 </p>
               </CardHeader>
               <CardBody className="p-0">
                 <div className="flex flex-row gap-1">
-                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                  <p className="text-xs text-default-400 whitespace-nowrap">
                     {setsCount}{" "}
                     {"подход" +
                       (setsCount % 10 === 1
@@ -276,7 +276,7 @@ export default function RoutineDetailsPage({
                           : "ов")}
                     {" •"}
                   </p>
-                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                  <p className="text-xs text-default-400 whitespace-nowrap">
                     {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
                       ", ",
                     )}

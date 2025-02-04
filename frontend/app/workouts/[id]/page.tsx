@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@nextui-org/button";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import {
   Modal,
@@ -10,12 +10,12 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/modal";
-import { DropdownItem, ScrollShadow } from "@nextui-org/react";
+import { DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { ChevronRightIcon, PlusIcon } from "@/config/icons";
+import { BoltIcon, ChevronRightIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
 import { PageHeader } from "@/components/page-header";
 import { Loading } from "@/components/loading";
@@ -36,17 +36,27 @@ function ExerciseLogCard({
     <Card
       fullWidth
       as={Link}
-      className="flex flex-row items-center justify-between p-4 cursor-pointer"
+      className="flex flex-row items-center justify-between p-3 cursor-pointer gap-3"
       href={`/workouts/${workoutId}/exerciseLogs/${exerciseLogDetails.exerciseLog?.id}`}
       shadow="sm"
     >
       <div className="flex flex-col items-start justify-between w-full gap-3">
-        <div className="flex flex-col">
-          <p className="text-lg font-bold">
-            {exerciseLogDetails.exercise?.name}
-          </p>
+        <CardHeader className="flex flex-col p-0 items-start">
+          <div className="flex flex-row justify-between w-full gap-4">
+            <p className="text-md font-bold text-start">
+              {exerciseLogDetails.exercise?.name}
+            </p>
+            {exerciseLogDetails.exerciseLog?.powerRating! !== 0 && (
+              <div className="flex flex-row items-center h-full">
+                <BoltIcon className="w-3 h-3" />
+                <p className="text-sm/6 font-semibold">
+                  {exerciseLogDetails.exerciseLog?.powerRating}/10
+                </p>
+              </div>
+            )}
+          </div>
           {exerciseLogDetails.expectedSets!.length > 0 && (
-            <div className="text-xs font-light text-default-600">
+            <div className="text-xs text-default-400">
               {exerciseLogDetails.expectedSets!.length} подходов x{" "}
               {(exerciseLogDetails.expectedSets!.reduce(
                 (acc, set) => acc + set.reps!,
@@ -57,7 +67,7 @@ function ExerciseLogCard({
               раз
             </div>
           )}
-        </div>
+        </CardHeader>
         {exerciseLogDetails.setLogs!.length > 0 && (
           <CardBody className="flex flex-col w-full gap-1 p-0">
             {exerciseLogDetails.setLogs?.map((setLog, setNum) => (
@@ -89,7 +99,7 @@ function ExerciseLogCard({
   );
 }
 
-export default function RoutineDetailsPage({
+export default function WorkoutDetailsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -293,29 +303,27 @@ export default function RoutineDetailsPage({
             Удалить
           </DropdownItem>
         </PageHeader>
-        <section className="flex flex-col gap-4 h-full overflow-y-scroll">
-          <ScrollShadow size={50}>
-            <div className="flex flex-col gap-2 p-4 ">
-              {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
-                <ExerciseLogCard
-                  key={index}
-                  exerciseLogDetails={exerciseLogDetails}
-                  workoutId={id}
-                />
-              ))}
-              <Card className="p-2">
-                <Button
-                  className="w-full"
-                  onPress={() => {
-                    onOpen();
-                  }}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  <span>Добавить упражнение</span>
-                </Button>
-              </Card>
-            </div>
-          </ScrollShadow>
+        <section className="flex flex-col gap-4 ">
+          <div className="flex flex-col gap-4 p-4 ">
+            {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
+              <ExerciseLogCard
+                key={index}
+                exerciseLogDetails={exerciseLogDetails}
+                workoutId={id}
+              />
+            ))}
+            <Card className="p-2">
+              <Button
+                className="w-full"
+                onPress={() => {
+                  onOpen();
+                }}
+              >
+                <PlusIcon className="w-4 h-4" />
+                <span>Добавить упражнение</span>
+              </Button>
+            </Card>
+          </div>
         </section>
         <section className="w-full px-4 py-2 ">
           <Button
