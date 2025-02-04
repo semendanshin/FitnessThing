@@ -3,7 +3,13 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
-import { useDisclosure } from "@nextui-org/modal";
+import {
+  Modal,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/modal";
 import { DropdownItem, ScrollShadow } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -209,6 +215,54 @@ export default function RoutineDetailsPage({
     }
   }
 
+  const {
+    isOpen: isFinishModalOpen,
+    onOpen: onFinishModalOpen,
+    onClose: onFinishModalClose,
+  } = useDisclosure();
+
+  function FinishWorkoutModal() {
+    const [loading, setLoading] = useState(false);
+
+    return (
+      <Modal
+        isOpen={isFinishModalOpen}
+        placement="center"
+        size="xs"
+        title="Завершить тренировку"
+        onClose={onFinishModalClose}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <div className="flex flex-col py-4 gap-4">
+              <ModalHeader className="p-0 px-4">
+                Завершить тренировку?
+              </ModalHeader>
+              <ModalFooter className="flex flex-row gap-2 w-full px-2 py-0">
+                <Button className="w-full" color="danger" onPress={onClose}>
+                  Отмена
+                </Button>
+                <Button
+                  className="w-full"
+                  color="success"
+                  isLoading={loading}
+                  onPress={async () => {
+                    setLoading(true);
+                    await finishWorkout();
+                    setLoading(false);
+                  }}
+                >
+                  Завершить
+                </Button>
+              </ModalFooter>
+            </div>
+          )}
+        </ModalContent>
+        <p>Вы уверены, что хотите завершить тренировку?</p>
+      </Modal>
+    );
+  }
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -267,9 +321,7 @@ export default function RoutineDetailsPage({
           <Button
             className="w-full"
             color="primary"
-            onPress={async () => {
-              await finishWorkout();
-            }}
+            onPress={onFinishModalOpen}
           >
             Завершить тренировку
           </Button>
@@ -283,6 +335,7 @@ export default function RoutineDetailsPage({
         onClose={onClose}
         onSubmit={addExercisesToWorkout}
       />
+      <FinishWorkoutModal />
     </>
   );
 }

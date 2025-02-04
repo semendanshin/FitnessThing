@@ -171,22 +171,21 @@ export default function Home() {
 
   function RoutineCard({ routine }: { routine: any }) {
     return (
-      <Card
-        key={routine.id}
-        as={Link}
-        className="w-52 h-52 p-3 gap-1"
-        href={`/routines/${routine.id}`}
-      >
-        <h3 className="text-lg font-bold">{routine.name}</h3>
+      <Card key={routine.id} className="w-52 h-52 p-3 gap-1">
+        <Link
+          className="flex flex-col h-full gap-1"
+          href={`/routines/${routine.id}`}
+        >
+          <h3 className="text-lg font-bold">{routine.name}</h3>
 
-        <div className="flex flex-col h-full overflow-hidden">
-          <p className="text-xs font-light line-clamp-[7]">
-            {routine.description}
-          </p>
-        </div>
-
+          <div className="flex flex-col h-full overflow-hidden">
+            <p className="text-xs font-light line-clamp-[7]">
+              {routine.description}
+            </p>
+          </div>
+        </Link>
         <Button
-          className="flex items-center p-2 w-full"
+          className="flex items-center p-2 w-full z-20"
           color="primary"
           size="sm"
           onPress={async () => {
