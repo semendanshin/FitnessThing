@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useIntersectionObserver } from "@siberiacancode/reactuse";
+import clsx from "clsx";
 
 import { Loading } from "./loading";
 
@@ -12,7 +13,7 @@ export default function InfiniteScroll({
   showError,
   showEnd,
   children,
-  ...props
+  className,
 }: {
   fetchMore: () => Promise<void>;
   hasMore: boolean;
@@ -20,6 +21,7 @@ export default function InfiniteScroll({
   showError?: boolean;
   showEnd?: boolean;
   children: React.ReactNode;
+  className?: string;
 } & React.HTMLAttributes<HTMLDivElement>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -50,17 +52,19 @@ export default function InfiniteScroll({
   });
 
   return (
-    <div {...props}>
-      {children}
-      {showLoading && isLoading && <Loading />}
-      {showError && isError && (
-        <div className="text-red-500 text-center">
-          Ошибка при загрузке данных
-        </div>
-      )}
-      {showEnd && !hasMore && <div className="text-center">Конец!</div>}
-      <div ref={ref} />
-    </div>
+    <>
+      <div className={clsx("relative", className)}>
+        {children}
+        {showLoading && isLoading && <Loading />}
+        {showError && isError && (
+          <div className="text-red-500 text-center">
+            Ошибка при загрузке данных
+          </div>
+        )}
+        {showEnd && !hasMore && <div className="text-center">Конец!</div>}
+        <div ref={ref} className="bottom-0 h-[100px] absolute z-[-1]" />
+      </div>
+    </>
   );
 }
 
