@@ -49,10 +49,11 @@ func routineFromDomain(routine domain.Routine) routineEntity {
 func (r *PGXRepository) GetRoutines(ctx context.Context, userID domain.ID) ([]domain.Routine, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetRoutines")
 	defer span.Finish()
-	
+
 	query := `
 		SELECT * FROM routines r
 		WHERE r.user_id = $1
+		ORDER BY r.created_at DESC
 	`
 
 	engine := r.contextManager.GetEngineFromContext(ctx)
