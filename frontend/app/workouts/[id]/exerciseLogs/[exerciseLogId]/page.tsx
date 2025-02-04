@@ -31,6 +31,7 @@ import {
 } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 import { InputWithIncrement } from "@/components/input-with-increments";
+import InfiniteScroll from "@/components/infinite-scroll";
 
 export default function RoutineDetailsPage({
   params,
@@ -50,6 +51,10 @@ export default function RoutineDetailsPage({
   const [exerciseLogForUpdate, setExerciseLogForUpdate] =
     useState<WorkoutSetLog>({});
 
+  const limit = 10;
+  const [offset, setOffset] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const router = useRouter();
@@ -60,29 +65,6 @@ export default function RoutineDetailsPage({
       .then((response) => {
         console.log(response.data);
         setExerciseLogDetails(response.data.exerciseLogDetails!);
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error === errUnauthorized || error.response?.status === 401) {
-          router.push("/auth/login");
-
-          return;
-        }
-        throw error;
-      });
-  }
-
-  async function fetchExerciseLogHistory(exerciseId: string) {
-    await authApi.v1
-      .exerciseServiceGetExerciseHistory(exerciseId)
-      .then((response) => {
-        console.log(response.data);
-        setExerciseLogHistory(
-          response.data.exerciseLogs!.filter(
-            (log) =>
-              log.exerciseLog?.workoutId != id && log.setLogs?.length! > 0,
-          ),
-        );
       })
       .catch((error) => {
         console.log(error);
@@ -111,12 +93,6 @@ export default function RoutineDetailsPage({
   useEffect(() => {
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (exerciseLogDetails.exercise?.id) {
-      fetchExerciseLogHistory(exerciseLogDetails.exercise.id);
-    }
-  }, [exerciseLogDetails.exercise?.id]);
 
   if (isLoading) {
     return <Loading />;
@@ -152,21 +128,21 @@ export default function RoutineDetailsPage({
       <Card
         className="flex flex-row items-center justify-between p-2 w-full h-[2.5rem]"
         isDisabled={isDisabled}
-        isPressable={!!onPress}
-        onPress={onPress}
       >
-        <div className="grid grid-cols-[1.5rem_3rem_1rem_auto] gap-2 px-2 w-full">
-          <div className="text-sm font-semibold text-center w-4">
-            {setNum + 1}
+        <button onClick={onPress}>
+          <div className="grid grid-cols-[1.5rem_3rem_1rem_auto] gap-2 px-2 w-full">
+            <div className="text-sm font-semibold text-center w-4">
+              {setNum + 1}
+            </div>
+            <div className="text-sm font-semibold justify-self-start">
+              {setLog.weight! > 0 ? `${setLog.weight} кг` : ""}
+            </div>
+            <div className="text-sm font-semibold justify-self-center">x</div>
+            <div className="text-sm font-semibold justify-self-start">
+              {setLog?.reps} раз
+            </div>
           </div>
-          <div className="text-sm font-semibold justify-self-start">
-            {setLog.weight! > 0 ? `${setLog.weight} кг` : ""}
-          </div>
-          <div className="text-sm font-semibold justify-self-center">x</div>
-          <div className="text-sm font-semibold justify-self-start">
-            {setLog?.reps} раз
-          </div>
-        </div>
+        </button>
         {enableDelete && (
           <div className="flex flex-col">
             <Button
@@ -542,53 +518,105 @@ export default function RoutineDetailsPage({
     );
   }
 
-  function HistoryContent() {
+  function HistoryContent({ id }: { id: string }) {
+    async function fetchMore() {
+      try {
+        await authApi.v1
+          .exerciseServiceGetExerciseHistory(id, {
+            offset: offset,
+            limit: limit,
+          })
+          .then((response) => {
+            console.log(response.data);
+            setExerciseLogHistory((prev) => [
+              ...prev,
+              ...response.data.exerciseLogs!,
+            ]);
+            setHasMore(response.data.exerciseLogs!.length === limit);
+            setOffset(offset + limit);
+            console.log(offset, hasMore);
+          });
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to fetch more exercise logs");
+      }
+    }
+    function ExerciseHistoryCard({
+      exerciseLog,
+    }: {
+      exerciseLog: WorkoutExerciseLogDetails;
+    }) {
+      function formatDate(date: string) {
+        const dateObj = new Date(date);
+
+        let formatOpts = {};
+
+        if (Date.now() - dateObj.getTime() < 60 * 60 * 24 * 14 * 1000) {
+          formatOpts = {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+          };
+        } else {
+          formatOpts = {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          };
+        }
+
+        return dateObj.toLocaleDateString("ru-RU", formatOpts);
+      }
+
+      return (
+        <Card>
+          <CardBody className="flex flex-col gap-2">
+            <div className="flex flex-row justify-between items-center">
+              <p className="text-md font-bold">
+                {formatDate(exerciseLog.exerciseLog?.createdAt!)}
+              </p>
+
+              {exerciseLog.exerciseLog?.powerRating! !== 0 && (
+                <div className="flex flex-row items-center">
+                  <BoltIcon className="w-3 h-3" />
+                  <p className="text-sm font-semibold">
+                    {exerciseLog.exerciseLog?.powerRating}/10
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              {exerciseLog.setLogs?.map((setLog, index) => (
+                <SetLogCard key={index} setLog={setLog} setNum={index} />
+              ))}
+            </div>
+            {exerciseLog.exerciseLog?.notes && (
+              <Textarea
+                isReadOnly
+                className="w-full"
+                classNames={{
+                  input: "text-xs font-light",
+                }}
+                maxRows={4}
+                value={exerciseLog.exerciseLog?.notes}
+              />
+            )}
+          </CardBody>
+        </Card>
+      );
+    }
+
     return (
-      <div className="flex flex-col gap-4">
+      <InfiniteScroll
+        className="flex flex-col gap-4"
+        fetchMore={fetchMore}
+        hasMore={hasMore}
+      >
         {exerciseLogHistory.map(
           (exerciseLog, index) =>
             exerciseLog.setLogs!.length > 0 &&
             exerciseLog.exerciseLog?.workoutId != id && (
-              <Card key={index}>
-                <CardBody className="flex flex-col gap-2">
-                  <div className="flex flex-row justify-between items-center">
-                    <p className="text-lg font-bold">
-                      {new Date(
-                        exerciseLog.exerciseLog?.createdAt!,
-                      ).toLocaleDateString("ru-RU", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                      })}
-                    </p>
-
-                    {exerciseLog.exerciseLog?.powerRating! !== 0 && (
-                      <div className="flex flex-row items-center">
-                        <BoltIcon className="w-3 h-3" />
-                        <p className="text-sm font-semibold">
-                          {exerciseLog.exerciseLog?.powerRating}/10
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    {exerciseLog.setLogs?.map((setLog, index) => (
-                      <SetLogCard key={index} setLog={setLog} setNum={index} />
-                    ))}
-                  </div>
-                  {exerciseLog.exerciseLog?.notes && (
-                    <Textarea
-                      isReadOnly
-                      className="w-full"
-                      classNames={{
-                        input: "text-xs font-light",
-                      }}
-                      maxRows={4}
-                      value={exerciseLog.exerciseLog?.notes}
-                    />
-                  )}
-                </CardBody>
-              </Card>
+              <ExerciseHistoryCard key={index} exerciseLog={exerciseLog} />
             ),
         )}
         {exerciseLogHistory.length === 0 && (
@@ -599,7 +627,7 @@ export default function RoutineDetailsPage({
             </p>
           </div>
         )}
-      </div>
+      </InfiniteScroll>
     );
   }
 
@@ -626,7 +654,7 @@ export default function RoutineDetailsPage({
                 <TodayContent />
               </Tab>
               <Tab key="history" title="История">
-                <HistoryContent />
+                <HistoryContent id={exerciseLogDetails.exercise?.id!} />
               </Tab>
             </Tabs>
           </section>

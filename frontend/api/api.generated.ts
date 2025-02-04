@@ -702,10 +702,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/v1/exercises/{exerciseId}/history
      * @secure
      */
-    exerciseServiceGetExerciseHistory: (exerciseId: string, params: RequestParams = {}) =>
+    exerciseServiceGetExerciseHistory: (
+      exerciseId: string,
+      query?: {
+        /** @format int32 */
+        offset?: number;
+        /** @format int32 */
+        limit?: number;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<WorkoutExerciseHistoryResponse, RpcStatus>({
         path: `/v1/exercises/${exerciseId}/history`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,

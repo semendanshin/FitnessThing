@@ -32,7 +32,22 @@ func (i *Implementation) GetExerciseHistory(ctx context.Context, in *desc.GetExe
 		return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
 	}
 
-	logs, err := i.service.GetExerciseHistory(ctx, userID, id)
+	var limit, offset int
+	{
+		if in.Limit <= 0 {
+			limit = 10
+		} else {
+			limit = int(in.GetLimit())
+		}
+
+		if in.Offset <= 0 {
+			offset = 0
+		} else {
+			offset = int(in.GetOffset())
+		}
+	}
+
+	logs, err := i.service.GetExerciseHistory(ctx, userID, id, offset, limit)
 	if err != nil {
 		return nil, err
 	}

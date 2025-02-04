@@ -2777,6 +2777,10 @@ func (m *GetExerciseHistoryRequest) validate(all bool) error {
 
 	// no validation rules for ExerciseId
 
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
 	if len(errors) > 0 {
 		return GetExerciseHistoryRequestMultiError(errors)
 	}

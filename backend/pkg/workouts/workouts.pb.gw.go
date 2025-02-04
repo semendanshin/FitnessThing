@@ -164,6 +164,8 @@ func local_request_ExerciseService_GetExerciseAlternatives_0(ctx context.Context
 	return msg, metadata, err
 }
 
+var filter_ExerciseService_GetExerciseHistory_0 = &utilities.DoubleArray{Encoding: map[string]int{"exercise_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+
 func request_ExerciseService_GetExerciseHistory_0(ctx context.Context, marshaler runtime.Marshaler, client ExerciseServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetExerciseHistoryRequest
@@ -177,6 +179,12 @@ func request_ExerciseService_GetExerciseHistory_0(ctx context.Context, marshaler
 	protoReq.ExerciseId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_id", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ExerciseService_GetExerciseHistory_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetExerciseHistory(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -195,6 +203,12 @@ func local_request_ExerciseService_GetExerciseHistory_0(ctx context.Context, mar
 	protoReq.ExerciseId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_id", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ExerciseService_GetExerciseHistory_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetExerciseHistory(ctx, &protoReq)
 	return msg, metadata, err

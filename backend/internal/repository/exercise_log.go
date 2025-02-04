@@ -116,7 +116,7 @@ func (r *PGXRepository) GetExerciseLogByID(ctx context.Context, id domain.ID) (d
 	return exerciseLog.toDomain(), nil
 }
 
-func (r *PGXRepository) GetExerciseLogsByExerciseIDAndUserID(ctx context.Context, exerciseID, userID domain.ID) ([]domain.ExerciseLog, error) {
+func (r *PGXRepository) GetExerciseLogsByExerciseIDAndUserID(ctx context.Context, exerciseID, userID domain.ID, offset, limit int) ([]domain.ExerciseLog, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.GetExerciseLogsByExerciseIDAndUserID")
 	defer span.Finish()
 
@@ -124,14 +124,19 @@ func (r *PGXRepository) GetExerciseLogsByExerciseIDAndUserID(ctx context.Context
 		SELECT el.id, el.exercise_id, el.workout_id, el.notes, el.power_rating, el.created_at, el.updated_at
 		FROM exercise_logs el
 		JOIN workouts w ON el.workout_id = w.id
-		WHERE el.exercise_id = $1 AND w.user_id = $2
-		ORDER BY el.created_at DESC;
+		JOIN set_logs sl ON el.id = sl.exercise_log_id
+		WHERE el.exercise_id = $1 AND w.user_id = $2 AND w.finished_at IS NOT NULL
+		GROUP BY el.id
+		HAVING COUNT(sl.id) > 0
+		ORDER BY el.created_at DESC
+		LIMIT $3
+		OFFSET $4;
 	`
 
 	engine := r.contextManager.GetEngineFromContext(ctx)
 
 	var exerciseLogs []domain.ExerciseLog
-	err := pgxscan.Select(ctx, engine, &exerciseLogs, query, exerciseID, userID)
+	err := pgxscan.Select(ctx, engine, &exerciseLogs, query, exerciseID, userID, limit, offset)
 	if err != nil {
 		logger.Errorf("failed to get exercise logs by exercise id and user id: %v", err)
 		return nil, err

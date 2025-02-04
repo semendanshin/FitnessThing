@@ -48,11 +48,11 @@ func (s *Service) GetExerciseAlternatives(ctx context.Context, id domain.ID) ([]
 	return result, nil
 }
 
-func (s *Service) GetExerciseHistory(ctx context.Context, userID, exerciseID domain.ID) ([]dto.ExerciseLogDTO, error) {
+func (s *Service) GetExerciseHistory(ctx context.Context, userID, exerciseID domain.ID, offset, limit int) ([]dto.ExerciseLogDTO, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.GetExerciseHistory")
 	defer span.Finish()
 
-	exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByExerciseIDAndUserID(ctx, exerciseID, userID)
+	exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByExerciseIDAndUserID(ctx, exerciseID, userID, offset, limit)
 	if err != nil {
 		return nil, err
 	}

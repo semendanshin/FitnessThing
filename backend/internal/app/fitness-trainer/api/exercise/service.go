@@ -16,7 +16,7 @@ type Service interface {
 
 	GetMuscleGroups(ctx context.Context) ([]dto.MuscleGroupDTO, error)
 
-	GetExerciseHistory(ctx context.Context, userID, exerciseID domain.ID) ([]dto.ExerciseLogDTO, error)
+	GetExerciseHistory(ctx context.Context, userID, exerciseID domain.ID, offset, limit int) ([]dto.ExerciseLogDTO, error)
 }
 
 type Implementation struct {

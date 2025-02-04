@@ -91,7 +91,7 @@ function WorkoutHistoryCard({
   );
 }
 
-function WorkoutHistoryPage({
+function WorkoutHistoryContainer({
   workouts,
   fetchMore,
   hasMore,
@@ -188,7 +188,7 @@ export default function WorkoutsHistoryPage() {
   return (
     <div className="py-4 flex flex-col h-full">
       <PageHeader enableBackButton title="История" />
-      <WorkoutHistoryPage
+      <WorkoutHistoryContainer
         fetchMore={fetchExerciseLogHistory}
         hasMore={hasMore}
         workouts={exerciseLogHistory}
