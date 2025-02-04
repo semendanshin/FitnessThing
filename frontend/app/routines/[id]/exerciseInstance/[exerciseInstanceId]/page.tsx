@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { DropdownItem } from "@nextui-org/dropdown";
-import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { Spinner } from "@nextui-org/spinner";
 
 import { Loading } from "@/components/loading";
@@ -156,50 +155,60 @@ export default function ExerciseInstancePage({
     }
 
     return (
-      <Card>
-        <CardBody className="flex flex-col gap-4">
+      <Card className="flex flex-row items-start gap-2 p-3 w-full">
+        <CardBody className="flex flex-col gap-2 p-0">
           <div className="flex flex-row justify-between items-center">
-            <div className="flex flex-row gap-2 items-center">
-              <h2 className="text-md font-semibold w-5 text-center">{num}.</h2>
-              <div className="bg-default-100 rounded-small p-2">
-                {(() => {
-                  switch (set.setType) {
-                    case WorkoutSetType.SET_TYPE_REPS:
-                      return <RepeatIcon className="w-4 h-4" />;
-                    default:
-                      return <div className="w-4 h-4" />;
-                  }
-                })()}
+            <div className="flex flex-row gap-1 items-center">
+              <div className="h-7 w-7 p-2 flex flex-row items-center justify-center bg-default-100 rounded-small">
+                <h2 className="text-sm font-bold text-center">{num}</h2>
               </div>
+              <p className="text-sm font-bold">подход</p>
             </div>
             <Button
               isIconOnly
-              className="min-w-fit h-fit py-2 px-2 w-8 h-8"
+              className="min-w-fit h-fit py-2 px-2 w-7 h-7"
               color="danger"
               isLoading={isLoading}
               size="sm"
               spinner={
                 <Spinner
-                  classNames={{ wrapper: "w-4 h-4" }}
+                  classNames={{ wrapper: "w-3 h-3" }}
                   color="white"
                   size="sm"
                 />
               }
               onPress={onDelete}
             >
-              <TrashCanIcon className="w-3 h-3" />
+              <TrashCanIcon className="w-[0.6rem] h-[0.6rem]" />
             </Button>
           </div>
-          <div className="flex flex-row items-center w-full">
+          <div className="flex flex-row justify-between items-center w-full">
+            <div className="flex flex-row gap-2 items-center">
+              <div className="bg-default-100 rounded-small p-2 h-7 items-center flex flex-row">
+                {(() => {
+                  switch (set.setType) {
+                    case WorkoutSetType.SET_TYPE_REPS:
+                      return (
+                        <div className="flex flex-row gap-1 items-center">
+                          <RepeatIcon className="w-3 h-3" />
+                          <p className="text-xs font-regular">Повторения</p>
+                        </div>
+                      );
+                    default:
+                      return <div className="w-3 h-3" />;
+                  }
+                })()}
+              </div>
+            </div>
             {(() => {
               switch (set.setType) {
                 case WorkoutSetType.SET_TYPE_REPS:
                   return (
-                    <div className="flex flex-row justify-between items-center w-full">
-                      <p className="text-md font-regular">Повторения</p>
-                      <div className="flex flex-row gap-1 items-center h-8">
+                    <div className="flex flex-row items-center gap-2">
+                      <div className="flex flex-row items-center h-7">
                         <InputWithIncrement
-                          className="w-16"
+                          className="w-14 h-7"
+                          classNames={{ incrementButton: "h-7 w-7" }}
                           label=""
                           placeholder="10"
                           setValue={onChange}
@@ -258,11 +267,9 @@ export default function ExerciseInstancePage({
 
   function ContentCard() {
     return (
-      <div className="pb-4 h-full overflow-y-auto flex flex-col gap-4">
-        <ScrollShadow size={30}>
-          {/* <AddSetBlock /> */}
-          <SetsList sets={exerciseInstanceDetails.sets!} />
-        </ScrollShadow>
+      <div className="pb-4 flex flex-col gap-4">
+        {/* <AddSetBlock /> */}
+        <SetsList sets={exerciseInstanceDetails.sets!} />
       </div>
     );
   }

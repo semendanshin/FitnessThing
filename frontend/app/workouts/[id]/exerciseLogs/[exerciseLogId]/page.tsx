@@ -354,17 +354,22 @@ export default function RoutineDetailsPage({
             <div className="flex flex-col gap-4">
               <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                 <div className="flex flex-row justify-around gap-4">
-                  <div className="flex flex-col gap-1 w-1/2">
+                  <div className="flex flex-col gap-1 w-1/2 h-16">
                     <InputWithIncrement
+                      className="h-10"
+                      classNames={{ incrementButton: "w-12" }}
                       label="Вес"
                       placeholder="10"
                       setValue={setWeight}
+                      size="md"
                       type="number"
                       value={weight}
                     />
                   </div>
                   <div className="flex flex-col gap-1 w-1/2">
                     <InputWithIncrement
+                      className="h-10"
+                      classNames={{ incrementButton: "w-12" }}
                       label="Повторы"
                       placeholder="10"
                       setValue={setReps}

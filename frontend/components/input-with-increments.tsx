@@ -7,18 +7,21 @@ export function IncrementButtons({
   setValue,
   isSubtract,
   radius,
+  className,
 }: {
   value: number;
   setValue: (value: number) => void;
   isSubtract?: boolean;
   radius?: "sm" | "md" | "lg";
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col h-full">
+    <div className={clsx(className, "flex flex-col h-full")}>
       <Button
         isIconOnly
-        className="min-w-fit w-fit p-3 h-full"
+        className="min-w-fit h-full w-full max-w-full"
         radius={radius}
+        size={radius}
         onPress={() => {
           if (value > 0 && isSubtract) {
             setValue(value - 1);
@@ -44,6 +47,7 @@ export function InputWithIncrement({
   type,
   className,
   size,
+  classNames,
 }: {
   value: number;
   setValue: (value: number) => void;
@@ -52,6 +56,7 @@ export function InputWithIncrement({
   type: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  classNames?: { incrementButton: string };
 }) {
   return (
     <>
@@ -59,21 +64,27 @@ export function InputWithIncrement({
       <div className="flex flex-row gap-2 items-center h-full">
         <IncrementButtons
           isSubtract
+          className={clsx("h-full", classNames?.incrementButton)}
           radius={size}
           setValue={setValue}
           value={value}
         />
         <Input
           isRequired
-          className={clsx("p-0 w-full h-full", className)}
-          classNames={{ inputWrapper: "h-full max-h-full" }}
+          className={clsx("p-0 w-full h-full h-8", className)}
+          classNames={{ inputWrapper: "h-full max-h-full min-h-fit" }}
           placeholder={placeholder}
           size={size}
           type={type}
           value={String(value)}
           onValueChange={(value) => setValue(Number(value))}
         />
-        <IncrementButtons radius={size} setValue={setValue} value={value} />
+        <IncrementButtons
+          className={clsx("h-full", classNames?.incrementButton)}
+          radius={size}
+          setValue={setValue}
+          value={value}
+        />
       </div>
     </>
   );
