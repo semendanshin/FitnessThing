@@ -48,6 +48,7 @@ export function InputWithIncrement({
   className,
   size,
   classNames,
+  min,
 }: {
   value: number;
   setValue: (value: number) => void;
@@ -57,6 +58,7 @@ export function InputWithIncrement({
   className?: string;
   size?: "sm" | "md" | "lg";
   classNames?: { incrementButton: string };
+  min?: number;
 }) {
   return (
     <>
@@ -73,6 +75,7 @@ export function InputWithIncrement({
           isRequired
           className={clsx("p-0 w-full h-full h-8", className)}
           classNames={{ inputWrapper: "h-full max-h-full min-h-fit" }}
+          min={min}
           placeholder={placeholder}
           size={size}
           type={type}

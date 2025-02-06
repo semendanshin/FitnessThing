@@ -92,7 +92,6 @@ export default function RoutineDetailsPage({
           ]);
           setHasMore(response.data.exerciseLogs!.length === limit);
           setOffset(offset + limit);
-          console.log(offset, hasMore);
         });
     } catch (error) {
       console.log(error);
@@ -223,21 +222,16 @@ export default function RoutineDetailsPage({
     const [weight, setWeight] = useState<number>(setLog.weight!);
     const [reps, setReps] = useState<number>(setLog.reps!);
 
-    const [errors, setErrors] = useState<{
-      weight?: string;
-      reps?: string;
-    }>({});
-
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       if (weight < 0) {
-        setErrors({ ...errors, weight: "Вес не может быть отрицательным" });
+        toast.error("Вес не может быть отрицательным");
 
         return;
       }
 
       if (reps <= 0) {
-        setErrors({ ...errors, reps: "Повторы должны быть больше 0" });
+        toast.error("Повторы должны быть больше 0");
 
         return;
       }
@@ -256,7 +250,7 @@ export default function RoutineDetailsPage({
         onClose();
       } catch (error) {
         console.log(error);
-        toast.error("Failed to update set log");
+        toast.error("Ошибка при изменении сета");
       } finally {
         setIsLoading(false);
       }
@@ -271,7 +265,6 @@ export default function RoutineDetailsPage({
               <Form
                 className="flex flex-col p-0 px-2"
                 validationBehavior="native"
-                validationErrors={errors}
                 onSubmit={handleSubmit}
               >
                 <ModalBody className="flex flex-row gap-2 px-2 w-full">
@@ -331,6 +324,18 @@ export default function RoutineDetailsPage({
 
       async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        if (weight < 0) {
+          toast.error("Вес не может быть отрицательным");
+
+          return;
+        }
+
+        if (reps <= 0) {
+          toast.error("Повторы должны быть больше 0");
+
+          return;
+        }
+
         try {
           await authApi.v1.workoutServiceLogSet(id, exerciseLogId, {
             weight: weight!,
@@ -339,7 +344,7 @@ export default function RoutineDetailsPage({
           await fetchExerciseLogDetails();
         } catch (error) {
           console.log(error);
-          toast.error("Failed to add exercises to workout");
+          toast.error("Ошибка при добавлении сета");
         }
       }
 
@@ -357,13 +362,18 @@ export default function RoutineDetailsPage({
         <Card>
           <CardBody>
             <div className="flex flex-col gap-4">
-              <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+              <Form
+                className="flex flex-col gap-3"
+                validationBehavior="native"
+                onSubmit={handleSubmit}
+              >
                 <div className="flex flex-row justify-around gap-4">
                   <div className="flex flex-col gap-1 w-1/2 h-16">
                     <InputWithIncrement
                       className="h-10"
                       classNames={{ incrementButton: "w-12" }}
                       label="Вес"
+                      min={0}
                       placeholder="10"
                       setValue={setWeight}
                       size="md"
@@ -376,6 +386,7 @@ export default function RoutineDetailsPage({
                       className="h-10"
                       classNames={{ incrementButton: "w-12" }}
                       label="Повторы"
+                      min={0}
                       placeholder="10"
                       setValue={setReps}
                       type="number"
