@@ -13,6 +13,7 @@ import { Button } from "@nextui-org/button";
 import InfiniteScroll, { useInfiniteScroll } from "./infinite-scroll";
 
 import { authApi, errUnauthorized } from "@/api/api";
+import { WorkoutExercise } from "@/api/api.generated";
 
 function SkeletonExerciseCard() {
   return (
@@ -37,6 +38,21 @@ function SkeletonExerciseCard() {
         </Skeleton>
       </div>
     </Card>
+  );
+}
+
+function SkeletonExerciseList() {
+  return (
+    <>
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+      <SkeletonExerciseCard />
+    </>
   );
 }
 
@@ -76,7 +92,7 @@ function ExerciseCard({
         </CardBody>
       </div>
       <div className="flex flex-col items-center justify-center p-2">
-        <Checkbox checked={isSelected} onChange={onSelectedChange} />
+        <Checkbox isSelected={isSelected} onChange={onSelectedChange} />
       </div>
     </Card>
   );
@@ -218,6 +234,29 @@ export function ModalSelectExercise({
     fetchExercises();
   }, [muscleGroup, isOpen]);
 
+  function ExerciseList({
+    exercises,
+    selectedExercisesIds,
+  }: {
+    exercises: WorkoutExercise[];
+    selectedExercisesIds: string[];
+  }) {
+    return (
+      <>
+        {exercises.map((exercise) => (
+          <ExerciseCard
+            key={exercise.id}
+            exercise={exercise}
+            isSelected={selectedExercisesIds.includes(exercise.id!)}
+            onSelectedChange={() => {
+              toggleExerciseSelection(exercise.id!);
+            }}
+          />
+        ))}
+      </>
+    );
+  }
+
   return (
     <Modal
       className="overflow-y-auto h-full p-2 w-full h-[85vh] min-h-[450px]"
@@ -232,70 +271,49 @@ export function ModalSelectExercise({
           <div className="flex flex-col h-full">
             <ModalHeader className="p-2">Выберите упражнение</ModalHeader>
 
-            <ScrollShadow className="flex-grow">
-              <div className="flex flex-col gap-4 p-2 flex-grow">
-                <Input
-                  placeholder="Поиск"
-                  value={serachQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Select
-                  aria-label="Выберите группу мышц"
-                  placeholder="Выберите группу мышц"
-                  onChange={(e) => {
-                    setMuscleGroup(e.target.value);
-                  }}
-                >
-                  {muscleGroups.map((muscleGroup) => (
-                    <SelectItem key={muscleGroup.id} value={muscleGroup.id}>
-                      {muscleGroup.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <InfiniteScroll
-                  showError
-                  showLoading
-                  className="flex flex-col gap-2"
-                  fetchMore={fetchMore}
-                  hasMore={hasMore}
-                >
-                  {isLoading ? (
-                    <>
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                      <SkeletonExerciseCard />
-                    </>
-                  ) : (
-                    exercises
-                      .filter((exercise) => {
-                        if (serachQuery === "") {
-                          return true;
-                        }
+            <ScrollShadow className="flex flex-col gap-4 p-2 flex-grow">
+              <Input
+                placeholder="Поиск"
+                value={serachQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Select
+                aria-label="Выберите группу мышц"
+                placeholder="Выберите группу мышц"
+                onChange={(e) => {
+                  setMuscleGroup(e.target.value);
+                }}
+              >
+                {muscleGroups.map((muscleGroup) => (
+                  <SelectItem key={muscleGroup.id} value={muscleGroup.id}>
+                    {muscleGroup.name}
+                  </SelectItem>
+                ))}
+              </Select>
+              <InfiniteScroll
+                showError
+                showLoading
+                className="flex flex-col gap-2"
+                fetchMore={fetchMore}
+                hasMore={hasMore}
+              >
+                {isLoading ? (
+                  <SkeletonExerciseList />
+                ) : (
+                  <ExerciseList
+                    exercises={exercises.filter((exercise) => {
+                      if (serachQuery === "") {
+                        return true;
+                      }
 
-                        return exercise.name
-                          .toLowerCase()
-                          .includes(serachQuery.toLowerCase());
-                      })
-                      .map((exercise) => (
-                        <ExerciseCard
-                          key={exercise.id}
-                          exercise={exercise}
-                          isSelected={selectedExercisesIds.includes(
-                            exercise.id,
-                          )}
-                          onSelectedChange={() =>
-                            toggleExerciseSelection(exercise.id)
-                          }
-                        />
-                      ))
-                  )}
-                </InfiniteScroll>
-              </div>
+                      return exercise
+                        .name!.toLowerCase()
+                        .includes(serachQuery.toLowerCase());
+                    })}
+                    selectedExercisesIds={selectedExercisesIds}
+                  />
+                )}
+              </InfiniteScroll>
             </ScrollShadow>
             <div className="h-fit p-2">
               <Button
