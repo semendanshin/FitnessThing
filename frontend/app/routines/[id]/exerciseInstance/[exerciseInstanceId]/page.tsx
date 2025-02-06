@@ -151,7 +151,7 @@ export default function ExerciseInstancePage({
 
       timeoutRef.current = setTimeout(() => {
         updateSet();
-      }, 1000);
+      }, 300);
     }
 
     return (
