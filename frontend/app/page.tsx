@@ -20,6 +20,7 @@ export default function Home() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isWorkoutGenerating, setIsWorkoutGenerating] = useState(false);
 
   const router = useRouter();
 
@@ -99,6 +100,7 @@ export default function Home() {
 
       return;
     }
+    setIsWorkoutGenerating(true);
     await authApi.v1
       .workoutServiceStartWorkout({
         routineId: routineId,
@@ -115,6 +117,8 @@ export default function Home() {
 
           return;
         }
+        toast.error("Ошибка при начале тренировки");
+        setIsWorkoutGenerating(false);
         throw error;
       });
   }
@@ -311,6 +315,22 @@ export default function Home() {
           pointer-events: none;
         }
       `}</style>
+
+      {isWorkoutGenerating && (
+        <div className="h-full w-full fixed top-0 left-0 z-10 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center gap-4 h-full bg-background bg-opacity-50">
+            <div className="flex flex-col items-center">
+              <h2 className="text-xl font-bold">Генерация тренировки...</h2>
+              <p className="text-xs font-light text-default-500">
+                Это может занять некоторое время
+              </p>
+            </div>
+            <div>
+              <Loading showText={false} size="lg" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
