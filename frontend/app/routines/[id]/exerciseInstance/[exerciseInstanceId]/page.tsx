@@ -280,7 +280,7 @@ export default function ExerciseInstancePage({
         .routineServiceRemoveExerciseInstanceFromRoutine(id, exerciseInstanceId)
         .then((response) => {
           console.log(response.data);
-          router.push(`/routines/${id}`);
+          router.back();
         })
         .catch((error) => {
           console.log(error);
