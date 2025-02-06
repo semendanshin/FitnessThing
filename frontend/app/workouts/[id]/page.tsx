@@ -325,7 +325,7 @@ export default function WorkoutDetailsPage({
             </Card>
           </div>
         </section>
-        <section className="w-full px-4 py-2 ">
+        <section className="w-full px-4">
           <Button
             className="w-full"
             color="primary"
