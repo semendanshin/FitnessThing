@@ -77,6 +77,29 @@ export default function RoutineDetailsPage({
       });
   }
 
+  async function fetchMore() {
+    try {
+      await authApi.v1
+        .exerciseServiceGetExerciseHistory(exerciseLogDetails.exercise?.id!, {
+          offset: offset,
+          limit: limit,
+        })
+        .then((response) => {
+          console.log(response.data);
+          setExerciseLogHistory((prev) => [
+            ...prev,
+            ...response.data.exerciseLogs!,
+          ]);
+          setHasMore(response.data.exerciseLogs!.length === limit);
+          setOffset(offset + limit);
+          console.log(offset, hasMore);
+        });
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to fetch more exercise logs");
+    }
+  }
+
   async function fetchData() {
     setIsLoading(true);
     try {
@@ -93,6 +116,12 @@ export default function RoutineDetailsPage({
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (exerciseLogDetails.exercise?.id) {
+      fetchMore();
+    }
+  }, [exerciseLogDetails]);
 
   if (isLoading) {
     return <Loading />;
@@ -293,7 +322,7 @@ export default function RoutineDetailsPage({
           setWeight(exerciseLogDetails.setLogs[lastIndex]?.weight!);
           setReps(exerciseLogDetails.setLogs[lastIndex]?.reps!);
         } else if (exerciseLogHistory.length) {
-          const lastIndex = exerciseLogHistory.length - 1;
+          const lastIndex = exerciseLogHistory[0]!.setLogs!.length - 1;
 
           setWeight(exerciseLogHistory[0]!.setLogs![lastIndex]?.weight!);
           setReps(exerciseLogHistory[0]!.setLogs![lastIndex]?.reps!);
@@ -518,29 +547,7 @@ export default function RoutineDetailsPage({
     );
   }
 
-  function HistoryContent({ id }: { id: string }) {
-    async function fetchMore() {
-      try {
-        await authApi.v1
-          .exerciseServiceGetExerciseHistory(id, {
-            offset: offset,
-            limit: limit,
-          })
-          .then((response) => {
-            console.log(response.data);
-            setExerciseLogHistory((prev) => [
-              ...prev,
-              ...response.data.exerciseLogs!,
-            ]);
-            setHasMore(response.data.exerciseLogs!.length === limit);
-            setOffset(offset + limit);
-            console.log(offset, hasMore);
-          });
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to fetch more exercise logs");
-      }
-    }
+  function HistoryContent() {
     function ExerciseHistoryCard({
       exerciseLog,
     }: {
@@ -654,7 +661,7 @@ export default function RoutineDetailsPage({
                 <TodayContent />
               </Tab>
               <Tab key="history" title="История">
-                <HistoryContent id={exerciseLogDetails.exercise?.id!} />
+                <HistoryContent />
               </Tab>
             </Tabs>
           </section>
