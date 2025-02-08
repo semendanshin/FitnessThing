@@ -22,33 +22,33 @@ var sugar *zap.SugaredLogger
 
 func Init() {
 	config := zap.Config{
-        Encoding: "json",
-        Level: zap.NewAtomicLevelAt(zap.InfoLevel),
-        OutputPaths: []string{"stdout"},
-        EncoderConfig: zapcore.EncoderConfig{
-            TimeKey:        "timestamp",
-            LevelKey:      "level",
-            MessageKey:    "message",
-            EncodeLevel:   zapcore.LowercaseLevelEncoder,
-            EncodeTime:    zapcore.TimeEncoderOfLayout(time.RFC3339),
-            EncodeCaller:  zapcore.ShortCallerEncoder,
-        },
-    }
-    
-    // Добавляем базовые поля, которые будут в каждом логе
-    defaultFields := []zap.Field{
+		Encoding:    "json",
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		OutputPaths: []string{"stdout"},
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:      "timestamp",
+			LevelKey:     "level",
+			MessageKey:   "message",
+			EncodeLevel:  zapcore.LowercaseLevelEncoder,
+			EncodeTime:   zapcore.TimeEncoderOfLayout(time.RFC3339),
+			EncodeCaller: zapcore.ShortCallerEncoder,
+		},
+	}
+
+	// Добавляем базовые поля, которые будут в каждом логе
+	defaultFields := []zap.Field{
 		zap.String("service", "fitness-trainer"),
 		zap.String("env", os.Getenv("ENV")),
 	}
-    
-    var err error
-    logger, err = config.Build(zap.Fields(
-        defaultFields...,
-    ))
-    if err != nil {
-        panic(err)
-    }
-    sugar = logger.Sugar()
+
+	var err error
+	logger, err = config.Build(zap.Fields(
+		defaultFields...,
+	))
+	if err != nil {
+		panic(err)
+	}
+	sugar = logger.Sugar()
 }
 
 func Logger() *zap.Logger {

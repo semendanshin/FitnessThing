@@ -22,7 +22,7 @@ func New(client *openai.Client, assistantID string) *Client {
 }
 
 func (c *Client) CreateCompletion(ctx context.Context, userID domain.ID, systemPrompt, prompt string) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "client.CreateCompletion")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "openai.CreateCompletion")
 	defer span.Finish()
 
 	// Get assistant

@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"fitness-trainer/internal/app"
-	openai_client "fitness-trainer/internal/clients/openai"
+	genai_client "fitness-trainer/internal/clients/gemini"
 	s3_client "fitness-trainer/internal/clients/s3"
 	"fitness-trainer/internal/db"
 	"fitness-trainer/internal/jwt"
@@ -26,11 +26,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/generative-ai-go/genai"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
 	"golang.org/x/net/proxy"
+	apiOpts "google.golang.org/api/option"
 )
 
 func init() {
@@ -97,11 +99,16 @@ func Run() error {
 		),
 	)
 
-	openaiClient := newOpenAIClient()
+	// openaiClient := newOpenAIClient()
+	genaiClient, err := newGeminiClient(ctx)
+	if err != nil {
+		return err
+	}
 
-	OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
+	// OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
+	GenAIClientWrapper := genai_client.New(genaiClient)
 
-	WorkoutGenerator := workout_generator_service.New(OpenAIClientWrapper)
+	WorkoutGenerator := workout_generator_service.New(GenAIClientWrapper)
 
 	Service := service.New(
 		ContextManager,
@@ -184,6 +191,13 @@ func newHTTPClient(proxyURL string, auth *proxy.Auth) *http.Client {
 
 		Timeout: 10 * time.Second,
 	}
+}
+
+func newGeminiClient(ctx context.Context) (*genai.Client, error) {
+	return genai.NewClient(
+		ctx,
+		apiOpts.WithAPIKey(os.Getenv("GENAI_API_KEY")),
+	)
 }
 
 func newOpenAIClient() *openai.Client {
