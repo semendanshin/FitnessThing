@@ -14,6 +14,10 @@ type jwtProvider interface {
 	ParseToken(ctx context.Context, token string) (domain.ID, error)
 }
 
+type workoutGenerator interface {
+	GenerateWorkout(ctx context.Context, userID domain.ID, workouts []dto.SlimWorkoutDTO, exercises []dto.SlimExerciseDTO, userPrompt string) (dto.GeneratedWorkoutDTO, error)
+}
+
 type sessionRepository interface {
 	GetSessionByToken(ctx context.Context, token string) (domain.Session, error)
 	SetSessionExpired(ctx context.Context, id domain.ID, expiredAt time.Time) error
@@ -107,6 +111,7 @@ type s3Client interface {
 type Service struct {
 	jwtProvider                jwtProvider
 	s3Client                   s3Client
+	workoutGenerator           workoutGenerator
 	sessionRepository          sessionRepository
 	userRepository             userRepository
 	exerciseRepository         exerciseRepository
@@ -125,6 +130,7 @@ func New(
 	unitOfWork unitOfWork,
 	jwtProvider jwtProvider,
 	s3Client s3Client,
+	workoutGenerator workoutGenerator,
 	sessionRepository sessionRepository,
 	userRepository userRepository,
 	exerciseRepository exerciseRepository,
@@ -139,6 +145,7 @@ func New(
 ) *Service {
 	return &Service{
 		unitOfWork:                 unitOfWork,
+		workoutGenerator:           workoutGenerator,
 		jwtProvider:                jwtProvider,
 		s3Client:                   s3Client,
 		sessionRepository:          sessionRepository,

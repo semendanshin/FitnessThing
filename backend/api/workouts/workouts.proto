@@ -649,6 +649,8 @@ service WorkoutService {
 
 message StartWorkoutRequest {
   optional string routine_id = 2;
+  optional bool generate_workout = 3;
+  optional string user_prompt = 4;
 }
 
 message GetWorkoutRequest {

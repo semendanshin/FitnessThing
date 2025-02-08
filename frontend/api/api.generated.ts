@@ -353,6 +353,8 @@ export enum WorkoutSetType {
 
 export interface WorkoutStartWorkoutRequest {
   routineId?: string;
+  generateWorkout?: boolean;
+  userPrompt?: string;
 }
 
 export interface WorkoutTokensPair {

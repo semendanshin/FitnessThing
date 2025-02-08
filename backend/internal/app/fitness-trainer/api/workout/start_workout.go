@@ -6,6 +6,7 @@ import (
 	"fitness-trainer/internal/app/mappers"
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/logger"
+	"fitness-trainer/internal/utils"
 	desc "fitness-trainer/pkg/workouts"
 	"fmt"
 
@@ -26,17 +27,23 @@ func (i *Implementation) StartWorkout(ctx context.Context, in *desc.StartWorkout
 		return nil, domain.ErrInternal
 	}
 
-	var routineID *domain.ID
-	var err error
+	var (
+		opts domain.StartWorkoutOpts
+		err  error
+	)
+
 	if in.RoutineId != nil {
 		parsedID, err := domain.ParseID(*in.RoutineId)
 		if err != nil {
 			return nil, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
 		}
-		routineID = &parsedID
+		opts.RoutineID = utils.NewNullable(parsedID, true)
 	}
 
-	workout, err := i.service.StartWorkout(ctx, userID, routineID)
+	opts.GenerateWorkout = in.GetGenerateWorkout()
+	opts.UserPrompt = in.GetUserPrompt()
+
+	workout, err := i.service.StartWorkout(ctx, userID, opts)
 	if err != nil {
 		return nil, err
 	}

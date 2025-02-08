@@ -90,7 +90,10 @@ export default function Home() {
     }
   }
 
-  async function startWorkout(routineId: string | undefined) {
+  async function startWorkout(
+    routineId: string | undefined,
+    generate: boolean = false,
+  ) {
     if (activeWorkouts.length > 0) {
       toast.error("Сначала завершите активную тренировку");
 
@@ -99,6 +102,7 @@ export default function Home() {
     await authApi.v1
       .workoutServiceStartWorkout({
         routineId: routineId,
+        generateWorkout: generate,
       })
       .then((response) => {
         console.log(response.data);
@@ -239,7 +243,7 @@ export default function Home() {
             className="flex items-center bg-transparent h-fit"
             size="lg"
             onPress={async () => {
-              await startWorkout(undefined);
+              await startWorkout(undefined, true);
             }}
           >
             <BoltIcon className="w-7 h-7" fill="currentColor" />
@@ -249,7 +253,7 @@ export default function Home() {
             className="flex items-center text-white-500 bg-transparent underline p-0"
             size="sm"
             onPress={async () => {
-              await startWorkout(undefined);
+              await startWorkout(undefined, false);
             }}
           >
             Пустая тренировка

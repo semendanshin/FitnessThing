@@ -6,16 +6,20 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
+	"net/http"
 	"os"
 	"time"
 
 	"fitness-trainer/internal/app"
+	openai_client "fitness-trainer/internal/clients/openai"
 	s3_client "fitness-trainer/internal/clients/s3"
 	"fitness-trainer/internal/db"
 	"fitness-trainer/internal/jwt"
 	"fitness-trainer/internal/logger"
 	"fitness-trainer/internal/repository"
 	"fitness-trainer/internal/service"
+	workout_generator_service "fitness-trainer/internal/service/workout_generator"
 	"fitness-trainer/internal/tracer"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -24,6 +28,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
+	"golang.org/x/net/proxy"
 )
 
 func init() {
@@ -90,21 +97,28 @@ func Run() error {
 		),
 	)
 
+	openaiClient := newOpenAIClient()
+
+	OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
+
+	WorkoutGenerator := workout_generator_service.New(OpenAIClientWrapper)
+
 	Service := service.New(
 		ContextManager,
-		JWTProvider,     // JWT Provider
-		s3ClientWrapper, // S3 Client
-		Repo,            // Auth
-		Repo,            // User
-		Repo,            // Exercise
-		Repo,            // Workout
-		Repo,            // ExerciseInstance
-		Repo,            // MuscleGroup
-		Repo,            // Workout
-		Repo,            // ExerciseLog
-		Repo,            // SetLog
-		Repo,            // Set
-		Repo,            // ExpectedSet
+		JWTProvider,
+		s3ClientWrapper,
+		WorkoutGenerator,
+		Repo, // Auth
+		Repo, // User
+		Repo, // Exercise
+		Repo, // Workout
+		Repo, // ExerciseInstance
+		Repo, // MuscleGroup
+		Repo, // Workout
+		Repo, // ExerciseLog
+		Repo, // SetLog
+		Repo, // Set
+		Repo, // ExpectedSet
 	)
 
 	App := app.New(
@@ -146,4 +160,36 @@ func getAWSConfig(ctx context.Context) aws.Config {
 	}
 
 	return cfg
+}
+
+func newHTTPClient(proxyURL string, auth *proxy.Auth) *http.Client {
+	dialer, err := proxy.SOCKS5("tcp", proxyURL, auth, proxy.Direct)
+	if err != nil {
+		panic(err)
+	}
+
+	dialContext := func(ctx context.Context, network, address string) (net.Conn, error) {
+		return dialer.Dial(network, address)
+	}
+
+	return &http.Client{
+		Transport: &http.Transport{
+			DialContext:           dialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			Proxy:                 http.ProxyFromEnvironment,
+		},
+
+		Timeout: 10 * time.Second,
+	}
+}
+
+func newOpenAIClient() *openai.Client {
+	return openai.NewClient(
+		option.WithAPIKey(os.Getenv("OPENAI_API_KEY")),
+		option.WithHeader("OpenAI-Beta", "assistants=v2"),
+		// option.WithHTTPClient(newHTTPClient("", nil)),
+	)
 }

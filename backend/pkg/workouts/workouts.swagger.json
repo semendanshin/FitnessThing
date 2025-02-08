@@ -2385,6 +2385,12 @@
       "properties": {
         "routineId": {
           "type": "string"
+        },
+        "generateWorkout": {
+          "type": "boolean"
+        },
+        "userPrompt": {
+          "type": "string"
         }
       }
     },

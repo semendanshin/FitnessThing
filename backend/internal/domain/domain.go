@@ -237,16 +237,11 @@ type Workout struct {
 	FinishedAt time.Time
 }
 
-func NewWorkout(userID ID, routineID *ID) Workout {
-	var parsedRoutineID utils.Nullable[ID]
-	if routineID != nil {
-		parsedRoutineID = utils.NewNullable(*routineID, true)
-	}
-
+func NewWorkout(userID ID, routineID utils.Nullable[ID]) Workout {
 	return Workout{
 		Model:     NewModel(),
 		UserID:    userID,
-		RoutineID: parsedRoutineID,
+		RoutineID: routineID,
 	}
 }
 

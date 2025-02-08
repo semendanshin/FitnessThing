@@ -11,7 +11,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 )
 
-func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID *domain.ID) (domain.Workout, error) {
+func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, opts domain.StartWorkoutOpts) (domain.Workout, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.StartWorkout")
 	defer span.Finish()
 
@@ -21,22 +21,29 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID 
 	}
 	defer s.unitOfWork.Rollback(ctx)
 
-	if routineID != nil {
-		_, err := s.routineRepository.GetRoutineByID(ctx, *routineID)
+	if opts.RoutineID.IsValid {
+		_, err := s.routineRepository.GetRoutineByID(ctx, opts.RoutineID.V)
 		if err != nil {
 			return domain.Workout{}, fmt.Errorf("%w: %w", domain.ErrInvalidArgument, err)
 		}
 	}
 
-	workout := domain.NewWorkout(userID, routineID)
+	workout := domain.NewWorkout(userID, opts.RoutineID)
 
 	workout, err = s.workoutRepository.CreateWorkout(ctx, workout)
 	if err != nil {
 		return domain.Workout{}, err
 	}
 
-	if routineID != nil {
-		err = s.assignExercisesToWorkout(ctx, workout)
+	if opts.RoutineID.IsValid {
+		err = s.enrichWorkoutFromRoutine(ctx, userID, workout.ID, opts.RoutineID.V)
+		if err != nil {
+			return domain.Workout{}, err
+		}
+	}
+
+	if opts.GenerateWorkout {
+		err = s.enrichWorkoutByGenerating(ctx, userID, workout.ID, opts.UserPrompt)
 		if err != nil {
 			return domain.Workout{}, err
 		}
@@ -50,11 +57,11 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, routineID 
 	return workout, nil
 }
 
-func (s *Service) assignExercisesToWorkout(ctx context.Context, workout domain.Workout) error {
+func (s *Service) enrichWorkoutFromRoutine(ctx context.Context, userID, workoutID, routineID domain.ID) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.assignExercisesToWorkout")
 	defer span.Finish()
 
-	routine, err := s.routineRepository.GetRoutineByID(ctx, workout.RoutineID.V)
+	routine, err := s.routineRepository.GetRoutineByID(ctx, routineID)
 	if err != nil {
 		return err
 	}
@@ -65,7 +72,7 @@ func (s *Service) assignExercisesToWorkout(ctx context.Context, workout domain.W
 	}
 
 	for _, instance := range exerciseInstances {
-		exerciseLog, err := s.LogExercise(ctx, workout.UserID, workout.ID, instance.ExerciseID)
+		exerciseLog, err := s.LogExercise(ctx, userID, workoutID, instance.ExerciseID)
 		if err != nil {
 			return err
 		}
@@ -88,6 +95,72 @@ func (s *Service) assignExercisesToWorkout(ctx context.Context, workout domain.W
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) generateWorkout(ctx context.Context, userID domain.ID, userPrompt string) (dto.GeneratedWorkoutDTO, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.generateWorkout")
+	defer span.Finish()
+
+	const numExercises = 4
+
+	userWorkouts, err := s.workoutRepository.GetWorkouts(ctx, userID, numExercises, 0)
+	if err != nil {
+		return dto.GeneratedWorkoutDTO{}, err
+	}
+
+	userWorkoutsDTO := make([]dto.SlimWorkoutDTO, 0, len(userWorkouts))
+	for _, workout := range userWorkouts {
+		exerciseLogs, err := s.exerciseLogRepository.GetExerciseLogsByWorkoutID(ctx, workout.ID)
+		if err != nil {
+			return dto.GeneratedWorkoutDTO{}, err
+		}
+
+		exerciseIDs := make([]domain.ID, 0, len(exerciseLogs))
+		for _, exerciseLog := range exerciseLogs {
+			exerciseIDs = append(exerciseIDs, exerciseLog.ExerciseID)
+		}
+
+		userWorkoutsDTO = append(userWorkoutsDTO, dto.SlimWorkoutDTO{
+			ID:          workout.ID,
+			CreatedAt:   workout.CreatedAt,
+			ExerciseIDs: exerciseIDs,
+		})
+	}
+
+	exercises, err := s.exerciseRepository.GetExercises(ctx, []domain.ID{}, []domain.ID{})
+	if err != nil {
+		return dto.GeneratedWorkoutDTO{}, err
+	}
+
+	exerciseDTOs := make([]dto.SlimExerciseDTO, 0, len(exercises))
+	for _, exercise := range exercises {
+		exerciseDTOs = append(exerciseDTOs, dto.SlimExerciseDTO{
+			ID:                 exercise.ID,
+			Name:               exercise.Name,
+			TargetMuscleGroups: exercise.TargetMuscleGroups,
+		})
+	}
+
+	return s.workoutGenerator.GenerateWorkout(ctx, userID, userWorkoutsDTO, exerciseDTOs, userPrompt)
+}
+
+func (s *Service) enrichWorkoutByGenerating(ctx context.Context, userID, workoutID domain.ID, userPrompt string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "service.enrichWorkoutByGenerating")
+	defer span.Finish()
+
+	generatedWorkout, err := s.generateWorkout(ctx, userID, userPrompt)
+	if err != nil {
+		return err
+	}
+
+	for _, exerciseID := range generatedWorkout.ExerciseIDs {
+		_, err := s.LogExercise(ctx, userID, workoutID, exerciseID)
+		if err != nil {
+			return err
 		}
 	}
 

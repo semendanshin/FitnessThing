@@ -5645,6 +5645,14 @@ func (m *StartWorkoutRequest) validate(all bool) error {
 		// no validation rules for RoutineId
 	}
 
+	if m.GenerateWorkout != nil {
+		// no validation rules for GenerateWorkout
+	}
+
+	if m.UserPrompt != nil {
+		// no validation rules for UserPrompt
+	}
+
 	if len(errors) > 0 {
 		return StartWorkoutRequestMultiError(errors)
 	}
