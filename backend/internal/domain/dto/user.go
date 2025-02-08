@@ -17,9 +17,10 @@ type CreateUserDTO struct {
 }
 
 type UpdateUserDTO struct {
-	FirstName   utils.Nullable[string]
-	LastName    utils.Nullable[string]
-	Height      utils.Nullable[float32]
-	Weight      utils.Nullable[float32]
-	DateOfBirth time.Time
+	FirstName     utils.Nullable[string]
+	LastName      utils.Nullable[string]
+	Height        utils.Nullable[float32]
+	Weight        utils.Nullable[float32]
+	ProfilePicURL utils.Nullable[string]
+	DateOfBirth   time.Time
 }

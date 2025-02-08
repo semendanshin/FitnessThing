@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fitness-trainer/internal/logger"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
@@ -28,6 +29,10 @@ func NewContextManager(pool *pgxpool.Pool) *ContextManager {
 type Engine interface {
 	pgxscan.Querier
 	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
+}
+
+type Transactioner interface {
+	InTransaction(ctx context.Context, f func(ctx context.Context) error) error
 }
 
 func (cm *ContextManager) GetEngineFromContext(ctx context.Context) Engine {
@@ -73,6 +78,27 @@ func (cm *ContextManager) Rollback(ctx context.Context) error {
 	}
 
 	return tx.Rollback(ctx)
+}
+
+func (cm *ContextManager) InTransaction(ctx context.Context, f func(ctx context.Context) error) error {
+	txCtx, err := cm.Begin(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			cm.Rollback(txCtx)
+		} else {
+			err = cm.Commit(txCtx)
+		}
+		if err != nil {
+			logger.Errorf("failed to commit transaction: %v", err)
+			return
+		}
+	}()
+
+	return f(txCtx)
 }
 
 func (cm *ContextManager) Close() {

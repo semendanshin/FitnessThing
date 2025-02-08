@@ -22,6 +22,8 @@ type userEntity struct {
 	FirstName string
 	LastName  string
 
+	PictureProfileURL pgtype.Text `db:"picture_profile_url"`
+
 	DateOfBirth pgtype.Timestamptz
 
 	Weight pgtype.Float4
@@ -38,28 +40,30 @@ func (u userEntity) toDomain() domain.User {
 			CreatedAt: timeFromPgtype(u.CreatedAt),
 			UpdatedAt: timeFromPgtype(u.UpdatedAt),
 		},
-		Email:       u.Email,
-		Password:    u.Password,
-		FirstName:   u.FirstName,
-		LastName:    u.LastName,
-		DateOfBirth: timeFromPgtype(u.DateOfBirth),
-		Weight:      u.Weight.Float32,
-		Height:      u.Height.Float32,
+		Email:         u.Email,
+		Password:      u.Password,
+		FirstName:     u.FirstName,
+		LastName:      u.LastName,
+		DateOfBirth:   timeFromPgtype(u.DateOfBirth),
+		Weight:        u.Weight.Float32,
+		Height:        u.Height.Float32,
+		ProfilePicURL: u.PictureProfileURL.String,
 	}
 }
 
 func userFromDomain(user domain.User) userEntity {
 	return userEntity{
-		ID:          uuidToPgtype(user.ID),
-		Email:       user.Email,
-		FirstName:   user.FirstName,
-		LastName:    user.LastName,
-		Password:    user.Password,
-		DateOfBirth: timeToPgtype(user.DateOfBirth),
-		Weight:      floatToPgtype(user.Weight),
-		Height:      floatToPgtype(user.Height),
-		CreatedAt:   timeToPgtype(user.CreatedAt),
-		UpdatedAt:   timeToPgtype(user.UpdatedAt),
+		ID:                uuidToPgtype(user.ID),
+		Email:             user.Email,
+		FirstName:         user.FirstName,
+		LastName:          user.LastName,
+		Password:          user.Password,
+		DateOfBirth:       timeToPgtype(user.DateOfBirth),
+		Weight:            floatToPgtype(user.Weight),
+		Height:            floatToPgtype(user.Height),
+		CreatedAt:         timeToPgtype(user.CreatedAt),
+		UpdatedAt:         timeToPgtype(user.UpdatedAt),
+		PictureProfileURL: pgtype.Text{String: user.ProfilePicURL, Valid: user.ProfilePicURL != ""},
 	}
 }
 
@@ -68,7 +72,7 @@ func (r *PGXRepository) GetUserByEmail(ctx context.Context, email string) (domai
 	defer span.Finish()
 
 	const query = `
-		select id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at
+		select id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at, picture_profile_url
 		from users u 
 		where u.email=$1;
 	`
@@ -93,7 +97,7 @@ func (r *PGXRepository) GetUserByID(ctx context.Context, id domain.ID) (domain.U
 	defer span.Finish()
 
 	const query = `
-		select id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at
+		select id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at, picture_profile_url
 		from users u 
 		where u.id=$1;
 	`
@@ -118,8 +122,8 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 	defer span.Finish()
 
 	const query = `
-		insert into users (id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at)
-		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+		insert into users (id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at, picture_profile_url)
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
 	`
 
 	userEntity := userFromDomain(user)
@@ -137,6 +141,7 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 		floatToPgtype(user.Weight),
 		timeToPgtype(user.CreatedAt),
 		timeToPgtype(user.UpdatedAt),
+		pgtype.Text{String: user.ProfilePicURL, Valid: user.ProfilePicURL != ""},
 	)
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok {
@@ -157,7 +162,7 @@ func (r *PGXRepository) UpdateUser(ctx context.Context, user domain.User) (domai
 
 	const query = `
 		update users
-		set email=$2, first_name=$3, last_name=$4, date_of_birth=$5, height=$6, weight=$7, updated_at=$8
+		set email=$2, first_name=$3, last_name=$4, date_of_birth=$5, height=$6, weight=$7, updated_at=$8, picture_profile_url=$9
 		where id=$1
 		returning id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at;
 	`
@@ -176,6 +181,7 @@ func (r *PGXRepository) UpdateUser(ctx context.Context, user domain.User) (domai
 		floatToPgtype(user.Height),
 		floatToPgtype(user.Weight),
 		timeToPgtype(user.UpdatedAt),
+		pgtype.Text{String: user.ProfilePicURL, Valid: user.ProfilePicURL != ""},
 	)
 	if err != nil {
 		logger.Errorf("error updating user: %v", err)

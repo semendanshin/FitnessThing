@@ -101,10 +101,95 @@ function DataForm({ user }: { user: WorkoutUser }) {
   );
 }
 
-function AvatarSection() {
+function AvatarSection({
+  src,
+  setProfilePictureURL,
+}: {
+  src: string;
+  setProfilePictureURL: (url: string) => void;
+}) {
+  async function handleUploadAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+
+    const filename =
+      (Math.random() + 1).toString(36).substring(2) + "-" + file.name;
+
+    const data = await authApi.v1
+      .fileServicePresignUpload({
+        filename: filename,
+        contentType: file.type,
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Ошибка при загрузке файла");
+      });
+
+    if (!data) {
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    const response = await fetch(data.uploadUrl!, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Ошибка при загрузке файла");
+        } else {
+          toast.success("Фотография успешно загружена");
+        }
+
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Ошибка при загрузке файла");
+      });
+
+    if (!response) {
+      return;
+    }
+
+    await authApi.v1
+      .userServiceUpdateUser({
+        profilePictureUrl: data.getUrl,
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Ошибка при обновлении аватара");
+      });
+
+    e.target.value = "";
+
+    setProfilePictureURL(data.getUrl!);
+  }
+
   return (
-    <div className="flex flex-col gap-4 items-center justify-around pt-4 px-4">
-      <Avatar size="lg" src="https://i.pravatar.cc/300" />
+    <div className="flex flex-col gap-2 items-center justify-around pt-4 px-4">
+      <Avatar size="lg" src={src} />
+      <label className="text-blue-500 cursor-pointer hover:underline text-sm">
+        Загрузить фотографию
+        <input
+          accept="image/*"
+          className="hidden"
+          type="file"
+          onChange={handleUploadAvatar}
+        />
+      </label>
     </div>
   );
 }
@@ -167,7 +252,12 @@ export default function EditProfilePage() {
   return (
     <div className="py-4 flex flex-col h-full">
       <PageHeader enableBackButton title="Редактировать профиль" />
-      <AvatarSection />
+      <AvatarSection
+        setProfilePictureURL={(url) =>
+          setUser({ ...user!, profilePictureUrl: url })
+        }
+        src={user!.profilePictureUrl!}
+      />
       <DataForm user={user!} />
     </div>
   );

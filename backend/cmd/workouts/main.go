@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"fitness-trainer/internal/app"
+	s3_client "fitness-trainer/internal/clients/s3"
 	"fitness-trainer/internal/db"
 	"fitness-trainer/internal/jwt"
 	"fitness-trainer/internal/logger"
@@ -17,6 +18,10 @@ import (
 	"fitness-trainer/internal/service"
 	"fitness-trainer/internal/tracer"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
@@ -61,13 +66,24 @@ func Run() error {
 		logger.Fatal(err.Error())
 	}
 
+	endpoint := os.Getenv("AWS_ENDPOINT")
+	bucket := os.Getenv("AWS_S3_BUCKET")
+
+	awsConfig := getAWSConfig(ctx)
+	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
+		o.BaseEndpoint = aws.String(endpoint)
+	})
+	s3ClientWrapper := s3_client.New(s3Client, bucket)
+
 	ContextManager := db.NewContextManager(pool)
 
 	Repo := repository.NewPGXRepository(ContextManager)
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+
 	JWTProvider := jwt.NewProvider(
 		jwt.WithCredentials(
-			jwt.NewSecretCredentials(os.Getenv("JWT_SECRET")),
+			jwt.NewSecretCredentials(jwtSecret),
 		),
 		jwt.WithAccessTTL(
 			30*time.Minute,
@@ -76,21 +92,23 @@ func Run() error {
 
 	Service := service.New(
 		ContextManager,
-		JWTProvider, // JWT Provider
-		Repo,        // Auth
-		Repo,        // User
-		Repo,        // Exercise
-		Repo,        // Workout
-		Repo,        // ExerciseInstance
-		Repo,        // MuscleGroup
-		Repo,        // Workout
-		Repo,        // ExerciseLog
-		Repo,        // SetLog
-		Repo,        // Set
-		Repo,        // ExpectedSet
+		JWTProvider,     // JWT Provider
+		s3ClientWrapper, // S3 Client
+		Repo,            // Auth
+		Repo,            // User
+		Repo,            // Exercise
+		Repo,            // Workout
+		Repo,            // ExerciseInstance
+		Repo,            // MuscleGroup
+		Repo,            // Workout
+		Repo,            // ExerciseLog
+		Repo,            // SetLog
+		Repo,            // Set
+		Repo,            // ExpectedSet
 	)
 
 	App := app.New(
+		Service,
 		Service,
 		Service,
 		Service,
@@ -110,4 +128,22 @@ func main() {
 	if err := Run(); err != nil {
 		panic(err)
 	}
+}
+
+func getAWSConfig(ctx context.Context) aws.Config {
+	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
+	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	customRegion := os.Getenv("AWS_REGION")
+
+	cfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(customRegion),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
+	)
+
+	if err != nil {
+		log.Fatal("Unable to load AWS config:", err)
+	}
+
+	return cfg
 }

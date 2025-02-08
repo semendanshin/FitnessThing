@@ -51,6 +51,7 @@ message User {
   float height = 8;
   float weight = 9;
   google.protobuf.Timestamp updated_at = 10;
+  string profile_picture_url = 11;
 }
 
 message MuscleGroup {
@@ -916,6 +917,9 @@ message UpdateUserRequest {
   optional float weight = 8 [
     (validate.rules).float.gt = 0
   ];
+  optional string profile_picture_url = 9 [
+    (validate.rules).string.uri = true
+  ];
 }
 
 message DeleteUserRequest {
@@ -985,4 +989,27 @@ message LogoutRequest {
   string refresh_token = 1 [
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+service FileService {
+  rpc PresignUpload(PresignUploadRequest) returns (PresignUploadResponse) {
+    option (google.api.http) = {
+      post: "/v1/files/presign"
+      body: "*"
+    };
+  }
+}
+
+message PresignUploadRequest {
+  string filename = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string content_type = 2 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message PresignUploadResponse {
+  string upload_url = 1;
+  string get_url = 2;
 }

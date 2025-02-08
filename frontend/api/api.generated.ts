@@ -254,6 +254,16 @@ export interface WorkoutMuscleGroup {
   name?: string;
 }
 
+export interface WorkoutPresignUploadRequest {
+  filename: string;
+  contentType: string;
+}
+
+export interface WorkoutPresignUploadResponse {
+  uploadUrl?: string;
+  getUrl?: string;
+}
+
 export interface WorkoutRefreshRequest {
   tokens?: WorkoutTokensPair;
 }
@@ -359,6 +369,7 @@ export interface WorkoutUpdateUserRequest {
   height?: number;
   /** @format float */
   weight?: number;
+  profilePictureUrl?: string;
 }
 
 export interface WorkoutUser {
@@ -376,6 +387,7 @@ export interface WorkoutUser {
   weight?: number;
   /** @format date-time */
   updatedAt?: string;
+  profilePictureUrl?: string;
 }
 
 export interface WorkoutUserResponse {
@@ -717,6 +729,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags FileService
+     * @name FileServicePresignUpload
+     * @request POST:/v1/files/presign
+     * @secure
+     */
+    fileServicePresignUpload: (body: WorkoutPresignUploadRequest, params: RequestParams = {}) =>
+      this.request<WorkoutPresignUploadResponse, RpcStatus>({
+        path: `/v1/files/presign`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

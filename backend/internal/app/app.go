@@ -13,6 +13,7 @@ import (
 
 	"fitness-trainer/internal/app/fitness-trainer/api/auth"
 	"fitness-trainer/internal/app/fitness-trainer/api/exercise"
+	"fitness-trainer/internal/app/fitness-trainer/api/file"
 	"fitness-trainer/internal/app/fitness-trainer/api/routine"
 	"fitness-trainer/internal/app/fitness-trainer/api/user"
 	"fitness-trainer/internal/app/fitness-trainer/api/workout"
@@ -113,6 +114,7 @@ type App struct {
 	workoutService  workout.Service
 	exerciseService exercise.Service
 	routineService  routine.Service
+	fileService     file.Service
 
 	options *Options
 }
@@ -123,6 +125,7 @@ func New(
 	workoutService workout.Service,
 	exerciseService exercise.Service,
 	routineService routine.Service,
+	fileService file.Service,
 	options ...OptionsFunc,
 ) *App {
 	opts := defaultOptions
@@ -135,6 +138,7 @@ func New(
 		workoutService:  workoutService,
 		exerciseService: exerciseService,
 		routineService:  routineService,
+		fileService:     fileService,
 		options:         opts,
 	}
 }
@@ -167,6 +171,7 @@ func (a *App) Run(ctx context.Context) error {
 	routineService := routine.New(a.routineService)
 	authServiceServer := auth.New(a.authService)
 	userServiceServer := user.New(a.userService)
+	fileServiceServer := file.New(a.fileService)
 
 	// Register the service
 	desc.RegisterWorkoutServiceServer(srv, workoutService)
@@ -174,6 +179,7 @@ func (a *App) Run(ctx context.Context) error {
 	desc.RegisterRoutineServiceServer(srv, routineService)
 	desc.RegisterUserServiceServer(srv, userServiceServer)
 	desc.RegisterAuthServiceServer(srv, authServiceServer)
+	desc.RegisterFileServiceServer(srv, fileServiceServer)
 
 	// Reflect the service
 	if a.options.enableReflection {
@@ -298,6 +304,11 @@ func registerGateway(ctx context.Context, mux *runtime.ServeMux, grpcEndpoint st
 	}
 
 	err = desc.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, grpcEndpoint, opts)
+	if err != nil {
+		return err
+	}
+
+	err = desc.RegisterFileServiceHandlerFromEndpoint(ctx, mux, grpcEndpoint, opts)
 	if err != nil {
 		return err
 	}

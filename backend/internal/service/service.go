@@ -99,8 +99,13 @@ type unitOfWork interface {
 	Rollback(ctx context.Context) error
 }
 
+type s3Client interface {
+	GeneratePutPresignedURL(ctx context.Context, key string) (string, error)
+}
+
 type Service struct {
 	jwtProvider                jwtProvider
+	s3Client                   s3Client
 	sessionRepository          sessionRepository
 	userRepository             userRepository
 	exerciseRepository         exerciseRepository
@@ -118,6 +123,7 @@ type Service struct {
 func New(
 	unitOfWork unitOfWork,
 	jwtProvider jwtProvider,
+	s3Client s3Client,
 	sessionRepository sessionRepository,
 	userRepository userRepository,
 	exerciseRepository exerciseRepository,
@@ -133,6 +139,7 @@ func New(
 	return &Service{
 		unitOfWork:                 unitOfWork,
 		jwtProvider:                jwtProvider,
+		s3Client:                   s3Client,
 		sessionRepository:          sessionRepository,
 		userRepository:             userRepository,
 		exerciseRepository:         exerciseRepository,

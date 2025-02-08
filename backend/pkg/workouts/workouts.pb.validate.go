@@ -155,6 +155,8 @@ func (m *User) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ProfilePictureUrl
+
 	if len(errors) > 0 {
 		return UserMultiError(errors)
 	}
@@ -9163,6 +9165,31 @@ func (m *UpdateUserRequest) validate(all bool) error {
 
 	}
 
+	if m.ProfilePictureUrl != nil {
+
+		if uri, err := url.Parse(m.GetProfilePictureUrl()); err != nil {
+			err = UpdateUserRequestValidationError{
+				field:  "ProfilePictureUrl",
+				reason: "value must be a valid URI",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else if !uri.IsAbs() {
+			err := UpdateUserRequestValidationError{
+				field:  "ProfilePictureUrl",
+				reason: "value must be absolute",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return UpdateUserRequestMultiError(errors)
 	}
@@ -10169,6 +10196,218 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LogoutRequestValidationError{}
+
+// Validate checks the field values on PresignUploadRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PresignUploadRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PresignUploadRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PresignUploadRequestMultiError, or nil if none found.
+func (m *PresignUploadRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PresignUploadRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Filename
+
+	// no validation rules for ContentType
+
+	if len(errors) > 0 {
+		return PresignUploadRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// PresignUploadRequestMultiError is an error wrapping multiple validation
+// errors returned by PresignUploadRequest.ValidateAll() if the designated
+// constraints aren't met.
+type PresignUploadRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PresignUploadRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PresignUploadRequestMultiError) AllErrors() []error { return m }
+
+// PresignUploadRequestValidationError is the validation error returned by
+// PresignUploadRequest.Validate if the designated constraints aren't met.
+type PresignUploadRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PresignUploadRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PresignUploadRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PresignUploadRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PresignUploadRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PresignUploadRequestValidationError) ErrorName() string {
+	return "PresignUploadRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PresignUploadRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPresignUploadRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PresignUploadRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PresignUploadRequestValidationError{}
+
+// Validate checks the field values on PresignUploadResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PresignUploadResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PresignUploadResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PresignUploadResponseMultiError, or nil if none found.
+func (m *PresignUploadResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PresignUploadResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UploadUrl
+
+	// no validation rules for GetUrl
+
+	if len(errors) > 0 {
+		return PresignUploadResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// PresignUploadResponseMultiError is an error wrapping multiple validation
+// errors returned by PresignUploadResponse.ValidateAll() if the designated
+// constraints aren't met.
+type PresignUploadResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PresignUploadResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PresignUploadResponseMultiError) AllErrors() []error { return m }
+
+// PresignUploadResponseValidationError is the validation error returned by
+// PresignUploadResponse.Validate if the designated constraints aren't met.
+type PresignUploadResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PresignUploadResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PresignUploadResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PresignUploadResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PresignUploadResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PresignUploadResponseValidationError) ErrorName() string {
+	return "PresignUploadResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PresignUploadResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPresignUploadResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PresignUploadResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PresignUploadResponseValidationError{}
 
 // Validate checks the field values on GetWorkoutsResponse_WorkoutDetails with
 // the rules defined in the proto definition for this message. If any rules

@@ -20,6 +20,9 @@
     },
     {
       "name": "AuthService"
+    },
+    {
+      "name": "FileService"
     }
   ],
   "basePath": "/api",
@@ -311,6 +314,38 @@
         ],
         "tags": [
           "ExerciseService"
+        ]
+      }
+    },
+    "/v1/files/presign": {
+      "post": {
+        "operationId": "FileService_PresignUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutPresignUploadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutPresignUploadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
         ]
       }
     },
@@ -2142,6 +2177,32 @@
         }
       }
     },
+    "workoutPresignUploadRequest": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filename",
+        "contentType"
+      ]
+    },
+    "workoutPresignUploadResponse": {
+      "type": "object",
+      "properties": {
+        "uploadUrl": {
+          "type": "string"
+        },
+        "getUrl": {
+          "type": "string"
+        }
+      }
+    },
     "workoutRefreshRequest": {
       "type": "object",
       "properties": {
@@ -2362,6 +2423,9 @@
         "weight": {
           "type": "number",
           "format": "float"
+        },
+        "profilePictureUrl": {
+          "type": "string"
         }
       }
     },
@@ -2399,6 +2463,9 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "profilePictureUrl": {
+          "type": "string"
         }
       }
     },

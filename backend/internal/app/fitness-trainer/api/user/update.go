@@ -39,6 +39,8 @@ func (i *Implementation) UpdateUser(ctx context.Context, in *desc.UpdateUserRequ
 
 		input.Height = utils.NewNullable(in.GetHeight(), in.GetHeight() != 0)
 		input.Weight = utils.NewNullable(in.GetWeight(), in.GetWeight() != 0)
+
+		input.ProfilePicURL = utils.NewNullable(in.GetProfilePictureUrl(), in.ProfilePictureUrl != nil)
 	}
 
 	user, err := i.service.UpdateUser(ctx, id, input)

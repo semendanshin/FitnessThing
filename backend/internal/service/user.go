@@ -75,6 +75,10 @@ func (s *Service) UpdateUser(ctx context.Context, id domain.ID, dto dto.UpdateUs
 			user.Weight = dto.Weight.V
 		}
 
+		if dto.ProfilePicURL.IsValid {
+			user.ProfilePicURL = dto.ProfilePicURL.V
+		}
+
 		user.UpdatedAt = time.Now()
 	}
 

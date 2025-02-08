@@ -100,7 +100,7 @@ export default function ProfilePage() {
     <div className="p-4 flex-grow gap-4">
       <div className="grid grid-cols-1 gap-4 py-4">
         <div className="flex flex-col gap-4 items-center justify-around">
-          <Avatar size="lg" src="https://i.pravatar.cc/300" />
+          <Avatar size="lg" src={user.profilePictureUrl} />
           <h2 className="text-2xl font-bold">
             {user.firstName} {user.lastName}
           </h2>

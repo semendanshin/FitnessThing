@@ -43,13 +43,14 @@ func NewModel() Model {
 type User struct {
 	Model
 
-	Email       string
-	Password    string
-	FirstName   string
-	LastName    string
-	DateOfBirth time.Time
-	Height      float32
-	Weight      float32
+	Email         string
+	Password      string
+	FirstName     string
+	LastName      string
+	DateOfBirth   time.Time
+	Height        float32
+	Weight        float32
+	ProfilePicURL string
 }
 
 func NewUser(
