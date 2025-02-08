@@ -270,7 +270,10 @@ export default function RoutineDetailsPage({
                 <ModalBody className="flex flex-row gap-2 px-2 w-full">
                   <div className="flex flex-col gap-1 w-1/2">
                     <InputWithIncrement
+                      className="h-10"
+                      classNames={{ incrementButton: "w-12" }}
                       label="Вес"
+                      min={0}
                       placeholder="10"
                       setValue={setWeight}
                       type="number"
@@ -279,7 +282,10 @@ export default function RoutineDetailsPage({
                   </div>
                   <div className="flex flex-col gap-1 w-1/2">
                     <InputWithIncrement
+                      className="h-10"
+                      classNames={{ incrementButton: "w-12" }}
                       label="Повторы"
+                      min={0}
                       placeholder="10"
                       setValue={setReps}
                       type="number"
