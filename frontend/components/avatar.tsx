@@ -7,19 +7,22 @@ export default function Avatar({ src }: { src: string | null }) {
   const [useFallback, setUseFallback] = useState(false);
 
   return (
-    <span className="flex items-center justify-center w-[5.5rem] h-[5.5rem] bg-default-100 rounded-full overflow-hidden">
+    <div className="relative w-[5.5rem] h-[5.5rem]">
       {useFallback || !src ? (
-        <ProfileIcon className="w-10 h-10" fill="currentColor" />
+        <span className="flex items-center justify-center w-full h-full bg-default-100 rounded-full overflow-hidden">
+          <ProfileIcon className="w-10 h-10" fill="currentColor" />
+        </span>
       ) : (
         <Image
+          fill
           alt="avatar"
-          height={400}
+          className="rounded-full"
           loader={() => src}
           src={src}
-          width={400}
+          style={{ objectFit: "cover" }}
           onError={() => setUseFallback(true)}
         />
       )}
-    </span>
+    </div>
   );
 }
