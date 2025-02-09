@@ -123,7 +123,8 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 
 	const query = `
 		insert into users (id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at, picture_profile_url)
-		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		returning id, email, password, first_name, last_name, date_of_birth, height, weight, created_at, updated_at, picture_profile_url;
 	`
 
 	userEntity := userFromDomain(user)
