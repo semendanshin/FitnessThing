@@ -3,7 +3,6 @@ import { Form } from "@nextui-org/form";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@nextui-org/input";
-import { Avatar } from "@nextui-org/avatar";
 import { DatePicker } from "@nextui-org/date-picker";
 import { Button } from "@nextui-org/button";
 import { CalendarDate } from "@internationalized/date";
@@ -13,6 +12,7 @@ import { PageHeader } from "@/components/page-header";
 import { WorkoutUser } from "@/api/api.generated";
 import { authApi, errUnauthorized } from "@/api/api";
 import { Loading } from "@/components/loading";
+import Avatar from "@/components/avatar";
 
 function DataForm({ user }: { user: WorkoutUser }) {
   function protoToCalendarDate(s: string) {
@@ -180,7 +180,7 @@ function AvatarSection({
 
   return (
     <div className="flex flex-col gap-2 items-center justify-around pt-4 px-4">
-      <Avatar size="lg" src={src} />
+      <Avatar src={src} />
       <label className="text-blue-500 cursor-pointer hover:underline text-sm">
         Загрузить фотографию
         <input

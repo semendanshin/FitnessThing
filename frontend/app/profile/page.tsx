@@ -2,7 +2,6 @@
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { Card } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
@@ -15,6 +14,7 @@ import {
   ListIcon,
   TrophyIcon,
 } from "@/config/icons";
+import Avatar from "@/components/avatar";
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -100,7 +100,7 @@ export default function ProfilePage() {
     <div className="p-4 flex-grow gap-4">
       <div className="grid grid-cols-1 gap-4 py-4">
         <div className="flex flex-col gap-4 items-center justify-around">
-          <Avatar size="lg" src={user.profilePictureUrl} />
+          <Avatar src={user.profilePictureUrl} />
           <h2 className="text-2xl font-bold">
             {user.firstName} {user.lastName}
           </h2>
