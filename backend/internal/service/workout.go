@@ -28,7 +28,7 @@ func (s *Service) StartWorkout(ctx context.Context, userID domain.ID, opts domai
 		}
 	}
 
-	workout := domain.NewWorkout(userID, opts.RoutineID)
+	workout := domain.NewWorkout(userID, opts.RoutineID, opts.GenerateWorkout)
 
 	workout, err = s.workoutRepository.CreateWorkout(ctx, workout)
 	if err != nil {
@@ -162,6 +162,18 @@ func (s *Service) enrichWorkoutByGenerating(ctx context.Context, userID, workout
 		if err != nil {
 			return err
 		}
+	}
+
+	workout, err := s.workoutRepository.GetWorkoutByID(ctx, workoutID)
+	if err != nil {
+		return err
+	}
+
+	workout.Reasoning = generatedWorkout.Reasoning
+
+	_, err = s.workoutRepository.UpdateWorkout(ctx, workoutID, workout)
+	if err != nil {
+		return err
 	}
 
 	return nil

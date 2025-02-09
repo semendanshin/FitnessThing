@@ -27,14 +27,16 @@ func WorkoutToProto(workout domain.Workout) *desc.Workout {
 		routineID = &routineIDValue
 	}
 	return &desc.Workout{
-		Id:         workout.ID.String(),
-		RoutineId:  routineID,
-		UserId:     workout.UserID.String(),
-		CreatedAt:  timestamppb.New(workout.CreatedAt),
-		Notes:      workout.Notes,
-		Rating:     int32(workout.Rating),
-		FinishedAt: timestamppb.New(workout.FinishedAt),
-		UpdatedAt:  timestamppb.New(workout.UpdatedAt),
+		Id:            workout.ID.String(),
+		RoutineId:     routineID,
+		UserId:        workout.UserID.String(),
+		CreatedAt:     timestamppb.New(workout.CreatedAt),
+		Notes:         workout.Notes,
+		Rating:        int32(workout.Rating),
+		FinishedAt:    timestamppb.New(workout.FinishedAt),
+		UpdatedAt:     timestamppb.New(workout.UpdatedAt),
+		Reasoning:     workout.Reasoning,
+		IsAiGenerated: workout.IsAIGenerated,
 	}
 }
 

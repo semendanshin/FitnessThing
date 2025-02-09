@@ -230,18 +230,21 @@ func NewSet(exerciseInstanceID ID, setType SetType, reps int, weight float32, ti
 type Workout struct {
 	Model
 
-	UserID     ID
-	RoutineID  utils.Nullable[ID]
-	Notes      string
-	Rating     int
-	FinishedAt time.Time
+	UserID        ID
+	RoutineID     utils.Nullable[ID]
+	Notes         string
+	Rating        int
+	FinishedAt    time.Time
+	IsAIGenerated bool
+	Reasoning     string
 }
 
-func NewWorkout(userID ID, routineID utils.Nullable[ID]) Workout {
+func NewWorkout(userID ID, routineID utils.Nullable[ID], isAIGenerated bool) Workout {
 	return Workout{
-		Model:     NewModel(),
-		UserID:    userID,
-		RoutineID: routineID,
+		Model:         NewModel(),
+		UserID:        userID,
+		RoutineID:     routineID,
+		IsAIGenerated: isAIGenerated,
 	}
 }
 

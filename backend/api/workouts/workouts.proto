@@ -114,6 +114,8 @@ message Workout {
   int32 rating = 6;
   google.protobuf.Timestamp finished_at = 7;
   google.protobuf.Timestamp updated_at = 8;
+  bool is_ai_generated = 9;
+  string reasoning = 10;
 }
 
 // Лог выполнения упражнения

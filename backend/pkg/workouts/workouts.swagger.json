@@ -2513,6 +2513,12 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "isAiGenerated": {
+          "type": "boolean"
+        },
+        "reasoning": {
+          "type": "string"
         }
       },
       "title": "Структура тренировки"

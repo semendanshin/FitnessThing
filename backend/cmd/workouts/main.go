@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -31,7 +31,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
-	"golang.org/x/net/proxy"
 	apiOpts "google.golang.org/api/option"
 )
 
@@ -99,16 +98,20 @@ func Run() error {
 		),
 	)
 
-	// openaiClient := newOpenAIClient()
 	genaiClient, err := newGeminiClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	// OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
 	GenAIClientWrapper := genai_client.New(genaiClient)
 
 	WorkoutGenerator := workout_generator_service.New(GenAIClientWrapper)
+	
+	// openaiClient := newOpenAIClient()
+
+	// OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
+
+	// WorkoutGenerator := workout_generator_service.New(OpenAIClientWrapper)
 
 	Service := service.New(
 		ContextManager,
@@ -169,41 +172,78 @@ func getAWSConfig(ctx context.Context) aws.Config {
 	return cfg
 }
 
-func newHTTPClient(proxyURL string, auth *proxy.Auth) *http.Client {
-	dialer, err := proxy.SOCKS5("tcp", proxyURL, auth, proxy.Direct)
+type ProxyRoundTripper struct {
+	proxy  *url.URL
+	apiKey string
+}
+
+func (t *ProxyRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+
+	if t.proxy != nil {
+		transport.Proxy = http.ProxyURL(t.proxy)
+	}
+
+	newReq := req.Clone(req.Context())
+	q := newReq.URL.Query()
+	q.Add("key", t.apiKey)
+	newReq.URL.RawQuery = q.Encode()
+
+	return transport.RoundTrip(newReq)
+}
+
+func loadProxyData() *url.URL {
+	proxyURL := os.Getenv("PROXY_URL")
+	proxyUser := os.Getenv("PROXY_USER")
+	proxyPassword := os.Getenv("PROXY_PASSWORD")
+
+	if proxyURL == "" {
+		return nil
+	}
+
+	parsedURL, err := url.Parse(proxyURL)
 	if err != nil {
-		panic(err)
+		logger.Fatal(err.Error())
 	}
 
-	dialContext := func(ctx context.Context, network, address string) (net.Conn, error) {
-		return dialer.Dial(network, address)
+	if proxyUser != "" && proxyPassword != "" {
+		parsedURL.User = url.UserPassword(proxyUser, proxyPassword)
 	}
 
+	return parsedURL
+}
+
+func newHTTPClient(proxyURL *url.URL, apiKey string) *http.Client {
 	return &http.Client{
-		Transport: &http.Transport{
-			DialContext:           dialContext,
-			MaxIdleConns:          100,
-			IdleConnTimeout:       90 * time.Second,
-			TLSHandshakeTimeout:   10 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-			Proxy:                 http.ProxyFromEnvironment,
+		Transport: &ProxyRoundTripper{
+			apiKey: apiKey,
+			proxy:  proxyURL,
 		},
-
-		Timeout: 10 * time.Second,
+		Timeout: 30 * time.Second,
 	}
 }
 
 func newGeminiClient(ctx context.Context) (*genai.Client, error) {
+	proxy := loadProxyData()
+
 	return genai.NewClient(
 		ctx,
+		apiOpts.WithHTTPClient(newHTTPClient(proxy, os.Getenv("GENAI_API_KEY"))),
 		apiOpts.WithAPIKey(os.Getenv("GENAI_API_KEY")),
 	)
 }
 
 func newOpenAIClient() *openai.Client {
+	proxyURL := loadProxyData()
+
 	return openai.NewClient(
 		option.WithAPIKey(os.Getenv("OPENAI_API_KEY")),
 		option.WithHeader("OpenAI-Beta", "assistants=v2"),
-		// option.WithHTTPClient(newHTTPClient("", nil)),
+		option.WithHTTPClient(&http.Client{
+			Transport: &ProxyRoundTripper{
+				proxy: proxyURL,
+			},
+			Timeout: 30 * time.Second,
+		}),
 	)
 }

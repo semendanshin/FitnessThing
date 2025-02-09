@@ -410,6 +410,8 @@ export interface WorkoutWorkout {
   finishedAt?: string;
   /** @format date-time */
   updatedAt?: string;
+  isAiGenerated?: boolean;
+  reasoning?: string;
 }
 
 export interface WorkoutWorkoutReportResponse {

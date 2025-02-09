@@ -10,10 +10,11 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/modal";
-import { DropdownItem } from "@nextui-org/react";
+import { Accordion, AccordionItem, DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import ReactMarkdown from "react-markdown";
 
 import { BoltIcon, ChevronRightIcon, PlusIcon } from "@/config/icons";
 import { ModalSelectExercise } from "@/components/pick-exercises-modal";
@@ -292,7 +293,7 @@ export default function WorkoutDetailsPage({
 
   return (
     <>
-      <div className="py-4 flex flex-col h-full flex-grow max-w-full basis-full">
+      <div className="py-4 flex flex-col h-full flex-grow max-w-full basis-full gap-4">
         <PageHeader enableBackButton={true} title={"Тренировка"}>
           <DropdownItem
             key="delete"
@@ -304,7 +305,24 @@ export default function WorkoutDetailsPage({
           </DropdownItem>
         </PageHeader>
         <section className="flex flex-col gap-4 ">
-          <div className="flex flex-col gap-4 p-4 ">
+          {workoutDetails.workout?.isAiGenerated && (
+            <Accordion className="px-4" title="Сгенерировано ИИ">
+              <AccordionItem
+                className="flex flex-col p-0"
+                classNames={{
+                  trigger: "p-0",
+                  content: "p-0 mt-2",
+                  title: "text-xs font-semibold text-default-400",
+                }}
+                title="Записка от ИИ"
+              >
+                <ReactMarkdown className="text-xs/4 text-default-400">
+                  {workoutDetails.workout?.reasoning}
+                </ReactMarkdown>
+              </AccordionItem>
+            </Accordion>
+          )}
+          <div className="flex flex-col gap-4 px-4">
             {workoutDetails.exerciseLogs?.map((exerciseLogDetails, index) => (
               <ExerciseLogCard
                 key={index}
