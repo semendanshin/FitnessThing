@@ -244,7 +244,7 @@ export default function RoutineDetailsPage({
       >
         <Card
           fullWidth
-          className="flex flex-row flex-grow p-2 gap-3 items-center"
+          className="flex flex-row flex-grow p-3 gap-3 items-center"
           shadow="sm"
         >
           <div
@@ -419,7 +419,7 @@ export default function RoutineDetailsPage({
             </p>
           </div>
         ) : null}
-        <div className="grid grid-cols-1 gap-4 px-4">
+        <div className="flex flex-col gap-4 px-4">
           <DndContext
             sensors={sensors}
             onDragEnd={handleDragEnd}

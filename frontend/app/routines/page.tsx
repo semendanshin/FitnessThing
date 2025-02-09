@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Link } from "@nextui-org/link";
 import {
   Modal,
   ModalContent,
@@ -77,24 +76,17 @@ export default function RoutinesPage() {
             <Card
               key={routine.id}
               fullWidth
-              as={Link}
-              className="flex flex-row items-center justify-between p-4 cursor-pointer gap-4"
-              href={`/routines/${routine.id}`}
+              isPressable
+              className="flex flex-row items-center justify-between p-3 cursor-pointer gap-3"
               shadow="sm"
+              onPress={() => router.push(`/routines/${routine.id}`)}
             >
-              <div className="flex flex-col items-start justify-between">
+              <div className="flex flex-col items-start justify-between w-full">
                 <CardHeader className="p-0">
-                  <p className="text-m font-bold">{routine.name}</p>
+                  <p className="text-md font-bold text-start">{routine.name}</p>
                 </CardHeader>
                 <CardBody className="p-0">
-                  {routine.description ? (
-                    <div className="py-2">
-                      <p className="text-xs text-gray-400/80">
-                        {routine.description}
-                      </p>
-                    </div>
-                  ) : null}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-default-400">
                     {Math.ceil(Math.random() * (10 - 5) + 5)} упражнений
                   </p>
                 </CardBody>

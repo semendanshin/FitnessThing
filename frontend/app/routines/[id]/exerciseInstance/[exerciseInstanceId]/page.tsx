@@ -155,8 +155,8 @@ export default function ExerciseInstancePage({
     }
 
     return (
-      <Card className="flex flex-row items-start gap-2 p-3 w-full">
-        <CardBody className="flex flex-col gap-2 p-0">
+      <Card className="flex flex-row items-start gap-3 p-3 w-full">
+        <CardBody className="flex flex-col gap-3 p-0">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row gap-1 items-center">
               <div className="h-7 w-7 p-2 flex flex-row items-center justify-center bg-default-100 rounded-small">

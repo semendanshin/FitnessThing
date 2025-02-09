@@ -259,12 +259,12 @@ export default function Home() {
       {activeWorkouts.length > 0 && (
         <section className="flex flex-col flex-grow max-w-full h-fit relative">
           <h4 className="text-xl font-bold px-4">Активные тренировки</h4>
-          <div className="flex flex-col p-4 max-w-full overflow-y-auto">
+          <div className="flex flex-col p-4 max-w-full gap-4">
             {activeWorkouts.map((workout) => (
-              <Card key={workout.id} className="w-full">
-                <CardHeader>
+              <Card key={workout.id} className="w-full p-3 gap-4">
+                <CardHeader className="p-0">
                   <h3 className="text-lg font-bold">
-                    {"Тренировка от "}
+                    {"Тренировка "}
                     {new Date(workout.createdAt!).toLocaleString("ru-RU", {
                       weekday: "long",
                       day: "numeric",
@@ -272,7 +272,7 @@ export default function Home() {
                     })}
                   </h3>
                 </CardHeader>
-                <CardFooter>
+                <CardFooter className="p-0 rounded-sm">
                   <Button
                     className="flex items-center px-2 w-full"
                     color="primary"

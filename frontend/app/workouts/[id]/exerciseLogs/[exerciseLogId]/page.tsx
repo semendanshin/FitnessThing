@@ -369,7 +369,7 @@ export default function RoutineDetailsPage({
           <CardBody>
             <div className="flex flex-col gap-4">
               <Form
-                className="flex flex-col gap-3"
+                className="flex flex-col gap-4"
                 validationBehavior="native"
                 onSubmit={handleSubmit}
               >
