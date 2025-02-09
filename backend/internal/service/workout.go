@@ -152,6 +152,15 @@ func (s *Service) enrichWorkoutByGenerating(ctx context.Context, userID, workout
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.enrichWorkoutByGenerating")
 	defer span.Finish()
 
+	allowed, err := s.generateWorkoutLimiter.Allow(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if !allowed {
+		return fmt.Errorf("generate workout limit exceeded: %w", domain.ErrTooManyRequests)
+	}
+
 	generatedWorkout, err := s.generateWorkout(ctx, userID, userPrompt)
 	if err != nil {
 		return err

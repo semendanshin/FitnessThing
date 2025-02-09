@@ -20,4 +20,7 @@ var (
 
 	// ErrInternal is an error for internal server error
 	ErrInternal = errors.New("internal server error")
+
+	// ErrTooManyRequests is an error for too many requests
+	ErrTooManyRequests = errors.New("too many requests")
 )

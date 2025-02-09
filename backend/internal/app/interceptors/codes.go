@@ -29,6 +29,9 @@ func ErrCodesInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryS
 		if errors.Is(err, domain.ErrForbidden) {
 			return nil, status.Errorf(codes.PermissionDenied, "%s", err.Error())
 		}
+		if errors.Is(err, domain.ErrTooManyRequests) {
+			return nil, status.Errorf(codes.ResourceExhausted, "%s", err.Error())
+		}
 
 		logger.Errorf("[interceptor.Error] method: %s; error: %s", info.FullMethod, err.Error())
 		return nil, status.Error(codes.Internal, "internal server error")

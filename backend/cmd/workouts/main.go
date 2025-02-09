@@ -13,6 +13,7 @@ import (
 
 	"fitness-trainer/internal/app"
 	genai_client "fitness-trainer/internal/clients/gemini"
+	"fitness-trainer/internal/clients/ratelimiter"
 	s3_client "fitness-trainer/internal/clients/s3"
 	"fitness-trainer/internal/db"
 	"fitness-trainer/internal/jwt"
@@ -31,6 +32,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
+	"github.com/throttled/throttled/v2"
+	"github.com/throttled/throttled/v2/store/memstore"
 	apiOpts "google.golang.org/api/option"
 )
 
@@ -103,21 +106,37 @@ func Run() error {
 		return err
 	}
 
-	GenAIClientWrapper := genai_client.New(genaiClient)
+	clientWrapper := genai_client.New(genaiClient)
 
-	WorkoutGenerator := workout_generator_service.New(GenAIClientWrapper)
-	
 	// openaiClient := newOpenAIClient()
 
-	// OpenAIClientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
+	// clientWrapper := openai_client.New(openaiClient, os.Getenv("OPENAI_ASS_ID"))
 
-	// WorkoutGenerator := workout_generator_service.New(OpenAIClientWrapper)
+	WorkoutGenerator := workout_generator_service.New(clientWrapper)
+
+	quota := throttled.RateQuota{
+		MaxRate:  throttled.PerDay(5),
+		MaxBurst: 0,
+	}
+
+	inmemmoryStore, err := memstore.NewCtx(65536)
+	if err != nil {
+		return fmt.Errorf("failed to create in memory store: %w", err)
+	}
+
+	rateLimiter, err := throttled.NewGCRARateLimiterCtx(inmemmoryStore, quota)
+	if err != nil {
+		return fmt.Errorf("failed to create rate limiter: %w", err)
+	}
+
+	rateLimiterWrapper := ratelimiter.New(rateLimiter)
 
 	Service := service.New(
 		ContextManager,
 		JWTProvider,
 		s3ClientWrapper,
 		WorkoutGenerator,
+		rateLimiterWrapper,
 		Repo, // Auth
 		Repo, // User
 		Repo, // Exercise

@@ -112,14 +112,24 @@ export default function Home() {
       })
       .catch((error) => {
         console.log(error);
+
         if (error === errUnauthorized || error.response?.status === 401) {
           router.push("/auth/login");
 
           return;
         }
+
+        if (error.response?.status === 429) {
+          toast.error("Превышен лимит генераций на сегодня");
+
+          return;
+        }
+
         toast.error("Ошибка при начале тренировки");
-        setIsWorkoutGenerating(false);
         throw error;
+      })
+      .finally(() => {
+        setIsWorkoutGenerating(false);
       });
   }
 

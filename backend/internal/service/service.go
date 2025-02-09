@@ -108,10 +108,15 @@ type s3Client interface {
 	GeneratePutPresignedURL(ctx context.Context, key string) (string, error)
 }
 
+type generateWorkoutLimiter interface {
+	Allow(ctx context.Context, userID domain.ID) (bool, error)
+}
+
 type Service struct {
 	jwtProvider                jwtProvider
 	s3Client                   s3Client
 	workoutGenerator           workoutGenerator
+	generateWorkoutLimiter     generateWorkoutLimiter
 	sessionRepository          sessionRepository
 	userRepository             userRepository
 	exerciseRepository         exerciseRepository
@@ -131,6 +136,7 @@ func New(
 	jwtProvider jwtProvider,
 	s3Client s3Client,
 	workoutGenerator workoutGenerator,
+	generateWorkoutLimiter generateWorkoutLimiter,
 	sessionRepository sessionRepository,
 	userRepository userRepository,
 	exerciseRepository exerciseRepository,
@@ -148,6 +154,7 @@ func New(
 		workoutGenerator:           workoutGenerator,
 		jwtProvider:                jwtProvider,
 		s3Client:                   s3Client,
+		generateWorkoutLimiter:     generateWorkoutLimiter,
 		sessionRepository:          sessionRepository,
 		userRepository:             userRepository,
 		exerciseRepository:         exerciseRepository,
