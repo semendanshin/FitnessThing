@@ -97,6 +97,7 @@ type unitOfWork interface {
 	Begin(ctx context.Context) (context.Context, error)
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
+	InTransaction(ctx context.Context, f func(ctx context.Context) error) error
 }
 
 type s3Client interface {

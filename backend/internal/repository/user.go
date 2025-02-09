@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/logger"
 
@@ -145,7 +146,8 @@ func (r *PGXRepository) CreateUser(ctx context.Context, user domain.User) (domai
 		pgtype.Text{String: user.ProfilePicURL, Valid: user.ProfilePicURL != ""},
 	)
 	if err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				return domain.User{}, domain.ErrAlreadyExists
 			}

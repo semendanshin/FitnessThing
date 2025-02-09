@@ -80,25 +80,36 @@ func (cm *ContextManager) Rollback(ctx context.Context) error {
 	return tx.Rollback(ctx)
 }
 
-func (cm *ContextManager) InTransaction(ctx context.Context, f func(ctx context.Context) error) error {
+func (cm *ContextManager) InTransaction(ctx context.Context, f func(ctx context.Context) error) (err error) {
 	txCtx, err := cm.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
+	detCtx := context.WithoutCancel(txCtx)
 	defer func() {
-		if err != nil {
-			cm.Rollback(txCtx)
-		} else {
-			err = cm.Commit(txCtx)
+		if p := recover(); p != nil {
+			logger.Errorf("panic occurred: %v", p)
+			cm.Rollback(detCtx)
+			panic(p)
 		}
 		if err != nil {
-			logger.Errorf("failed to commit transaction: %v", err)
-			return
+			logger.Errorf("error in tx occurred: %v", err)
+			innerErr := cm.Rollback(txCtx)
+			if innerErr != nil {
+				logger.Errorf("failed to rollback transaction: %v", err)
+			}
+		} else {
+			err = cm.Commit(txCtx)
+			if err != nil {
+				logger.Errorf("failed to commit transaction: %v", err)
+			}
 		}
 	}()
 
-	return f(txCtx)
+	err = f(txCtx)
+
+	return err
 }
 
 func (cm *ContextManager) Close() {

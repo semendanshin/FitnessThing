@@ -30,7 +30,10 @@ func (s *Service) CreateUser(ctx context.Context, dto dto.CreateUserDTO) (domain
 		dto.Weight.V,
 	)
 
-	user, err = s.userRepository.CreateUser(ctx, user)
+	err = s.unitOfWork.InTransaction(ctx, func(ctx context.Context) error {
+		user, err = s.userRepository.CreateUser(ctx, user)
+		return err
+	})
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -48,7 +51,7 @@ func (s *Service) GetUserByID(ctx context.Context, id domain.ID) (domain.User, e
 func (s *Service) UpdateUser(ctx context.Context, id domain.ID, dto dto.UpdateUserDTO) (domain.User, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.UpdateUser")
 	defer span.Finish()
-	
+
 	user, err := s.GetUserByID(ctx, id)
 	if err != nil {
 		return domain.User{}, err
@@ -82,5 +85,14 @@ func (s *Service) UpdateUser(ctx context.Context, id domain.ID, dto dto.UpdateUs
 		user.UpdatedAt = time.Now()
 	}
 
-	return s.userRepository.UpdateUser(ctx, user)
+	err = s.unitOfWork.InTransaction(ctx, func(ctx context.Context) error {
+		user, err = s.userRepository.UpdateUser(ctx, user)
+
+		return err
+	})
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return user, nil
 }
