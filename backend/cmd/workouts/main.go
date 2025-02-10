@@ -116,7 +116,7 @@ func Run() error {
 
 	quota := throttled.RateQuota{
 		MaxRate:  throttled.PerDay(5),
-		MaxBurst: 0,
+		MaxBurst: 5,
 	}
 
 	inmemmoryStore, err := memstore.NewCtx(65536)

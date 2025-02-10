@@ -30,7 +30,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import Link from "next/link";
 import { hapticFeedback } from "@telegram-apps/sdk-react";
 
 import { ChevronRightIcon, GripVerticalIcon, PlusIcon } from "@/config/icons";
@@ -248,15 +247,19 @@ export default function RoutineDetailsPage({
           shadow="sm"
         >
           <div
-            className="rounded-md bg-default-100 hover:bg-default-200 cursor-grab flex items-center justify-center p-1"
+            className="rounded-md bg-default-100 cursor-grab flex items-center justify-center p-1"
             {...attributes}
             {...listeners}
           >
             <GripVerticalIcon className="w-4 h-4" />
           </div>
-          <Link
-            className="flex items-center justify-between w-full"
-            href={`/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`}
+          <button
+            className="flex items-center justify-between max-w-full w-full"
+            onClick={() =>
+              router.push(
+                `/routines/${id}/exerciseInstance/${exerciseInstanceDetails.exerciseInstance!.id}`,
+              )
+            }
           >
             <div className="flex flex-col items-start justify-between">
               <CardHeader className="p-0">
@@ -266,7 +269,7 @@ export default function RoutineDetailsPage({
               </CardHeader>
               <CardBody className="p-0">
                 <div className="flex flex-row gap-1">
-                  <p className="text-xs text-default-400 whitespace-nowrap">
+                  <p className="text-xs text-default-400">
                     {setsCount}{" "}
                     {"подход" +
                       (setsCount % 10 === 1
@@ -274,9 +277,7 @@ export default function RoutineDetailsPage({
                         : setsCount % 10 >= 2 && setsCount % 10 <= 4
                           ? "а"
                           : "ов")}
-                    {" •"}
-                  </p>
-                  <p className="text-xs text-default-400 whitespace-nowrap">
+                    {" • "}
                     {exerciseInstanceDetails.exercise!.targetMuscleGroups!.join(
                       ", ",
                     )}
@@ -287,7 +288,7 @@ export default function RoutineDetailsPage({
             <div className="flex flex-col items-center justify-center">
               <ChevronRightIcon className="w-4 h-4" fill="currentColor" />
             </div>
-          </Link>
+          </button>
         </Card>
       </div>
     );
