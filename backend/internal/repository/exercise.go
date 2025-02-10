@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/logger"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/opentracing/opentracing-go"
 )
@@ -74,6 +76,9 @@ func (r *PGXRepository) GetExercises(ctx context.Context, muscleGroups, excluded
 	var exercises []exerciseEntity
 	err := pgxscan.Select(ctx, engine, &exercises, query, muscleGroups, excludedExercises)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return []domain.Exercise{}, nil
+		}
 		logger.Errorf("failed to get exercises: %v", err)
 		return nil, err
 	}
@@ -104,6 +109,9 @@ func (r *PGXRepository) GetExerciseByID(ctx context.Context, id domain.ID) (doma
 	var exercise exerciseEntity
 	err := pgxscan.Get(ctx, engine, &exercise, query, id)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Exercise{}, domain.ErrNotFound
+		}
 		logger.Errorf("failed to get exercise by id: %v", err)
 		return domain.Exercise{}, err
 	}
@@ -111,6 +119,7 @@ func (r *PGXRepository) GetExerciseByID(ctx context.Context, id domain.ID) (doma
 	return exercise.toDomain(), nil
 }
 
+// CreateExercise must be called within a transaction
 func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exercise, muscleGroupIDs []domain.ID) (domain.Exercise, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "repository.CreateExercise")
 	defer span.Finish()
@@ -132,15 +141,11 @@ func (r *PGXRepository) CreateExercise(ctx context.Context, exercise domain.Exer
 		convertedMuscleGroupIDs[i] = uuidToPgtype(id)
 	}
 
-	ctx, err := r.contextManager.Begin(ctx)
-	if err != nil {
-	}
-
 	engine := r.contextManager.GetEngineFromContext(ctx)
 
 	exerciseEntity := exerciseFromDomain(exercise)
 
-	err = pgxscan.Get(
+	err := pgxscan.Get(
 		ctx,
 		engine,
 		&exerciseEntity,

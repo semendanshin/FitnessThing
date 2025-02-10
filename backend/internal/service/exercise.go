@@ -81,5 +81,13 @@ func (s *Service) CreateExercise(ctx context.Context, exerciseDTO dto.CreateExer
 		[]domain.MuscleGroup{},
 	)
 
-	return s.exerciseRepository.CreateExercise(ctx, exercise, exerciseDTO.TargetMuscleGroups)
+	err := s.unitOfWork.InTransaction(ctx, func(ctx context.Context) (err error) {
+		exercise, err = s.exerciseRepository.CreateExercise(ctx, exercise, exerciseDTO.TargetMuscleGroups)
+		return err
+	})
+	if err != nil {
+		return domain.Exercise{}, err
+	}
+
+	return exercise, nil
 }
