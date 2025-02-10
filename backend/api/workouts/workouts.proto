@@ -966,7 +966,8 @@ message TokensPair {
 
 message LoginRequest {
   string email = 1 [
-    (google.api.field_behavior) = REQUIRED
+    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string.email = true
   ];
   string password = 2 [
     (google.api.field_behavior) = REQUIRED
