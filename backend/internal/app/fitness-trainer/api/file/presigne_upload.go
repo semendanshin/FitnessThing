@@ -13,7 +13,7 @@ import (
 )
 
 func (i *Implementation) PresignUpload(ctx context.Context, in *desc.PresignUploadRequest) (*desc.PresignUploadResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.CreateExercise")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.file.PresignUpload")
 	defer span.Finish()
 
 	if err := in.ValidateAll(); err != nil {
@@ -31,6 +31,6 @@ func (i *Implementation) PresignUpload(ctx context.Context, in *desc.PresignUplo
 
 	return &desc.PresignUploadResponse{
 		UploadUrl: uploadURL,
-		GetUrl:   getURL,
+		GetUrl:    getURL,
 	}, nil
 }

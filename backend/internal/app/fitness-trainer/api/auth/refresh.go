@@ -12,7 +12,7 @@ import (
 )
 
 func (i *Implementation) Refresh(ctx context.Context, in *desc.RefreshRequest) (*desc.RefreshResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.refresh")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.Refresh")
 	defer span.Finish()
 
 	if err := in.Validate(); err != nil {

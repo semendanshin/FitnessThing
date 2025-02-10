@@ -16,7 +16,7 @@ import (
 )
 
 func (i *Implementation) CreateUser(ctx context.Context, in *desc.CreateUserRequest) (*desc.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.create")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.Create")
 	defer span.Finish()
 
 	if err := in.Validate(); err != nil {

@@ -12,7 +12,7 @@ import (
 )
 
 func (i *Implementation) Logout(ctx context.Context, in *desc.LogoutRequest) (*empty.Empty, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.logout")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.Logout")
 	defer span.Finish()
 
 	if err := in.Validate(); err != nil {

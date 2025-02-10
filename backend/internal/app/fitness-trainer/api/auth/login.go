@@ -12,7 +12,7 @@ import (
 )
 
 func (i *Implementation) Login(ctx context.Context, in *desc.LoginRequest) (*desc.LoginResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.login")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.auth.Login")
 	defer span.Finish()
 
 	if err := in.Validate(); err != nil {

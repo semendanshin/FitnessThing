@@ -14,7 +14,7 @@ import (
 )
 
 func (i *Implementation) GetUser(ctx context.Context, in *desc.GetUserRequest) (*desc.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.get")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.Get")
 	defer span.Finish()
 
 	span.SetTag("user_id", in.GetUserId())

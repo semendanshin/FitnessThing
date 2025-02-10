@@ -14,7 +14,7 @@ import (
 )
 
 func (i *Implementation) UpdateRoutine(ctx context.Context, in *desc.UpdateRoutineRequest) (*desc.RoutineResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.UpdateRoutine")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.routine.UpdateRoutine")
 	defer span.Finish()
 
 	if err := in.ValidateAll(); err != nil {

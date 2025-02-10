@@ -17,7 +17,7 @@ import (
 )
 
 func (i *Implementation) UpdateUser(ctx context.Context, in *desc.UpdateUserRequest) (*desc.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.update")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.Update")
 	defer span.Finish()
 
 	if err := in.Validate(); err != nil {

@@ -13,7 +13,7 @@ import (
 )
 
 func (i *Implementation) GetMe(ctx context.Context, _ *emptypb.Empty) (*desc.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.get_me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "api.user.GetMe")
 	defer span.Finish()
 
 	id, ok := interceptors.GetUserID(ctx)
