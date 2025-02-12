@@ -11,6 +11,7 @@ import { Loading } from "@/components/loading";
 import {
   ChevronRightIcon,
   EditIcon,
+  GearIcon,
   ListIcon,
   TrophyIcon,
 } from "@/config/icons";
@@ -121,6 +122,11 @@ export default function ProfilePage() {
           href="/profile/records"
           icon={<TrophyIcon className="w-4 h-4" fill="currentColor" />}
           label="Рекорды"
+        />
+        <SubPageButton
+          href="/profile/generation-settings"
+          icon={<GearIcon className="w-4 h-4" fill="currentColor" />}
+          label="Настройки генерации"
         />
         {/*  Light and dark mode switch */}
         <Divider />

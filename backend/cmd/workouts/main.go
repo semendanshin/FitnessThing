@@ -148,6 +148,7 @@ func Run() error {
 		Repo, // SetLog
 		Repo, // Set
 		Repo, // ExpectedSet
+		Repo, // Generation Settings
 	)
 
 	App := app.New(

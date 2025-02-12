@@ -16,6 +16,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/swaggest/swgui v1.8.2
+	github.com/throttled/throttled/v2 v2.13.0
 	github.com/uber/jaeger-lib v2.4.1+incompatible
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.31.0
@@ -66,7 +67,6 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/throttled/throttled/v2 v2.13.0 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -99,7 +99,6 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/pressly/goose/v3 v3.24.0
 	github.com/rs/cors v1.11.1
-	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/net v0.33.0 // indirect

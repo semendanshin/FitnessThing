@@ -11,6 +11,9 @@ type Service interface {
 	CreateUser(ctx context.Context, dto dto.CreateUserDTO) (domain.User, error)
 	GetUserByID(ctx context.Context, id domain.ID) (domain.User, error)
 	UpdateUser(ctx context.Context, id domain.ID, dto dto.UpdateUserDTO) (domain.User, error)
+
+	GetGenerationSettings(ctx context.Context, userID domain.ID) (domain.GenerationSettings, error)
+	SaveGenerationSettings(ctx context.Context, userID domain.ID, createDTO dto.CreateGenerationSettings) (domain.GenerationSettings, error)
 }
 
 type Implementation struct {

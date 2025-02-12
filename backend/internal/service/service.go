@@ -97,6 +97,11 @@ type expectedSetRepository interface {
 	CreateExpectedSet(ctx context.Context, set domain.ExpectedSet) (domain.ExpectedSet, error)
 }
 
+type generationSettingsRepository interface {
+	GetGenerationSettings(ctx context.Context, userID domain.ID) (domain.GenerationSettings, error)
+	SaveGenerationSettings(ctx context.Context, settings domain.GenerationSettings) (domain.GenerationSettings, error)
+}
+
 type unitOfWork interface {
 	Begin(ctx context.Context) (context.Context, error)
 	Commit(ctx context.Context) error
@@ -113,22 +118,23 @@ type generateWorkoutLimiter interface {
 }
 
 type Service struct {
-	jwtProvider                jwtProvider
-	s3Client                   s3Client
-	workoutGenerator           workoutGenerator
-	generateWorkoutLimiter     generateWorkoutLimiter
-	sessionRepository          sessionRepository
-	userRepository             userRepository
-	exerciseRepository         exerciseRepository
-	routineRepository          routineRepository
-	exerciseInstanceRepository exerciseInstanceRepository
-	muscleGroupRepository      muscleGroupRepository
-	workoutRepository          workoutRepository
-	exerciseLogRepository      exerciseLogRepository
-	setLogRepository           setLogRepository
-	setRepository              setRepository
-	expectedSetRepository      expectedSetRepository
-	unitOfWork                 unitOfWork
+	jwtProvider                  jwtProvider
+	s3Client                     s3Client
+	workoutGenerator             workoutGenerator
+	generateWorkoutLimiter       generateWorkoutLimiter
+	sessionRepository            sessionRepository
+	userRepository               userRepository
+	exerciseRepository           exerciseRepository
+	routineRepository            routineRepository
+	exerciseInstanceRepository   exerciseInstanceRepository
+	muscleGroupRepository        muscleGroupRepository
+	workoutRepository            workoutRepository
+	exerciseLogRepository        exerciseLogRepository
+	setLogRepository             setLogRepository
+	setRepository                setRepository
+	expectedSetRepository        expectedSetRepository
+	generationSettingsRepository generationSettingsRepository
+	unitOfWork                   unitOfWork
 }
 
 func New(
@@ -148,23 +154,25 @@ func New(
 	setLogRepository setLogRepository,
 	setRepository setRepository,
 	expectedSetRepository expectedSetRepository,
+	generationSettingsRepository generationSettingsRepository,
 ) *Service {
 	return &Service{
-		unitOfWork:                 unitOfWork,
-		workoutGenerator:           workoutGenerator,
-		jwtProvider:                jwtProvider,
-		s3Client:                   s3Client,
-		generateWorkoutLimiter:     generateWorkoutLimiter,
-		sessionRepository:          sessionRepository,
-		userRepository:             userRepository,
-		exerciseRepository:         exerciseRepository,
-		routineRepository:          routineRepository,
-		exerciseInstanceRepository: exerciseInstanceRepository,
-		muscleGroupRepository:      muscleGroupRepository,
-		workoutRepository:          workoutRepository,
-		exerciseLogRepository:      exerciseLogRepository,
-		setLogRepository:           setLogRepository,
-		setRepository:              setRepository,
-		expectedSetRepository:      expectedSetRepository,
+		unitOfWork:                   unitOfWork,
+		workoutGenerator:             workoutGenerator,
+		jwtProvider:                  jwtProvider,
+		s3Client:                     s3Client,
+		generateWorkoutLimiter:       generateWorkoutLimiter,
+		sessionRepository:            sessionRepository,
+		userRepository:               userRepository,
+		exerciseRepository:           exerciseRepository,
+		routineRepository:            routineRepository,
+		exerciseInstanceRepository:   exerciseInstanceRepository,
+		muscleGroupRepository:        muscleGroupRepository,
+		workoutRepository:            workoutRepository,
+		exerciseLogRepository:        exerciseLogRepository,
+		setLogRepository:             setLogRepository,
+		setRepository:                setRepository,
+		expectedSetRepository:        expectedSetRepository,
+		generationSettingsRepository: generationSettingsRepository,
 	}
 }

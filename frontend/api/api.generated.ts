@@ -374,6 +374,12 @@ export interface WorkoutUpdateUserRequest {
   profilePictureUrl?: string;
 }
 
+export interface WorkoutUpdateWorkoutGenerationSettingsRequest {
+  basePrompt?: string;
+  /** @format int32 */
+  varietyLevel?: number;
+}
+
 export interface WorkoutUser {
   id?: string;
   /** @format date-time */
@@ -412,6 +418,17 @@ export interface WorkoutWorkout {
   updatedAt?: string;
   isAiGenerated?: boolean;
   reasoning?: string;
+}
+
+/** Настройки генерации тренировок */
+export interface WorkoutWorkoutGenerationSettings {
+  basePrompt?: string;
+  /** @format int32 */
+  varietyLevel?: number;
+}
+
+export interface WorkoutWorkoutGenerationSettingsResponse {
+  settings?: WorkoutWorkoutGenerationSettings;
 }
 
 export interface WorkoutWorkoutReportResponse {
@@ -1092,6 +1109,47 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/v1/users/me`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags UserService
+     * @name UserServiceGetWorkoutGenerationSettings
+     * @summary Метод для получения настроек генерации тренировок
+     * @request GET:/v1/users/workout_generation_settings
+     * @secure
+     */
+    userServiceGetWorkoutGenerationSettings: (params: RequestParams = {}) =>
+      this.request<WorkoutWorkoutGenerationSettingsResponse, RpcStatus>({
+        path: `/v1/users/workout_generation_settings`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags UserService
+     * @name UserServiceUpdateWorkoutGenerationSettings
+     * @summary Метод для обновления настроек генерации тренировок
+     * @request PUT:/v1/users/workout_generation_settings
+     * @secure
+     */
+    userServiceUpdateWorkoutGenerationSettings: (
+      body: WorkoutUpdateWorkoutGenerationSettingsRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<WorkoutServiceCompleteWorkoutBody, RpcStatus>({
+        path: `/v1/users/workout_generation_settings`,
+        method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

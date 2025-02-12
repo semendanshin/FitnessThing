@@ -159,6 +159,12 @@ enum SetType {
   SET_TYPE_TIME = 3;
 }
 
+// Настройки генерации тренировок
+message WorkoutGenerationSettings {
+  string base_prompt = 1;
+  int32 variety_level = 2;
+}
+
 service ExerciseService {
   // Метод для получения списка всех упражнений
   rpc GetExercises(GetExercisesRequest) returns (GetExercisesResponse) {
@@ -879,6 +885,21 @@ service UserService {
       body: "*"
     };
   }
+
+  // Метод для обновления настроек генерации тренировок
+  rpc UpdateWorkoutGenerationSettings(UpdateWorkoutGenerationSettingsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/users/workout_generation_settings"
+      body: "*"
+    };
+  }
+
+  // Метод для получения настроек генерации тренировок
+  rpc GetWorkoutGenerationSettings(google.protobuf.Empty) returns (WorkoutGenerationSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/workout_generation_settings"
+    };
+  }
 }
 
 message CreateUserRequest {
@@ -934,6 +955,15 @@ message DeleteUserRequest {
 
 message UserResponse {
   User user = 1;
+}
+
+message WorkoutGenerationSettingsResponse {
+  WorkoutGenerationSettings settings = 1;
+}
+
+message UpdateWorkoutGenerationSettingsRequest {
+  optional string base_prompt = 1;
+  optional int32 variety_level = 2;
 }
 
 service AuthService {

@@ -1612,10 +1612,12 @@ var WorkoutService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	UserService_CreateUser_FullMethodName = "/fitness_trainer.api.workout.UserService/CreateUser"
-	UserService_GetUser_FullMethodName    = "/fitness_trainer.api.workout.UserService/GetUser"
-	UserService_GetMe_FullMethodName      = "/fitness_trainer.api.workout.UserService/GetMe"
-	UserService_UpdateUser_FullMethodName = "/fitness_trainer.api.workout.UserService/UpdateUser"
+	UserService_CreateUser_FullMethodName                      = "/fitness_trainer.api.workout.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                         = "/fitness_trainer.api.workout.UserService/GetUser"
+	UserService_GetMe_FullMethodName                           = "/fitness_trainer.api.workout.UserService/GetMe"
+	UserService_UpdateUser_FullMethodName                      = "/fitness_trainer.api.workout.UserService/UpdateUser"
+	UserService_UpdateWorkoutGenerationSettings_FullMethodName = "/fitness_trainer.api.workout.UserService/UpdateWorkoutGenerationSettings"
+	UserService_GetWorkoutGenerationSettings_FullMethodName    = "/fitness_trainer.api.workout.UserService/GetWorkoutGenerationSettings"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -1630,6 +1632,10 @@ type UserServiceClient interface {
 	GetMe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserResponse, error)
 	// Метод для обновления данных пользователя
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	// Метод для обновления настроек генерации тренировок
+	UpdateWorkoutGenerationSettings(ctx context.Context, in *UpdateWorkoutGenerationSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Метод для получения настроек генерации тренировок
+	GetWorkoutGenerationSettings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutGenerationSettingsResponse, error)
 }
 
 type userServiceClient struct {
@@ -1680,6 +1686,26 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateWorkoutGenerationSettings(ctx context.Context, in *UpdateWorkoutGenerationSettingsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserService_UpdateWorkoutGenerationSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetWorkoutGenerationSettings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkoutGenerationSettingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkoutGenerationSettingsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetWorkoutGenerationSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -1692,6 +1718,10 @@ type UserServiceServer interface {
 	GetMe(context.Context, *emptypb.Empty) (*UserResponse, error)
 	// Метод для обновления данных пользователя
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
+	// Метод для обновления настроек генерации тренировок
+	UpdateWorkoutGenerationSettings(context.Context, *UpdateWorkoutGenerationSettingsRequest) (*emptypb.Empty, error)
+	// Метод для получения настроек генерации тренировок
+	GetWorkoutGenerationSettings(context.Context, *emptypb.Empty) (*WorkoutGenerationSettingsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -1713,6 +1743,12 @@ func (UnimplementedUserServiceServer) GetMe(context.Context, *emptypb.Empty) (*U
 }
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateWorkoutGenerationSettings(context.Context, *UpdateWorkoutGenerationSettingsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWorkoutGenerationSettings not implemented")
+}
+func (UnimplementedUserServiceServer) GetWorkoutGenerationSettings(context.Context, *emptypb.Empty) (*WorkoutGenerationSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkoutGenerationSettings not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -1807,6 +1843,42 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateWorkoutGenerationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWorkoutGenerationSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateWorkoutGenerationSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateWorkoutGenerationSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateWorkoutGenerationSettings(ctx, req.(*UpdateWorkoutGenerationSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetWorkoutGenerationSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetWorkoutGenerationSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetWorkoutGenerationSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetWorkoutGenerationSettings(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1829,6 +1901,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _UserService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "UpdateWorkoutGenerationSettings",
+			Handler:    _UserService_UpdateWorkoutGenerationSettings_Handler,
+		},
+		{
+			MethodName: "GetWorkoutGenerationSettings",
+			Handler:    _UserService_GetWorkoutGenerationSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

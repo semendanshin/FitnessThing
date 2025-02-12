@@ -901,6 +901,61 @@
         ]
       }
     },
+    "/v1/users/workout_generation_settings": {
+      "get": {
+        "summary": "Метод для получения настроек генерации тренировок",
+        "operationId": "UserService_GetWorkoutGenerationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/workoutWorkoutGenerationSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      },
+      "put": {
+        "summary": "Метод для обновления настроек генерации тренировок",
+        "operationId": "UserService_UpdateWorkoutGenerationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workoutUpdateWorkoutGenerationSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/v1/users/{userId}": {
       "get": {
         "summary": "Метод для получения пользователя по ID",
@@ -2435,6 +2490,18 @@
         }
       }
     },
+    "workoutUpdateWorkoutGenerationSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "basePrompt": {
+          "type": "string"
+        },
+        "varietyLevel": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "workoutUser": {
       "type": "object",
       "properties": {
@@ -2522,6 +2589,27 @@
         }
       },
       "title": "Структура тренировки"
+    },
+    "workoutWorkoutGenerationSettings": {
+      "type": "object",
+      "properties": {
+        "basePrompt": {
+          "type": "string"
+        },
+        "varietyLevel": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Настройки генерации тренировок"
+    },
+    "workoutWorkoutGenerationSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/workoutWorkoutGenerationSettings"
+        }
+      }
     },
     "workoutWorkoutReportResponse": {
       "type": "object",
