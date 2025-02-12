@@ -8,7 +8,7 @@ import (
 type SlimWorkoutDTO struct {
 	ID          domain.ID
 	CreatedAt   time.Time
-	ExerciseIDs []domain.ID
+	ExerciseNames []string
 }
 
 type SlimExerciseDTO struct {

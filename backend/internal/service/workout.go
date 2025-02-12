@@ -105,7 +105,7 @@ func (s *Service) generateWorkout(ctx context.Context, userID domain.ID, userPro
 	span, ctx := opentracing.StartSpanFromContext(ctx, "service.generateWorkout")
 	defer span.Finish()
 
-	const numExercises = 4
+	const numExercises = 8
 
 	userWorkouts, err := s.workoutRepository.GetWorkouts(ctx, userID, numExercises, 0)
 	if err != nil {
@@ -124,10 +124,20 @@ func (s *Service) generateWorkout(ctx context.Context, userID domain.ID, userPro
 			exerciseIDs = append(exerciseIDs, exerciseLog.ExerciseID)
 		}
 
+		exerciseNames := make([]string, 0, len(exerciseIDs))
+		for _, exerciseLog := range exerciseLogs {
+			exercise, err := s.exerciseRepository.GetExerciseByID(ctx, exerciseLog.ExerciseID)
+			if err != nil {
+				return dto.GeneratedWorkoutDTO{}, nil
+			}
+
+			exerciseNames = append(exerciseNames, exercise.Name)
+		}
+
 		userWorkoutsDTO = append(userWorkoutsDTO, dto.SlimWorkoutDTO{
-			ID:          workout.ID,
-			CreatedAt:   workout.CreatedAt,
-			ExerciseIDs: exerciseIDs,
+			ID:            workout.ID,
+			CreatedAt:     workout.CreatedAt,
+			ExerciseNames: exerciseNames,
 		})
 	}
 
