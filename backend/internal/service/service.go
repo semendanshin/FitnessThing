@@ -15,7 +15,7 @@ type jwtProvider interface {
 }
 
 type workoutGenerator interface {
-	GenerateWorkout(ctx context.Context, userID domain.ID, workouts []dto.SlimWorkoutDTO, exercises []dto.SlimExerciseDTO, userPrompt string) (dto.GeneratedWorkoutDTO, error)
+	GenerateWorkout(ctx context.Context, options *dto.GenerateWorkoutOptions) (dto.GeneratedWorkoutDTO, error)
 }
 
 type sessionRepository interface {

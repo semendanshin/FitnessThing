@@ -155,7 +155,21 @@ func (s *Service) generateWorkout(ctx context.Context, userID domain.ID, userPro
 		})
 	}
 
-	return s.workoutGenerator.GenerateWorkout(ctx, userID, userWorkoutsDTO, exerciseDTOs, userPrompt)
+	generationSettings, err := s.GetGenerationSettings(ctx, userID)
+	if err != nil {
+		return dto.GeneratedWorkoutDTO{}, err
+	}
+
+	opts := &dto.GenerateWorkoutOptions{
+		UserID: userID,
+		Exercises: exerciseDTOs,
+		Workouts: userWorkoutsDTO,
+		VarietyLevel: generationSettings.VarietyLevel,
+		BaseUserPrompt: generationSettings.BasePrompt,
+		UserPrompt: userPrompt,
+	}
+
+	return s.workoutGenerator.GenerateWorkout(ctx, opts)
 }
 
 func (s *Service) enrichWorkoutByGenerating(ctx context.Context, userID, workoutID domain.ID, userPrompt string) error {

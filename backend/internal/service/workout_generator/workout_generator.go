@@ -13,12 +13,16 @@ import (
 const (
 	systemPromptTemplate = `
 Ты профессиональный и всемирно известный фитнес-тренер, обладающий глубокими знаниями в области физиологии, биомеханики и диетологии. Твоя задача - внимательно проанализировать последние тренировки клиента и на основе этого анализа выбрать оптимальный набор упражнений для его текущей тренировки.
-Обязательные условия: Мысленно сделай список упражнений, которые делал пользователь на предыдущих трениировках. В своих суждениях используй только этот список и не придумывай дополнительные упражнения. Используй только упражнения из предоставленного списка. Обеспечь проработку всех групп мышц тела, уделяя особое внимание тем группам, которые могли быть недостаточно проработаны в предыдущих тренировках. Включай в тренировочный план как упражнения со свободными весами, так и на тренажерах, отдавая предпочтение свободным весам в начале тренировки, так как они более энергозатратны. В тренировке должно быть 1, в редких случаях 2, основных упражнения со свободными весами, которые задействуют несколько групп мышц. Остальные упражнения должны быть изолированными, направленными на проработку конкретных мышц. Количество упражнений в тренировке должно быть не менее 5 и не более 8. Учитывай любые дополнительные пожелания клиента, отдавая им более высокий приоритет при выборе упражнений. Стремись к разнообразию в тренировках, сохраняя при этом их эффективность и безопасность.
+Обязательные условия: Мысленно сделай список упражнений, которые делал пользователь на предыдущих тренировках. В своих суждениях используй только этот список и не придумывай дополнительные упражнения. Используй только упражнения из предоставленного списка. Обеспечь проработку всех групп мышц тела, уделяя особое внимание тем группам, которые могли быть недостаточно проработаны в предыдущих тренировках. Включай в тренировочный план как упражнения со свободными весами, так и на тренажерах, отдавая предпочтение свободным весам в начале тренировки, так как они более энергозатратны. В тренировке должно быть 1, в редких случаях 2, основных упражнения со свободными весами, которые задействуют несколько групп мышц. Остальные упражнения должны быть изолированными, направленными на проработку конкретных мышц. Количество упражнений в тренировке должно быть не менее 5 и не более 8. Учитывай любые дополнительные пожелания клиента, отдавая им более высокий приоритет при выборе упражнений. 
+Variety_level определяет уровень разнообразия тренировок: 1 - минимальное разнообразие, повторяющиеся тренировки; 2 - умеренное разнообразие; 3 - максимальное разнообразие упражнений, но сбалансированное по нагрузке. Base_user_prompt содержит цель, общие пожелания и возможные противопоказания пользователя.
+Стремись к разнообразию в тренировках в соответствии с уровнем variety_level, сохраняя при этом их эффективность и безопасность. При составлении тренировочного плана также учитывай общие пожелания, цели клиента и возможные противопоказания, указанные в base_user_prompt.
 В ответ так же включи пояснение к итоговому результату, объясни, почему ты выбрал именно эти упражнения и как они помогут клиенту достичь его целей.
 <exercise_list>%s</exercise_list>
 `
 	userPromptTemplate = `
 <workout_list>%s</workout_list>
+<variety_level>%d</variety_level>
+<base_user_prompt>%s</base_user_prompt>
 <user_preferences>%s</user_preferences>
 `
 )
@@ -37,24 +41,24 @@ func New(completionProvider CompletionProvider) *Service {
 	}
 }
 
-func (s *Service) GenerateWorkout(ctx context.Context, userID domain.ID, workouts []dto.SlimWorkoutDTO, exercises []dto.SlimExerciseDTO, userPrompt string) (dto.GeneratedWorkoutDTO, error) {
+func (s *Service) GenerateWorkout(ctx context.Context, options *dto.GenerateWorkoutOptions) (dto.GeneratedWorkoutDTO, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "workout_generator_service.GenerateWorkout")
 	defer span.Finish()
 
-	marshaledWorkouts, err := marshalWorkouts(workouts)
+	marshaledWorkouts, err := marshalWorkouts(options.Workouts)
 	if err != nil {
 		return dto.GeneratedWorkoutDTO{}, fmt.Errorf("failed to marshal workouts: %w", err)
 	}
 
-	marshaledExercises, err := marshalExercises(exercises)
+	marshaledExercises, err := marshalExercises(options.Exercises)
 	if err != nil {
 		return dto.GeneratedWorkoutDTO{}, fmt.Errorf("failed to marshal exercises: %w", err)
 	}
 
-	innerUserPrompt := fmt.Sprintf(userPromptTemplate, marshaledWorkouts, userPrompt)
+	innerUserPrompt := fmt.Sprintf(userPromptTemplate, marshaledWorkouts, options.VarietyLevel, options.BaseUserPrompt, options.UserPrompt)
 	systemPrompt := fmt.Sprintf(systemPromptTemplate, marshaledExercises)
 
-	completion, err := s.completionProvider.CreateCompletion(ctx, userID, systemPrompt, innerUserPrompt)
+	completion, err := s.completionProvider.CreateCompletion(ctx, options.UserID, systemPrompt, innerUserPrompt)
 	if err != nil {
 		return dto.GeneratedWorkoutDTO{}, fmt.Errorf("failed to create completion: %w", err)
 	}
