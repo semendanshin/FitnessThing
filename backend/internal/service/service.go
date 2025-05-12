@@ -117,6 +117,10 @@ type generateWorkoutLimiter interface {
 	Allow(ctx context.Context, userID domain.ID) (bool, error)
 }
 
+type emailService interface {
+	SendWelcomeEmail(ctx context.Context, email, name string) error
+}
+
 type Service struct {
 	jwtProvider                  jwtProvider
 	s3Client                     s3Client
@@ -134,6 +138,7 @@ type Service struct {
 	setRepository                setRepository
 	expectedSetRepository        expectedSetRepository
 	generationSettingsRepository generationSettingsRepository
+	emailService                 emailService
 	unitOfWork                   unitOfWork
 }
 
@@ -155,6 +160,7 @@ func New(
 	setRepository setRepository,
 	expectedSetRepository expectedSetRepository,
 	generationSettingsRepository generationSettingsRepository,
+	emailService emailService,
 ) *Service {
 	return &Service{
 		unitOfWork:                   unitOfWork,
@@ -174,5 +180,6 @@ func New(
 		setRepository:                setRepository,
 		expectedSetRepository:        expectedSetRepository,
 		generationSettingsRepository: generationSettingsRepository,
+		emailService:                 emailService,
 	}
 }

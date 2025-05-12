@@ -6,6 +6,7 @@ import (
 
 	"fitness-trainer/internal/domain"
 	"fitness-trainer/internal/domain/dto"
+	"fitness-trainer/internal/logger"
 	"fitness-trainer/internal/utils"
 
 	"github.com/opentracing/opentracing-go"
@@ -37,6 +38,14 @@ func (s *Service) CreateUser(ctx context.Context, dto dto.CreateUserDTO) (domain
 	if err != nil {
 		return domain.User{}, err
 	}
+
+	innerCtx := context.WithoutCancel(ctx)
+	go func() {
+		err := s.emailService.SendWelcomeEmail(innerCtx, user.Email, user.FirstName)
+		if err != nil {
+			logger.Errorf("failed to send welcome email: %v", err)
+		}
+	}()
 
 	return user, nil
 }
