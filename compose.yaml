@@ -2,6 +2,7 @@ include:
     - database/db-compose.yaml
     - jaeger/jaeger-compose.yaml
     - nginx/nginx-compose.yaml
+    - kafka/kafka-compose.yaml
 
 services:
     app:
@@ -47,6 +48,8 @@ services:
             - "3000"
         depends_on:
             - app
+            - dozzle
+
     dozzle:
         container_name: dozzle
         profiles: [logging, full]
