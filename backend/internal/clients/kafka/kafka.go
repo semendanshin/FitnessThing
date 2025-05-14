@@ -28,6 +28,25 @@ func NewProducer(brokers []string) Producer {
 	}
 }
 
+func headersFromContext(ctx context.Context) ([]kafka.Header, error) {
+	span := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		return nil, nil
+	}
+
+	carrier := opentracing.TextMapCarrier{}
+	err := opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, carrier)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := make([]kafka.Header, 0, len(carrier))
+	for k, v := range carrier {
+		headers = append(headers, kafka.Header{Key: k, Value: []byte(v)})
+	}
+	return headers, nil
+}
+
 func (p *producer) Publish(ctx context.Context, topic string, key string, message any) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "kafka.Producer.Publish")
 	defer span.Finish()
@@ -41,11 +60,17 @@ func (p *producer) Publish(ctx context.Context, topic string, key string, messag
 		return err
 	}
 
+	headers, err := headersFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
 	msg := kafka.Message{
-		Topic: topic,
-		Key:   []byte(key),
-		Value: value,
-		Time:  time.Now(),
+		Topic:   topic,
+		Key:     []byte(key),
+		Value:   value,
+		Time:    time.Now(),
+		Headers: headers,
 	}
 
 	return p.writer.WriteMessages(ctx, msg)

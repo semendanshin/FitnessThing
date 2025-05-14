@@ -60,3 +60,16 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         expose:
             - "8080"
+
+    email:
+        container_name: email
+        profiles: [backend, full]
+        build:
+            context: email
+            dockerfile: Dockerfile
+        env_file:
+            - ./email/.env.docker
+        expose:
+            - "8081"
+        depends_on:
+            - kafka0

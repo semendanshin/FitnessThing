@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { startTracing } from './config/tracing';
+startTracing();
+
 import { runConsumer } from './consumers/kafkaConsumer';
 import logger from './utils/logger';
 
