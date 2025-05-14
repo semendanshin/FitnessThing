@@ -9,10 +9,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"fitness-trainer/internal/app"
 	genai_client "fitness-trainer/internal/clients/gemini"
+	"fitness-trainer/internal/clients/kafka"
 	"fitness-trainer/internal/clients/ratelimiter"
 	s3_client "fitness-trainer/internal/clients/s3"
 	"fitness-trainer/internal/db"
@@ -20,6 +22,7 @@ import (
 	"fitness-trainer/internal/logger"
 	"fitness-trainer/internal/repository"
 	"fitness-trainer/internal/service"
+	"fitness-trainer/internal/service/email"
 	workout_generator_service "fitness-trainer/internal/service/workout_generator"
 	"fitness-trainer/internal/tracer"
 
@@ -53,6 +56,14 @@ func loadPostgresURL() string {
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("POSTGRES_SSL_MODE"),
 	)
+}
+
+func loadBrokersURL() []string {
+	raw := os.Getenv("KAFKA_BROKERS")
+	if raw == "" {
+		return []string{"localhost:9092"}
+	}
+	return strings.Split(raw, ",")
 }
 
 func Run() error {
@@ -131,6 +142,10 @@ func Run() error {
 
 	rateLimiterWrapper := ratelimiter.New(rateLimiter)
 
+	kafkaClient := kafka.NewProducer(loadBrokersURL())
+
+	emailService := email.NewService(kafkaClient, os.Getenv("KAFKA_TOPIC_EMAIL"))
+
 	Service := service.New(
 		ContextManager,
 		JWTProvider,
@@ -149,6 +164,7 @@ func Run() error {
 		Repo, // Set
 		Repo, // ExpectedSet
 		Repo, // Generation Settings
+		emailService,
 	)
 
 	App := app.New(
